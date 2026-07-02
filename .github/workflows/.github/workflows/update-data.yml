@@ -1,0 +1,46 @@
+name: 🔄 Update MAD Dashboard Data
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Toutes les 6 heures
+  workflow_dispatch:         # Déclenchement manuel
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📊 Download MAD_data.json from SharePoint
+        run: |
+          # Télécharge via le lien de partage SharePoint
+          curl -L \
+            --user "${{ secrets.SP_USERNAME }}:${{ secrets.SP_PASSWORD }}" \
+            --ntlm \
+            "https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/_api/web/GetFileByServerRelativeUrl('/teams/DGF-GestionDette/Documents%20partages/Tableaux%20de%20Bord/MAD_data.json')/\$value" \
+            -H "Accept: application/json" \
+            -o data_new.json
+
+      - name: ✅ Validate and update data.json
+        run: |
+          # Vérifie que le fichier est un JSON valide
+          if python3 -c "import json; json.load(open('data_new.json'))"; then
+            echo "✅ JSON valide"
+            cp data_new.json data.json
+          else
+            echo "❌ JSON invalide - on garde l'ancien"
+            exit 1
+          fi
+
+      - name: 📤 Commit and push
+        run: |
+          git config user.name "DGF Bot"
+          git config user.email "bot@dgf.ci"
+          git add data.json
+          git diff --staged --quiet || \
+            git commit -m "🔄 MAD data update - $(date '+%d/%m/%Y %H:%M UTC')"
+          git push

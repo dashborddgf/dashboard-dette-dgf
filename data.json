@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "source": "MAD_ACTIF.xlsx",
+    "periode": "Situation au 31-12-2024",
+    "totalDette": 31406.9,
+    "detteInt": 11457.7,
+    "detteExt": 19949.2,
+    "generated": "2025-01-01T00:00:00.000Z"
+  },
+  "encours": {
+    "BCEAO": 870.7,
+    "BanqComm": 282.3,
+    "TitriseesDomestique": 41.2,
+    "BT": 1325.5,
+    "TPCI": 6686.5,
+    "OAT": 2785.7,
+    "Sukuk": 0,
+    "RCI": 0,
+    "FMI": 2216.4,
+    "BM": 2913.6,
+    "BAD": 846.6,
+    "BID": 454.1,
+    "AutresMulti": 477.7,
+    "AFD": 497.6,
+    "KFW": 284.8,
+    "EximbankChine": 1736.6,
+    "JICA": 167.5,
+    "AutresBil": 2109.9,
+    "Eurobonds": 6406.9,
+    "Samourai": 0,
+    "Commerciaux": 3509.8
+  },
+  "service": {
+    "BT":          [742.6,  53.9],
+    "TPCI":        [752.1, 271.5],
+    "OAT":         [0.0,   0.0],
+    "BanqComm":    [200.3,  93.5],
+    "FMI":         [293.9,  51.7],
+    "BM":          [34.5,   37.7],
+    "BAD":         [6.5,    30.8],
+    "BID":         [39.0,   13.4],
+    "AutresMulti": [54.9,   19.9],
+    "AFD":         [6.1,    11.6],
+    "KFW":         [25.2,    8.3],
+    "EximbankChine":[66.3,  28.4],
+    "JICA":        [0.0,    0.5],
+    "AutresBil":   [85.7,   33.8],
+    "Eurobonds":   [407.9, 292.5],
+    "Samourai":    [0.0,    0.0],
+    "Commerciaux": [1620.9, 294.2]
+  },
+  "mobilisations": {
+    "BT":          1325.5,
+    "TPCI":        391.3,
+    "OAT":         0,
+    "BanqComm":    22.8,
+    "BAD":         133.6,
+    "AutresMulti": 43.9,
+    "AutresBil":   77.3,
+    "Commerciaux": 1752.9
+  },
+  "devise": {
+    "EUR": 36.0,
+    "USD": 17.6,
+    "XOF": 16.1,
+    "CNY": 8.7,
+    "Autres": 21.6
+  },
+  "evolExt": {
+    "years": ["2021", "2022", "2023", "2024"],
+    "bilat": [2032.6, 2526.9, 2938.6, 3124.2],
+    "multi": [3700.2, 4452.1, 5655.0, 6908.4],
+    "euro":  [5208.1, 5296.2, 5184.9, 6406.9],
+    "comm":  [1369.7, 2793.8, 3377.8, 3509.8]
+  },
+  "evolTotal": {
+    "years": ["2021", "2022", "2023", "2024"],
+    "ext":   [12310.6, 15069.1, 17156.4, 19949.2],
+    "int":   [7959.2,  9705.3,  10626.3, 11457.7]
+  }
+}

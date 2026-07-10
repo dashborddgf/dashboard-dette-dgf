@@ -87,14 +87,38 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#EEF0F4;color:var(--
 .page-title{font-size:14px;font-weight:700;color:var(--dark)}
 .page-sub{font-size:10px;color:var(--gray)}
 .topbar-spacer{flex:1}
-.period-badge{display:flex;align-items:center;gap:5px;background:var(--orange-bg);border:1px solid var(--orange);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:600;color:var(--orange)}
+.period-badge{display:flex;align-items:center;gap:5px;background:var(--orange-bg);border:1px solid var(--orange);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:600;color:var(--orange);transition:all .15s}
+.period-badge.hist{background:#F1F5F9;border-color:#9CA3AF;color:#374151}
 .dot{width:7px;height:7px;border-radius:50%}
 .dot.green{background:var(--green-light);animation:pulse 2s infinite}
+.period-badge.hist .dot{background:#9CA3AF;animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .btn-export{background:var(--green);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
 .btn-export:hover{background:#1E4A1A}
 .btn-reset{background:#F1F5F9;color:var(--gray);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer}
 .btn-reset:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+
+/* ── NAVIGATION HISTORIQUE MAD ── */
+.mad-nav{display:none;align-items:center;gap:2px;background:#F1F5F9;border:1px solid var(--border);border-radius:20px;padding:2px}
+.mad-nav.visible{display:flex}
+.mad-nav-btn{width:22px;height:22px;border:none;background:transparent;border-radius:50%;cursor:pointer;font-size:14px;font-weight:700;color:var(--navy);display:flex;align-items:center;justify-content:center;transition:background .15s;font-family:inherit;line-height:1}
+.mad-nav-btn:hover:not(:disabled){background:var(--orange-bg);color:var(--orange)}
+.mad-nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.hist-banner{display:none;align-items:center;gap:8px;background:#F1F5F9;border-bottom:1px solid var(--border);padding:6px 20px;font-size:11px;color:#374151}
+.hist-banner.visible{display:flex}
+.hist-banner a{color:var(--orange);font-weight:700;cursor:pointer;text-decoration:none}
+.hist-banner a:hover{text-decoration:underline}
+
+/* ── LOADING OVERLAY ── */
+.loading-overlay{position:fixed;inset:0;background:rgba(10,14,26,.55);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s}
+.loading-overlay.visible{opacity:1;pointer-events:all}
+.loading-box{background:#fff;border-radius:12px;padding:24px 30px;min-width:230px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.loading-spinner{width:32px;height:32px;border:3px solid var(--orange-bg);border-top-color:var(--orange);border-radius:50%;margin:0 auto 12px;animation:ldspin .8s linear infinite}
+@keyframes ldspin{to{transform:rotate(360deg)}}
+.loading-text{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:10px}
+.loading-bar-track{height:6px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.loading-bar-fill{height:100%;background:var(--orange);border-radius:4px;width:0%;transition:width .15s}
+.loading-pct{font-size:10px;color:var(--gray);font-weight:700}
 
 /* ── FILTER BAR ── */
 .filter-bar{background:#fff;border-bottom:2px solid var(--orange);padding:0 20px;display:flex;align-items:center;gap:10px;min-height:var(--filter-h);flex-wrap:wrap;position:sticky;top:50px;z-index:140;box-shadow:0 2px 8px rgba(0,0,0,.06)}
@@ -262,6 +286,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#EEF0F4;color:var(--
   .page-sub { display: none; }
   .period-badge { font-size: 10px; padding: 2px 8px; }
   .btn-export, .btn-reset { font-size: 10px; padding: 4px 9px; }
+  .mad-nav-btn { width: 19px; height: 19px; font-size: 12px; }
+  .hist-banner { padding: 5px 12px; font-size: 10px; flex-wrap: wrap; }
 
   /* Barre de filtres scrollable horizontalement */
   .filter-bar {
@@ -426,6 +452,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#EEF0F4;color:var(--
   </div>
 </aside>
 
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Chargement du tableau de bord…</div>
+    <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+  </div>
+</div>
+
 <!-- MAIN -->
 <main class="main">
 
@@ -436,9 +472,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#EEF0F4;color:var(--
       <div class="page-sub">Dette Publique · Administration Centrale · Côte d'Ivoire</div>
     </div>
     <div class="topbar-spacer"></div>
-    <div class="period-badge"><div class="dot green"></div><span id="period-badge-label">MAD —</span></div>
-    <button class="btn-reset" onclick="resetAllFilters()">↺ Réinitialiser</button>
+    <div class="mad-nav" id="madNav" title="Naviguer entre les MAD archivés (MAD Historiques)">
+      <button type="button" class="mad-nav-btn" id="madNavPrev" onclick="madNavStep(-1)" title="MAD précédent" disabled>‹</button>
+      <button type="button" class="mad-nav-btn" id="madNavNext" onclick="madNavStep(1)" title="MAD suivant" disabled>›</button>
+    </div>
+    <div class="period-badge" id="periodBadge"><div class="dot green"></div><span id="period-badge-label">MAD —</span></div>
+    <button class="btn-reset" onclick="resetAllFilters()" title="Réinitialiser les filtres et revenir au MAD Actif">↺ Réinitialiser</button>
     <button class="btn-export" onclick="exportXLSX()">⬇ Export XLSX</button>
+  </div>
+
+  <!-- BANDEAU MAD HISTORIQUE (affiché uniquement lorsqu'on consulte un MAD archivé) -->
+  <div class="hist-banner" id="histBanner">
+    <span>🗂 Vous consultez un MAD archivé — <b id="histBannerLabel"></b> (lecture seule, visible uniquement par vous)</span>
+    <a onclick="returnToActiveMAD();return false;" href="#">Revenir au MAD Actif</a>
   </div>
 
   <!-- ═══════════════════════════════════════════
@@ -951,7 +997,13 @@ function applyFilters() {
 function resetAllFilters() {
   FILTER_DEFS.forEach(def => { F[def.key] = []; msRenderState(def.key); });
   updateFilterSummary();
-  refreshAll();
+  // "Réinitialiser" ramène toujours à l'affichage du MAD Actif, même si un MAD
+  // historique était consulté (uniquement pour l'utilisateur courant).
+  if (typeof HIST !== 'undefined' && HIST.idx !== -1) {
+    returnToActiveMAD();
+  } else {
+    refreshAll();
+  }
 }
 
 /* ─── Résumé des filtres actifs ─── */
@@ -1544,37 +1596,209 @@ function updateMadLabels() {
   document.title = 'DGF — Suivi Dette — ' + badgeTxt;
 }
 
+/* Injecte un jeu de données (format data.json) dans DATA + MAD_META.
+   Remplace entièrement chaque bloc présent (pas de fusion partielle) afin
+   qu'un MAD historique n'hérite jamais d'une valeur d'un autre MAD. */
+function applyDataJson(j) {
+  ['encours','service','mobilisations','devise','evolExt','evolTotal'].forEach(k => {
+    if (j[k] && typeof j[k] === 'object') {
+      if (Array.isArray(j[k])) { DATA[k] = j[k]; return; }
+      const cleaned = {};
+      Object.keys(j[k]).forEach(key => {
+        if (j[k][key] !== null && j[k][key] !== undefined) cleaned[key] = j[k][key];
+      });
+      DATA[k] = cleaned;
+    }
+  });
+  const meta = j.meta || j._meta || j;
+  const rawName = meta.madName || meta.source;
+  MAD_META.madName = rawName ? String(rawName).replace(/\.xlsx?$/i,'') : null;
+  if (meta.periode) MAD_META.periode = meta.periode;
+  return meta;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERLAY DE CHARGEMENT (avec pourcentage de progression)
+════════════════════════════════════════════════════════════════ */
+let _loadingHideTimer = null;
+function showLoading(label) {
+  clearTimeout(_loadingHideTimer);
+  const ov = document.getElementById('loadingOverlay');
+  const tx = document.getElementById('loadingText');
+  if (tx) tx.textContent = label || 'Chargement du tableau de bord…';
+  setLoadingProgress(0);
+  if (ov) ov.classList.add('visible');
+}
+function setLoadingProgress(pct) {
+  pct = Math.max(0, Math.min(100, Math.round(pct)));
+  const fill = document.getElementById('loadingBarFill');
+  const txt  = document.getElementById('loadingPct');
+  if (fill) fill.style.width = pct + '%';
+  if (txt)  txt.textContent = pct + '%';
+}
+function hideLoading() {
+  setLoadingProgress(100);
+  const ov = document.getElementById('loadingOverlay');
+  _loadingHideTimer = setTimeout(() => { if (ov) ov.classList.remove('visible'); }, 250);
+}
+
+/* Récupère un JSON en pilotant la barre de progression sur la taille réellement
+   téléchargée (Content-Length) ; à défaut, simule une progression fluide. */
+async function fetchJsonWithProgress(url, onProgress) {
+  const resp = await fetch(url, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const total = Number(resp.headers.get('Content-Length')) || 0;
+  if (!resp.body || !total) {
+    let pct = 0;
+    const timer = setInterval(() => { pct = Math.min(92, pct + 4 + Math.random() * 10); onProgress(pct); }, 120);
+    try { return JSON.parse(await resp.text()); }
+    finally { clearInterval(timer); onProgress(100); }
+  }
+  const reader = resp.body.getReader();
+  const chunks = [];
+  let received = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    received += value.length;
+    onProgress(received / total * 100);
+  }
+  onProgress(100);
+  const text = new TextDecoder('utf-8').decode(
+    chunks.reduce((acc, c) => { const n = new Uint8Array(acc.length + c.length); n.set(acc); n.set(c, acc.length); return n; }, new Uint8Array())
+  );
+  return JSON.parse(text);
+}
+
 async function loadRemoteData() {
+  showLoading('Chargement du MAD Actif…');
   try {
     // Anti-cache : force le navigateur ET le CDN GitHub Pages à servir la version fraîche
-    const resp = await fetch('data.json?v=' + Date.now(), { cache: 'no-store' });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const j = await resp.json();
-
-    // Fusion des blocs de données présents dans le JSON (les absents ou null gardent les valeurs intégrées)
-    ['encours','service','mobilisations','devise','evolExt','evolTotal'].forEach(k => {
-      if (j[k] && typeof j[k] === 'object') {
-        if (Array.isArray(j[k])) { DATA[k] = j[k]; return; }
-        DATA[k] = DATA[k] || {};
-        Object.keys(j[k]).forEach(key => {
-          if (j[k][key] !== null && j[k][key] !== undefined) DATA[k][key] = j[k][key];
-        });
-      }
-    });
-
-    // Métadonnées du MAD (accepte "meta" ou "_meta" ; nom via madName ou source)
-    const meta = j.meta || j._meta || j;
-    const rawName = meta.madName || meta.source;
-    if (rawName)       MAD_META.madName = String(rawName).replace(/\.xlsx?$/i,'');
-    if (meta.periode)  MAD_META.periode = meta.periode;
+    const j = await fetchJsonWithProgress('data.json?v=' + Date.now(), setLoadingProgress);
+    const meta = applyDataJson(j);
 
     // MAJ des libellés d'en-tête (badge période, titre onglet, pied de page)
     updateMadLabels();
-
     refreshAll();
     console.info('✅ data.json chargé — MAD :', madCoreLabel(), meta.dateMAJ ? '(généré le ' + meta.dateMAJ + ')' : '');
   } catch (e) {
     console.warn('⚠ data.json introuvable ou invalide — utilisation des données intégrées.', e);
+  } finally {
+    hideLoading();
+  }
+  // Le MAD Actif venant d'être établi, on le mémorise comme référence pour
+  // "Réinitialiser" et pour la borne supérieure de la navigation historique.
+  snapshotActiveMAD();
+  loadHistoryIndex();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION HISTORIQUE — MAD Historiques
+   Lit un manifeste "history/index.json" listant les MAD archivés
+   (du plus ancien au plus récent) et leurs fichiers "history/<id>.json"
+   au même format que data.json. Purement local : ne modifie jamais
+   data.json ni le MAD Actif, n'affecte que l'affichage du navigateur
+   courant, et n'est jamais persisté (retour au MAD Actif au rechargement).
+════════════════════════════════════════════════════════════════ */
+const HIST = { list: [], idx: -1 };           // idx = -1 → on affiche le MAD Actif
+let ACTIVE_SNAPSHOT = null;                    // copie figée du MAD Actif (DATA + MAD_META)
+
+function snapshotActiveMAD() {
+  ACTIVE_SNAPSHOT = { data: JSON.parse(JSON.stringify(DATA)), meta: { ...MAD_META } };
+}
+
+async function loadHistoryIndex() {
+  try {
+    const resp = await fetch('history/index.json?v=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const list = await resp.json();
+    if (Array.isArray(list) && list.length) {
+      HIST.list = list; // attendu trié du plus ancien au plus récent, ex: [{id,madName,periode,file}, ...]
+    }
+  } catch (e) {
+    console.info('ℹ Aucun MAD historique disponible (history/index.json absent ou invalide).');
+  }
+  updateMadNavUI();
+}
+
+function updateMadNavUI() {
+  const nav = document.getElementById('madNav');
+  const prevBtn = document.getElementById('madNavPrev');
+  const nextBtn = document.getElementById('madNavNext');
+  const badge   = document.getElementById('periodBadge');
+  const banner  = document.getElementById('histBanner');
+  if (!nav || !prevBtn || !nextBtn) return;
+
+  const onActive = HIST.idx === -1;
+  if (!HIST.list.length) {
+    nav.classList.remove('visible');
+  } else {
+    nav.classList.add('visible');
+    prevBtn.disabled = HIST.idx === 0;              // déjà sur le MAD archivé le plus ancien
+    nextBtn.disabled = onActive;                     // impossible d'aller au-delà du MAD Actif
+  }
+
+  if (badge) badge.classList.toggle('hist', !onActive);
+  if (banner) {
+    banner.classList.toggle('visible', !onActive);
+    if (!onActive) {
+      const lbl = document.getElementById('histBannerLabel');
+      if (lbl) lbl.textContent = 'MAD ' + madCoreLabel();
+    }
+  }
+}
+
+async function madNavStep(dir) {
+  if (!HIST.list.length) return;
+  if (dir < 0) {
+    // Précédent = MAD plus ancien
+    const target = HIST.idx === -1 ? HIST.list.length - 1 : HIST.idx - 1;
+    if (target < 0) return;
+    await loadHistoricalMAD(target);
+  } else {
+    // Suivant = MAD plus récent, jamais au-delà du MAD Actif
+    if (HIST.idx === -1) return;
+    const target = HIST.idx + 1;
+    if (target >= HIST.list.length) { await returnToActiveMAD(); return; }
+    await loadHistoricalMAD(target);
+  }
+}
+
+async function loadHistoricalMAD(idx) {
+  const entry = HIST.list[idx];
+  if (!entry || !entry.file) return;
+  showLoading('Chargement du MAD ' + (entry.periode || entry.madName || '') + '…');
+  try {
+    const j = await fetchJsonWithProgress(entry.file + '?v=' + Date.now(), setLoadingProgress);
+    applyDataJson(j);
+    HIST.idx = idx;
+    updateMadLabels();
+    refreshAll();
+    updateMadNavUI();
+  } catch (e) {
+    console.warn('⚠ Impossible de charger le MAD historique demandé.', entry, e);
+    alert("Ce MAD archivé n'a pas pu être chargé.");
+  } finally {
+    hideLoading();
+  }
+}
+
+async function returnToActiveMAD() {
+  if (HIST.idx === -1) return;
+  showLoading('Retour au MAD Actif…');
+  try {
+    if (ACTIVE_SNAPSHOT) {
+      applyDataJson({ ...ACTIVE_SNAPSHOT.data, meta: ACTIVE_SNAPSHOT.meta });
+    }
+    // Progression visuelle même si la restauration est instantanée (données déjà en mémoire)
+    for (let p = 20; p <= 100; p += 20) { setLoadingProgress(p); await new Promise(r => setTimeout(r, 30)); }
+    HIST.idx = -1;
+    updateMadLabels();
+    refreshAll();
+    updateMadNavUI();
+  } finally {
+    hideLoading();
   }
 }
 
@@ -1588,7 +1812,7 @@ document.addEventListener('DOMContentLoaded', () => {
   F.annee = ['2026'];
   msRenderState('annee');
   applyFilters();
-  loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META et les libellés)
+  loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META, l'historique et les libellés)
 });
 </script>
 
@@ -1640,5 +1864,4 @@ window.showScreen = function(id, el) {
 
 </body>
 </html>
-
 

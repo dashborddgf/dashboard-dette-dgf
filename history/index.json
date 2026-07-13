@@ -1,5 +1,11 @@
 [
   {
+    "id": "data_2025-04",
+    "madName": "MAD_Actif_Avril 25_20260713_165016",
+    "periode": "Avril 2025",
+    "file": "history/data_2025-04.json"
+  },
+  {
     "id": "data_2025-07",
     "madName": "MAD_Actif_Juillet 25_20260713_164247",
     "periode": "Juillet 2025",

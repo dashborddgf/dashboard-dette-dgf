@@ -1594,7 +1594,13 @@ function buildChartIntRep(enc) {
 }
 
 function buildChartIntEvol() {
-  const d = DATA.evolInt;
+  const d = DATA.evolInt || {
+    years:['2021','2022','2023','2024','2025'],
+    bceao:[870.7,870.7,870.7,870.7,858.2],
+    banques:[369.4,523.9,459.7,282.3,125.2],
+    titres:[6699.8,8288.7,9278.7,10294.0,11110.3],
+    autres:[19.3,22.1,17.1,10.7,5.4]
+  };
   mkChart('chartIntEvol',{type:'bar',data:{labels:d.years,datasets:[
     {label:'BCEAO',data:d.bceao,backgroundColor:C.goA,borderRadius:2},
     {label:'Banques&Assimilés',data:d.banques,backgroundColor:C.rd+'BB',borderRadius:2},

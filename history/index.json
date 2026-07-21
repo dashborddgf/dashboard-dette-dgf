@@ -4,5 +4,11 @@
     "madName": "MAD0325",
     "periode": "Mars 2025",
     "file": "history/data_2025-03.json"
+  },
+  {
+    "id": "data_2025-04",
+    "madName": "MAD0425",
+    "periode": "Avril 2025",
+    "file": "history/data_2025-04.json"
   }
 ]

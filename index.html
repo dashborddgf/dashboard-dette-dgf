@@ -134,6 +134,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .nav-item.active{background:rgba(236,141,8,.22);color:var(--orange-light);border-left-color:var(--orange)}
 .nav-icon{width:16px;height:16px;opacity:.7;flex-shrink:0}
 .nav-item.active .nav-icon{opacity:1}
+.nav-group-toggle{justify-content:space-between}
+.nav-item-main{display:flex;align-items:center;gap:9px}
+.nav-chevron{width:11px;height:11px;opacity:.55;flex-shrink:0;transition:transform .2s}
+.nav-group.open .nav-group-toggle .nav-chevron{transform:rotate(90deg)}
+.nav-submenu{max-height:0;overflow:hidden;transition:max-height .2s ease}
+.nav-group.open .nav-submenu{max-height:220px}
+.nav-subitem{padding-left:35px;font-size:11.5px}
 .sidebar-footer{margin-top:auto;padding:10px 12px;border-top:1px solid rgba(255,255,255,.15)}
 .user-card{display:flex;align-items:center;gap:8px}
 .user-avatar{width:28px;height:28px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
@@ -473,37 +480,87 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="nav-section">Navigation</div>
   <div class="nav-item active" onclick="showScreen('vue-exec',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Vue Exécutive
+    Vue d'ensemble
   </div>
-  <div class="nav-item" onclick="showScreen('tableau-bord',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" stroke-width="1.5"/></svg>
-    Tableau MAD
+
+  <div class="nav-group" id="navgroup-structure-dette">
+    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('structure-dette',this)">
+      <span class="nav-item-main">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
+        Structure Dette
+      </span>
+      <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
+    </div>
+    <div class="nav-submenu" id="navsub-structure-dette">
+      <div class="nav-item nav-subitem" onclick="showScreen('dette-int',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M12 3v18" stroke-width="1.5"/></svg>
+        Intérieur
+      </div>
+      <div class="nav-item nav-subitem" onclick="showScreen('dette-ext',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M3 12h18" stroke-width="1.5"/></svg>
+        Extérieur
+      </div>
+    </div>
   </div>
-  <div class="nav-item" onclick="showScreen('dette-ext',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
-    Dette Extérieure
-  </div>
-  <div class="nav-item" onclick="showScreen('dette-int',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M12 3v18" stroke-width="1.5"/></svg>
-    Dette Intérieure
-  </div>
+
   <div class="nav-item" onclick="showScreen('ratios',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="1.5"/></svg>
-    Ratios &amp; Risques
+    Indicateur court et Risque
   </div>
   <div class="nav-item" onclick="showScreen('eurobonds',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-width="1.5"/></svg>
     Eurobonds
   </div>
+  <div class="nav-item" onclick="showScreen('tableau-bord',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" stroke-width="1.5"/></svg>
+    Tableau MAD
+  </div>
+  <div class="nav-item" onclick="showScreen('template-bs',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 8h6M9 12h6M9 16h4" stroke-width="1.5"/></svg>
+    Template BS
+  </div>
+
+  <div class="nav-group" id="navgroup-nos-productions">
+    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('nos-productions',this)">
+      <span class="nav-item-main">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke-width="1.3"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="1.3"/></svg>
+        Nos Productions
+      </span>
+      <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
+    </div>
+    <div class="nav-submenu" id="navsub-nos-productions">
+      <div class="nav-item nav-subitem" onclick="showScreen('prod-strategie',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke-width="1.5"/><circle cx="12" cy="12" r="1.3" stroke-width="1.5"/></svg>
+        Stratégie
+      </div>
+      <div class="nav-item nav-subitem" onclick="showScreen('prod-statistique',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="10" width="4" height="11"/><rect x="10" y="4" width="4" height="17"/><rect x="17" y="7" width="4" height="14"/></svg>
+        Statistique
+      </div>
+      <div class="nav-item nav-subitem" onclick="showScreen('prod-esg',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M8 12l3 3 5-6" stroke-width="1.5"/></svg>
+        ESG
+      </div>
+    </div>
+  </div>
+
   <div class="nav-item" onclick="showScreen('comparaison',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="10" width="4" height="11"/><rect x="10" y="4" width="4" height="17"/><rect x="17" y="7" width="4" height="14"/></svg>
-    Comparaison Mensuelle
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
+    Evolution
+  </div>
+  <div class="nav-item" onclick="showScreen('docs-utiles',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V4a1 1 0 00-1-1H6.5A2.5 2.5 0 004 5.5v14z" stroke-width="1.5"/></svg>
+    Documentations Utiles
   </div>
 
   <div class="nav-section" style="margin-top:6px">Système</div>
   <div class="nav-item" onclick="openMADFolder()" title="Ouvrir le dossier SharePoint MAD mensuel">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="1.5"/></svg>
     Import MAD
+  </div>
+  <div class="nav-item" onclick="openBSFolder()" title="Import Bilan / Balance de Situation (à venir)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="1.5"/></svg>
+    Import BS
   </div>
 
   <div class="sidebar-footer">
@@ -533,7 +590,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- TOPBAR -->
   <div class="topbar">
     <div>
-      <div class="page-title" id="page-title">Vue Exécutive</div>
+      <div class="page-title" id="page-title">Vue d'ensemble</div>
       <div class="page-sub">Dette Publique · Administration Centrale · Côte d'Ivoire</div>
     </div>
     <div class="topbar-spacer"></div>
@@ -622,17 +679,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
     </div>
 
-    <div class="kpi-row kpi-5">
-      <div class="kpi-card green"><div class="kpi-label">Ratio Dette/PIB <span style="font-size:8px;color:#9CA3AF">· Bulletin déc-25</span></div><div class="kpi-value" style="font-size:17px;color:var(--green)">57,1%</div><div class="kpi-delta up">✓ &lt; 70% UEMOA</div></div>
-      <div class="kpi-card gold"><div class="kpi-label">Intérêts / Recettes <span style="font-size:8px;color:#9CA3AF">· Bulletin déc-25</span></div><div class="kpi-value" style="font-size:17px;color:#92720A">16,5%</div><div class="kpi-delta neutral">⚠ Vigilance</div></div>
-      <div class="kpi-card green"><div class="kpi-label">Taux Intérêt Moyen <span style="font-size:8px;color:#9CA3AF">· Bulletin déc-25</span></div><div class="kpi-value" style="font-size:17px;color:var(--green)">5,1%</div><div class="kpi-delta up">Ext:4,8% | Int:5,4%</div></div>
-      <div class="kpi-card green"><div class="kpi-label">Durée Moy. de Vie <span style="font-size:8px;color:#9CA3AF">· Bulletin déc-25</span></div><div class="kpi-value" style="font-size:17px;color:var(--green)">7,2 ans</div><div class="kpi-delta up">✓ Bon profil</div></div>
-      <div class="kpi-card green"><div class="kpi-label">Dette Taux Fixe <span style="font-size:8px;color:#9CA3AF">· Bulletin déc-25</span></div><div class="kpi-value" style="font-size:17px;color:var(--green)">89,4%</div><div class="kpi-delta up">✓ Risque taux faible</div></div>
-    </div>
-
     <div class="g31">
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Évolution du Stock de la Dette 2021–2026</div><div class="card-sub">milliards de FCFA · <span id="filter-label-chart1" style="color:var(--orange)">Toutes dettes</span></div></div><span class="card-badge" id="badge-chart1">Annuel</span></div>
+        <div class="card-header"><div><div class="card-title">Stock de la Dette — Mois en Cours</div><div class="card-sub">milliards de FCFA · <span id="filter-label-chart1" style="color:var(--orange)">Toutes dettes</span></div></div><span class="card-badge" id="badge-chart1">Mensuel</span></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartEvolution"></canvas></div></div>
       </div>
       <div class="card">
@@ -723,7 +772,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
     <div class="g2">
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Évolution Encours Extérieur par Créancier</div><div class="card-sub">2021–2025 — <span id="fl-ext-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
+        <div class="card-header"><div><div class="card-title">Dette Extérieure par Créancier — Mois en Cours</div><div class="card-sub"><span id="fl-ext-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartExtEvol"></canvas></div></div>
       </div>
       <div class="card">
@@ -735,7 +784,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
     <div class="g2">
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Service Dette Extérieure 2021–2025</div><div class="card-sub"><span id="fl-ext-svc-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
+        <div class="card-header"><div><div class="card-title">Service Dette Extérieure — Mois en Cours</div><div class="card-sub"><span id="fl-ext-svc-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartExtService"></canvas></div></div>
       </div>
       <div class="card">
@@ -770,7 +819,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntRep"></canvas></div></div>
       </div>
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Évolution par Créancier 2021–2025</div><div class="card-sub">BCEAO, Banques, Titres</div></div></div>
+        <div class="card-header"><div><div class="card-title">Dette Intérieure par Créancier — Mois en Cours</div><div class="card-sub">BCEAO, Banques, Titres</div></div></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntEvol"></canvas></div></div>
       </div>
     </div>
@@ -794,6 +843,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ RATIOS ══════════════ -->
   <div class="screen" id="screen-ratios">
     <div class="card" style="margin-bottom:12px">
+      <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs</div></div></div>
+      <div class="card-body">
+        <div class="ratio-grid">
+          <div class="ratio-item r-ok"><div class="ratio-val">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div></div>
+          <div class="ratio-item r-warn"><div class="ratio-val">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div></div>
+          <div class="ratio-item r-ok"><div class="ratio-val">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div></div>
+          <div class="ratio-item r-warn"><div class="ratio-val">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div></div>
+          <div class="ratio-item r-ok"><div class="ratio-val">89,4%</div><div class="ratio-label">Taux Fixe</div><div class="ratio-seuil">Cible: &gt;80%</div></div>
+          <div class="ratio-item r-ok"><div class="ratio-val">53,3%</div><div class="ratio-label">Devise Étr.</div><div class="ratio-seuil">Seuil: &lt;60%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
       <div class="card-header"><div><div class="card-title">Principaux Ratios et Indicateurs d'Endettement</div><div class="card-sub">2021–2025 · Source : DGF / FMI</div></div></div>
       <div class="card-body" style="padding:0">
         <table class="tbl">
@@ -813,24 +875,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         </table>
       </div>
     </div>
-    <div class="g2">
-      <div class="card">
-        <div class="card-header"><div><div class="card-title">Évolution Ratio Dette/PIB</div><div class="card-sub">2021–2025 vs seuil UEMOA 70%</div></div></div>
-        <div class="card-body"><div class="cw cw-lg"><canvas id="chartRatioPIB"></canvas></div></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs</div></div></div>
-        <div class="card-body">
-          <div class="ratio-grid">
-            <div class="ratio-item r-ok"><div class="ratio-val">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div></div>
-            <div class="ratio-item r-warn"><div class="ratio-val">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div></div>
-            <div class="ratio-item r-ok"><div class="ratio-val">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div></div>
-            <div class="ratio-item r-warn"><div class="ratio-val">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div></div>
-            <div class="ratio-item r-ok"><div class="ratio-val">89,4%</div><div class="ratio-label">Taux Fixe</div><div class="ratio-seuil">Cible: &gt;80%</div></div>
-            <div class="ratio-item r-ok"><div class="ratio-val">53,3%</div><div class="ratio-label">Devise Étr.</div><div class="ratio-seuil">Seuil: &lt;60%</div></div>
-          </div>
-        </div>
-      </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Évolution Ratio Dette/PIB</div><div class="card-sub">2021–2025 vs seuil UEMOA 70%</div></div></div>
+      <div class="card-body"><div class="cw cw-lg"><canvas id="chartRatioPIB"></canvas></div></div>
     </div>
   </div><!-- /ratios -->
 
@@ -881,15 +928,15 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
   </div><!-- /eurobonds -->
 
-  <!-- ══════════════ COMPARAISON MENSUELLE ══════════════ -->
+  <!-- ══════════════ EVOLUTION (ex-Comparaison Mensuelle) ══════════════ -->
   <div class="screen" id="screen-comparaison">
     <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Sélection des mois à comparer</div><div class="card-sub">Coche 2 mois ou plus (MAD Actif + archives disponibles)</div></div></div>
+      <div class="card-header"><div><div class="card-title">Sélection des mois — Evolution</div><div class="card-sub">Coche 2 mois ou plus (MAD Actif + archives disponibles)</div></div></div>
       <div class="card-body" id="comparePicker" style="display:flex;flex-wrap:wrap;gap:8px"></div>
     </div>
 
     <div id="compareEmpty" class="card" style="text-align:center;padding:30px;color:var(--gray);font-size:12px">
-      Sélectionne au moins 2 mois ci-dessus pour afficher la comparaison.
+      Sélectionne au moins 2 mois ci-dessus pour afficher l'évolution.
     </div>
 
     <div id="compareContent" style="display:none">
@@ -902,21 +949,61 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
       <div class="g2">
         <div class="card">
-          <div class="card-header"><div><div class="card-title">Encours Total / Extérieure / Intérieure</div><div class="card-sub">Comparaison par mois</div></div></div>
+          <div class="card-header"><div><div class="card-title">Encours Total / Extérieure / Intérieure</div><div class="card-sub">Évolution par mois</div></div></div>
           <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareEncours"></canvas></div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div><div class="card-title">Répartition par Instrument</div><div class="card-sub">Comparaison par mois</div></div></div>
+          <div class="card-header"><div><div class="card-title">Répartition par Instrument</div><div class="card-sub">Évolution par mois</div></div></div>
           <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareInstruments"></canvas></div></div>
         </div>
       </div>
 
       <div class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Capital + Intérêts — Comparaison par mois</div></div></div>
+        <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Capital + Intérêts — Évolution par mois</div></div></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareService"></canvas></div></div>
       </div>
     </div>
   </div><!-- /comparaison -->
+
+  <!-- ══════════════ TEMPLATE BS (à venir) ══════════════ -->
+  <div class="screen" id="screen-template-bs">
+    <div class="card" style="text-align:center;padding:40px 20px;color:var(--gray);font-size:12px">
+      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px">Template BS</div>
+      Contenu à venir.
+    </div>
+  </div><!-- /template-bs -->
+
+  <!-- ══════════════ NOS PRODUCTIONS — STRATÉGIE (à venir) ══════════════ -->
+  <div class="screen" id="screen-prod-strategie">
+    <div class="card" style="text-align:center;padding:40px 20px;color:var(--gray);font-size:12px">
+      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px">Nos Productions — Stratégie</div>
+      Contenu à venir.
+    </div>
+  </div><!-- /prod-strategie -->
+
+  <!-- ══════════════ NOS PRODUCTIONS — STATISTIQUE (à venir) ══════════════ -->
+  <div class="screen" id="screen-prod-statistique">
+    <div class="card" style="text-align:center;padding:40px 20px;color:var(--gray);font-size:12px">
+      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px">Nos Productions — Statistique</div>
+      Contenu à venir.
+    </div>
+  </div><!-- /prod-statistique -->
+
+  <!-- ══════════════ NOS PRODUCTIONS — ESG (à venir) ══════════════ -->
+  <div class="screen" id="screen-prod-esg">
+    <div class="card" style="text-align:center;padding:40px 20px;color:var(--gray);font-size:12px">
+      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px">Nos Productions — ESG</div>
+      Contenu à venir.
+    </div>
+  </div><!-- /prod-esg -->
+
+  <!-- ══════════════ DOCUMENTATIONS UTILES (à venir) ══════════════ -->
+  <div class="screen" id="screen-docs-utiles">
+    <div class="card" style="text-align:center;padding:40px 20px;color:var(--gray);font-size:12px">
+      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px">Documentations Utiles</div>
+      Contenu à venir.
+    </div>
+  </div><!-- /docs-utiles -->
 
   </div><!-- /content -->
 
@@ -932,8 +1019,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
    ÉTAT DES FILTRES
 ════════════════════════════════════════════════════════════════ */
 const F = {
-  annee:     [],   // tableau vide = "Toutes"
-  mois:      [],   // tableau vide = "Tous" (cosmétique, comme "annee")
+  annee:     [],
+  mois:      [],
   src:       [],   // int | ext
   creancier: [],
   bailleur:  [],
@@ -1001,18 +1088,31 @@ function optionLabel(key, val) {
    NAVIGATION
 ════════════════════════════════════════════════════════════════ */
 const PAGE_TITLES = {
-  'vue-exec':'Vue Exécutive', 'tableau-bord':'Tableau de Bord MAD',
+  'vue-exec':"Vue d'ensemble", 'tableau-bord':'Tableau de Bord MAD',
   'dette-ext':'Dette Extérieure', 'dette-int':'Dette Intérieure',
-  'ratios':'Ratios & Risques', 'eurobonds':'Eurobonds',
-  'comparaison':'Comparaison Mensuelle'
+  'ratios':'Indicateur court et Risque', 'eurobonds':'Eurobonds',
+  'comparaison':'Evolution', 'template-bs':'Template BS',
+  'prod-strategie':'Nos Productions — Stratégie',
+  'prod-statistique':'Nos Productions — Statistique',
+  'prod-esg':'Nos Productions — ESG',
+  'docs-utiles':'Documentations Utiles'
 };
+
+function toggleNavGroup(id, el) {
+  const group = document.getElementById('navgroup-' + id);
+  if (group) group.classList.toggle('open');
+}
 
 function showScreen(id, el) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   document.getElementById('page-title').textContent = PAGE_TITLES[id] || id;
-  if (el) el.classList.add('active');
+  if (el) {
+    el.classList.add('active');
+    const grp = el.closest('.nav-group');
+    if (grp) grp.classList.add('open');
+  }
   refreshAll();
   if (id === 'comparaison') { renderComparisonPicker(); refreshComparison(); }
 }
@@ -1441,10 +1541,10 @@ function refreshAll() {
   buildChartCreancier(enc);
   buildChartMADEncours(enc);
   buildChartMADService(enc);
-  buildChartExtEvol();
+  buildChartExtEvol(enc);
   buildChartDevise();
   buildChartIntRep(enc);
-  buildChartIntEvol();
+  buildChartIntEvol(enc);
   buildChartExtService();
   buildChartTaux();
   buildChartRatioPIB();
@@ -1566,19 +1666,19 @@ function buildChartEvolution(enc) {
   const extKeys=['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
   const hasInt = intKeys.some(k=>enc[k]);
   const hasExt = extKeys.some(k=>enc[k]);
-  const curLabel = (DATA.evolTotal && DATA.evolTotal.years && DATA.evolTotal.years[4]) || '2025';
+  const curLabel = MAD_META.periode || 'Mois en cours';
 
   let ds = [];
-  if(hasExt || !F.src.length || F.src.includes('ext')) {
-    const evolExt = DATA.evolExt;
-    ds.push({ label:'Dette Extérieure', data:[...evolExt.bilat.map((_,i)=>evolExt.bilat[i]+evolExt.multi[i]+evolExt.euro[i]+evolExt.comm[i]),hasExt?Object.entries(enc).filter(([k])=>extKeys.includes(k)).reduce((a,[,v])=>a+v,0):0], backgroundColor:C.blA, borderRadius:3 });
+  if(!F.src.length || F.src.includes('ext')) {
+    const extTotal = hasExt ? Object.entries(enc).filter(([k])=>extKeys.includes(k)).reduce((a,[,v])=>a+v,0) : 0;
+    ds.push({ label:'Dette Extérieure', data:[extTotal], backgroundColor:C.blA, borderRadius:3 });
   }
-  if(hasInt || !F.src.length || F.src.includes('int')) {
-    const evolTotal = DATA.evolTotal;
-    ds.push({ label:'Dette Intérieure', data:[7959.2,9705.3,10626.3,11457.7,evolTotal.int[4],hasInt?Object.entries(enc).filter(([k])=>intKeys.includes(k)).reduce((a,[,v])=>a+v,0):0], backgroundColor:C.orA, borderRadius:3 });
+  if(!F.src.length || F.src.includes('int')) {
+    const intTotal = hasInt ? Object.entries(enc).filter(([k])=>intKeys.includes(k)).reduce((a,[,v])=>a+v,0) : 0;
+    ds.push({ label:'Dette Intérieure', data:[intTotal], backgroundColor:C.orA, borderRadius:3 });
   }
 
-  mkChart('chartEvolution',{type:'bar',data:{labels:['2021','2022','2023','2024',curLabel,'Janv 2026'],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR')+'Mrds',...gO.ticks}}}}});
+  mkChart('chartEvolution',{type:'bar',data:{labels:[curLabel],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR')+'Mrds',...gO.ticks}}}}});
 }
 
 function buildChartDonut(tots) {
@@ -1622,12 +1722,18 @@ function buildChartMADService(enc) {
   mkChart('chartMADService',{type:'bar',data:{labels:keys.map(k=>lblMap[k]||k),datasets:[{label:'Capital',data:keys.map(k=>DATA.service[k][0]),backgroundColor:C.orA,borderRadius:3},{label:'Intérêts',data:keys.map(k=>DATA.service[k][1]),backgroundColor:C.goA,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
 }
 
-function buildChartExtEvol() {
-  const d=DATA.evolExt;
-  let ds=[{cat:'Bilatéral',label:'Bilatéraux',data:d.bilat,backgroundColor:C.grA,borderRadius:2},{cat:'Multilatéral',label:'Multilatéraux',data:d.multi,backgroundColor:C.blA,borderRadius:2},{cat:'Titres Internationaux',label:'Eurobonds',data:d.euro,backgroundColor:C.orA,borderRadius:2},{cat:'Commercial',label:'Commerciaux',data:d.comm,backgroundColor:C.rd+'BB',borderRadius:2}];
+function buildChartExtEvol(enc) {
+  const curLabel = MAD_META.periode || 'Mois en cours';
+  const g = k => enc[k] || 0;
+  let ds=[
+    {cat:'Bilatéral',label:'Bilatéraux',data:[g('AFD')+g('KFW')+g('EximbankChine')+g('JICA')+g('AutresBil')],backgroundColor:C.grA,borderRadius:2},
+    {cat:'Multilatéral',label:'Multilatéraux',data:[g('FMI')+g('BM')+g('BAD')+g('BID')+g('AutresMulti')],backgroundColor:C.blA,borderRadius:2},
+    {cat:'Titres Internationaux',label:'Eurobonds',data:[g('Eurobonds')+g('Samourai')],backgroundColor:C.orA,borderRadius:2},
+    {cat:'Commercial',label:'Commerciaux',data:[g('Commerciaux')],backgroundColor:C.rd+'BB',borderRadius:2}
+  ];
   // Filtrer selon créancier(s) sélectionné(s)
   if(F.creancier.length) ds=ds.filter(x=>F.creancier.includes(x.cat));
-  mkChart('chartExtEvol',{type:'bar',data:{labels:d.years,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
+  mkChart('chartExtEvol',{type:'bar',data:{labels:[curLabel],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
 }
 
 function buildChartDevise() {
@@ -1650,32 +1756,32 @@ function buildChartIntRep(enc) {
   mkChart('chartIntRep',{type:'bar',data:{labels:k.map(x=>lbl[x]),datasets:[{label:'Encours Janv 2026',data:k.map(x=>enc[x]),backgroundColor:k.map(x=>cols[x]||C.orA),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.parsed.x)} Mrds`}}},scales:{x:{...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}},y:{...gO}}}});
 }
 
-function buildChartIntEvol() {
-  const d = DATA.evolInt || {
-    years:['2021','2022','2023','2024','2025'],
-    bceao:[870.7,870.7,870.7,870.7,858.2],
-    banques:[369.4,523.9,459.7,282.3,125.2],
-    titres:[6699.8,8288.7,9278.7,10294.0,11110.3],
-    autres:[19.3,22.1,17.1,10.7,5.4]
-  };
-  mkChart('chartIntEvol',{type:'bar',data:{labels:d.years,datasets:[
-    {label:'BCEAO',data:d.bceao,backgroundColor:C.goA,borderRadius:2},
-    {label:'Banques&Assimilés',data:d.banques,backgroundColor:C.rd+'BB',borderRadius:2},
-    {label:'Titres Publics',data:d.titres,backgroundColor:C.orA,borderRadius:2},
-    {label:'Autres',data:d.autres,backgroundColor:C.go+'77',borderRadius:2}
+function buildChartIntEvol(enc) {
+  const curLabel = MAD_META.periode || 'Mois en cours';
+  const g = k => enc[k] || 0;
+  const bceao  = g('BCEAO');
+  const banques = g('BanqComm') + g('TitriseesDomestique');
+  const titres  = g('BT') + g('TPCI') + g('OAT');
+  const autres  = g('Sukuk') + g('RCI');
+
+  mkChart('chartIntEvol',{type:'bar',data:{labels:[curLabel],datasets:[
+    {label:'BCEAO',data:[bceao],backgroundColor:C.goA,borderRadius:2},
+    {label:'Banques&Assimilés',data:[banques],backgroundColor:C.rd+'BB',borderRadius:2},
+    {label:'Titres Publics',data:[titres],backgroundColor:C.orA,borderRadius:2},
+    {label:'Autres',data:[autres],backgroundColor:C.go+'77',borderRadius:2}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
 }
 
 function buildChartExtService() {
-  const year = currentServiceYear() || '2025';
+  const curLabel = MAD_META.periode || 'Mois en cours';
   const svcSum = keys => keys.reduce((a,k)=>{ const v=DATA.service[k]||[0,0]; return a+v[0]+v[1]; },0);
   const curBilat  = Math.round(svcSum(['AFD','KFW','EximbankChine','JICA','AutresBil'])*10)/10;
   const curMulti  = Math.round(svcSum(['FMI','BM','BAD','BID','AutresMulti'])*10)/10;
   const curTitres = Math.round(svcSum(['Eurobonds','Samourai'])*10)/10;
   const curAutres = Math.round(svcSum(['Commerciaux'])*10)/10;
-  let ds=[{cat:'Bilatéral',label:'Bilatéraux',data:[63.1,92.0,132.6,188.3,curBilat],backgroundColor:C.grA,borderRadius:2},{cat:'Multilatéral',label:'Multilatéraux',data:[194.4,220.3,392.5,582.2,curMulti],backgroundColor:C.blA,borderRadius:2},{cat:'Titres Internationaux',label:'Porteurs Titres',data:[302.1,331.4,328.8,381.4,curTitres],backgroundColor:C.orA,borderRadius:2},{cat:null,label:'Autres',data:[288.2,467.4,701.9,1207.2,curAutres],backgroundColor:C.rd+'BB',borderRadius:2}];
+  let ds=[{cat:'Bilatéral',label:'Bilatéraux',data:[curBilat],backgroundColor:C.grA,borderRadius:2},{cat:'Multilatéral',label:'Multilatéraux',data:[curMulti],backgroundColor:C.blA,borderRadius:2},{cat:'Titres Internationaux',label:'Porteurs Titres',data:[curTitres],backgroundColor:C.orA,borderRadius:2},{cat:null,label:'Autres',data:[curAutres],backgroundColor:C.rd+'BB',borderRadius:2}];
   if(F.creancier.length) ds=ds.filter(x=>x.cat && F.creancier.includes(x.cat));
-  mkChart('chartExtService',{type:'bar',data:{labels:['2021','2022','2023','2024',year],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
+  mkChart('chartExtService',{type:'bar',data:{labels:[curLabel],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
 }
 
 function buildChartTaux() {
@@ -1716,6 +1822,10 @@ function openMADFolder() {
   if (confirm(msg)) {
     openSharePointFolder(SHAREPOINT_MAD_CONFIG.madFolderUrl);
   }
+}
+
+function openBSFolder() {
+  alert("IMPORT BS\n\nFonctionnalité à venir : le dossier SharePoint et le pipeline d'import pour le Bilan / Balance de Situation ne sont pas encore configurés.");
 }
 
 function exportXLSX() {
@@ -2227,9 +2337,6 @@ async function returnToActiveMAD() {
 document.addEventListener('DOMContentLoaded', () => {
   renderFilterBar();
   updateMadLabels();
-  // Pré-sélectionner l'année en cours
-  F.annee = ['2026'];
-  msRenderState('annee');
   applyFilters();
   loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META, l'historique et les libellés)
 });
@@ -2276,7 +2383,11 @@ window.showScreen = function(id, el) {
   const scr = document.getElementById('screen-' + id);
   if(scr) scr.classList.add('active');
   document.getElementById('page-title').textContent = PAGE_TITLES[id] || id;
-  if(el) el.classList.add('active');
+  if(el) {
+    el.classList.add('active');
+    const grp = el.closest('.nav-group');
+    if (grp) grp.classList.add('open');
+  }
   refreshAll();
   if (id === 'comparaison') { renderComparisonPicker(); refreshComparison(); }
 };

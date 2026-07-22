@@ -1,0 +1,54 @@
+name: MAJ observations via issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  update:
+    # Sécurité : ne réagir qu'aux issues "OBS-UPDATE" créées par le propriétaire du dépôt
+    if: >
+      startsWith(github.event.issue.title, 'OBS-UPDATE') &&
+      github.event.issue.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Extraire et valider le JSON du corps de l'issue
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          printf '%s' "$BODY" > /tmp/payload.json
+          jq empty /tmp/payload.json
+
+      - name: Mettre à jour observations.json
+        run: |
+          [ -f observations.json ] || echo '{}' > observations.json
+          SLUG=$(jq -r '.slug' /tmp/payload.json)
+          echo "SLUG=$SLUG" >> "$GITHUB_ENV"
+          jq --argjson entry "$(jq '{text, author, date}' /tmp/payload.json)" \
+             --arg slug "$SLUG" \
+             '.[$slug] = $entry' observations.json > observations.tmp.json
+          mv observations.tmp.json observations.json
+          jq empty observations.json
+
+      - name: Commit et push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add observations.json
+          git commit -m "MAJ observation ($SLUG) via Power Automate - $(date -u +%FT%TZ)" || echo "Aucun changement"
+          git push
+
+      - name: Fermer l'issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue close ${{ github.event.issue.number }} \
+            --repo ${{ github.repository }} \
+            --comment "✅ Observation enregistrée ($SLUG). Dashboard actualisé."

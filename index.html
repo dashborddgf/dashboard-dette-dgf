@@ -255,7 +255,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .kpi-card.gold::before{background:var(--gold)}
 .kpi-card.blue::before{background:var(--blue)}
 .kpi-card.red::before{background:var(--red)}
-.kpi-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px}
+.kpi-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;font-weight:800;margin-bottom:5px}
 .kpi-value{font-size:20px;font-weight:800;color:var(--dark);line-height:1;margin-bottom:4px}
 .kpi-unit{font-size:10px;color:var(--gray);font-weight:400}
 .kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;margin-top:5px;padding:2px 7px;border-radius:20px}
@@ -346,7 +346,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .ratio-item{text-align:center;padding:10px 6px;border-radius:8px;border:1px solid var(--border)}
 .ratio-val{font-size:20px;font-weight:900;margin-bottom:2px}
 .ratio-label{font-size:9px;color:#000;font-weight:700}
-.ratio-seuil{font-size:8px;color:var(--gray);margin-top:2px}
+.ratio-seuil{font-size:8px;color:#000;font-weight:700;margin-top:2px}
 .r-ok{color:var(--green);background:var(--green-bg)}
 .r-warn{color:#92720A;background:var(--gold-bg)}
 .r-alert{color:var(--red);background:var(--red-bg)}
@@ -1727,19 +1727,18 @@ function buildChartEvolution(enc) {
   const extKeys=['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
   const hasInt = intKeys.some(k=>enc[k]);
   const hasExt = extKeys.some(k=>enc[k]);
-  const curLabel = MAD_META.periode || 'Mois en cours';
 
-  let ds = [];
+  const labels = [], data = [], colors = [];
   if(!F.src.length || F.src.includes('ext')) {
     const extTotal = hasExt ? Object.entries(enc).filter(([k])=>extKeys.includes(k)).reduce((a,[,v])=>a+v,0) : 0;
-    ds.push({ label:'Dette Extérieure', data:[extTotal], backgroundColor:C.blA, borderRadius:3 });
+    labels.push('Dette Extérieure'); data.push(extTotal); colors.push(C.blA);
   }
   if(!F.src.length || F.src.includes('int')) {
     const intTotal = hasInt ? Object.entries(enc).filter(([k])=>intKeys.includes(k)).reduce((a,[,v])=>a+v,0) : 0;
-    ds.push({ label:'Dette Intérieure', data:[intTotal], backgroundColor:C.orA, borderRadius:3 });
+    labels.push('Dette Intérieure'); data.push(intTotal); colors.push(C.orA);
   }
 
-  mkChart('chartEvolution',{type:'bar',data:{labels:[curLabel],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR')+'Mrds',...gO.ticks}}}}});
+  mkChart('chartEvolution',{type:'pie',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}});
 }
 
 function buildChartDonut(tots) {
@@ -1784,17 +1783,20 @@ function buildChartMADService(enc) {
 }
 
 function buildChartExtEvol(enc) {
-  const curLabel = MAD_META.periode || 'Mois en cours';
   const g = k => enc[k] || 0;
-  let ds=[
-    {cat:'Bilatéral',label:'Bilatéraux',data:[g('AFD')+g('KFW')+g('EximbankChine')+g('JICA')+g('AutresBil')],backgroundColor:C.grA,borderRadius:2},
-    {cat:'Multilatéral',label:'Multilatéraux',data:[g('FMI')+g('BM')+g('BAD')+g('BID')+g('AutresMulti')],backgroundColor:C.blA,borderRadius:2},
-    {cat:'Titres Internationaux',label:'Eurobonds',data:[g('Eurobonds')+g('Samourai')],backgroundColor:C.orA,borderRadius:2},
-    {cat:'Commercial',label:'Commerciaux',data:[g('Commerciaux')],backgroundColor:C.rd+'BB',borderRadius:2}
+  let items=[
+    {cat:'Bilatéral',label:'Bilatéraux',value:g('AFD')+g('KFW')+g('EximbankChine')+g('JICA')+g('AutresBil'),color:C.grA},
+    {cat:'Multilatéral',label:'Multilatéraux',value:g('FMI')+g('BM')+g('BAD')+g('BID')+g('AutresMulti'),color:C.blA},
+    {cat:'Titres Internationaux',label:'Eurobonds',value:g('Eurobonds')+g('Samourai'),color:C.orA},
+    {cat:'Commercial',label:'Commerciaux',value:g('Commerciaux'),color:C.rd+'BB'}
   ];
   // Filtrer selon créancier(s) sélectionné(s)
-  if(F.creancier.length) ds=ds.filter(x=>F.creancier.includes(x.cat));
-  mkChart('chartExtEvol',{type:'bar',data:{labels:[curLabel],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
+  if(F.creancier.length) items=items.filter(x=>F.creancier.includes(x.cat));
+  mkChart('chartExtEvol',{type:'pie',data:{labels:items.map(x=>x.label),datasets:[{
+    data:items.map(x=>x.value),
+    backgroundColor:items.map(x=>x.color),
+    borderWidth:2,borderColor:'#fff'
+  }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}});
 }
 
 function buildChartDevise() {
@@ -1818,31 +1820,37 @@ function buildChartIntRep(enc) {
 }
 
 function buildChartIntEvol(enc) {
-  const curLabel = MAD_META.periode || 'Mois en cours';
   const g = k => enc[k] || 0;
   const bceao  = g('BCEAO');
   const banques = g('BanqComm') + g('TitriseesDomestique');
   const titres  = g('BT') + g('TPCI') + g('OAT');
   const autres  = g('Sukuk') + g('RCI');
 
-  mkChart('chartIntEvol',{type:'bar',data:{labels:[curLabel],datasets:[
-    {label:'BCEAO',data:[bceao],backgroundColor:C.goA,borderRadius:2},
-    {label:'Banques&Assimilés',data:[banques],backgroundColor:C.rd+'BB',borderRadius:2},
-    {label:'Titres Publics',data:[titres],backgroundColor:C.orA,borderRadius:2},
-    {label:'Autres',data:[autres],backgroundColor:C.go+'77',borderRadius:2}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
+  mkChart('chartIntEvol',{type:'pie',data:{labels:['BCEAO','Banques&Assimilés','Titres Publics','Autres'],datasets:[{
+    data:[bceao,banques,titres,autres],
+    backgroundColor:[C.goA,C.rd+'BB',C.orA,C.go+'77'],
+    borderWidth:2,borderColor:'#fff'
+  }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
 }
 
 function buildChartExtService() {
-  const curLabel = MAD_META.periode || 'Mois en cours';
   const svcSum = keys => keys.reduce((a,k)=>{ const v=DATA.service[k]||[0,0]; return a+v[0]+v[1]; },0);
   const curBilat  = Math.round(svcSum(['AFD','KFW','EximbankChine','JICA','AutresBil'])*10)/10;
   const curMulti  = Math.round(svcSum(['FMI','BM','BAD','BID','AutresMulti'])*10)/10;
   const curTitres = Math.round(svcSum(['Eurobonds','Samourai'])*10)/10;
   const curAutres = Math.round(svcSum(['Commerciaux'])*10)/10;
-  let ds=[{cat:'Bilatéral',label:'Bilatéraux',data:[curBilat],backgroundColor:C.grA,borderRadius:2},{cat:'Multilatéral',label:'Multilatéraux',data:[curMulti],backgroundColor:C.blA,borderRadius:2},{cat:'Titres Internationaux',label:'Porteurs Titres',data:[curTitres],backgroundColor:C.orA,borderRadius:2},{cat:null,label:'Autres',data:[curAutres],backgroundColor:C.rd+'BB',borderRadius:2}];
-  if(F.creancier.length) ds=ds.filter(x=>x.cat && F.creancier.includes(x.cat));
-  mkChart('chartExtService',{type:'bar',data:{labels:[curLabel],datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
+  let items=[
+    {cat:'Bilatéral',label:'Bilatéraux',value:curBilat,color:C.grA},
+    {cat:'Multilatéral',label:'Multilatéraux',value:curMulti,color:C.blA},
+    {cat:'Titres Internationaux',label:'Porteurs Titres',value:curTitres,color:C.orA},
+    {cat:null,label:'Autres',value:curAutres,color:C.rd+'BB'}
+  ];
+  if(F.creancier.length) items=items.filter(x=>x.cat && F.creancier.includes(x.cat));
+  mkChart('chartExtService',{type:'pie',data:{labels:items.map(x=>x.label),datasets:[{
+    data:items.map(x=>x.value),
+    backgroundColor:items.map(x=>x.color),
+    borderWidth:2,borderColor:'#fff'
+  }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
 }
 
 function buildChartTaux() {

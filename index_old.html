@@ -141,6 +141,10 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .nav-submenu{max-height:0;overflow:hidden;transition:max-height .2s ease}
 .nav-group.open .nav-submenu{max-height:220px}
 .nav-subitem{padding-left:35px;font-size:11.5px}
+[data-nav-key]{cursor:grab}
+[data-nav-key].nav-dragging{opacity:.35}
+[data-nav-key].nav-drop-before{box-shadow:inset 0 2px 0 0 var(--orange)}
+[data-nav-key].nav-drop-after{box-shadow:inset 0 -2px 0 0 var(--orange)}
 .nav-scroll{flex:1 1 0;min-height:0;height:0;overflow-y:scroll;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.6) rgba(0,0,0,.15)}
 .nav-scroll::-webkit-scrollbar{width:8px}
 .nav-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,.15)}
@@ -227,7 +231,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .ms-opt input{accent-color:var(--orange);width:13px;height:13px;flex-shrink:0;cursor:pointer}
 
 /* ── ACTIVE FILTERS SUMMARY ── */
-.filter-summary{background:linear-gradient(90deg,var(--orange-bg),#fff);border-bottom:1px solid rgba(232,112,26,.2);padding:6px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:0;max-height:0;overflow:hidden;transition:all .3s}
+.filter-summary{background:#fff;border-bottom:1px solid var(--border);padding:6px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:0;max-height:0;overflow:hidden;transition:all .3s}
 .filter-summary.visible{min-height:34px;max-height:60px;padding:6px 20px}
 .filter-tag{display:inline-flex;align-items:center;gap:5px;background:var(--orange);color:#fff;border-radius:20px;padding:2px 8px 2px 10px;font-size:10px;font-weight:600}
 .filter-tag-x{cursor:pointer;opacity:.8;font-size:12px;margin-left:2px}
@@ -281,7 +285,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .card:hover{box-shadow:0 3px 12px rgba(0,0,0,.06)}
 .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;border-bottom:1px solid var(--border)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark)}
-.card-sub{font-size:10px;color:var(--gray);margin-top:1px}
+.card-sub{font-size:10px;color:#000;font-weight:700;margin-top:1px}
 .card-badge{background:var(--orange-bg);color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px}
 .card-badge.blue{background:var(--blue-bg);color:var(--blue)}
 .card-badge.green{background:var(--green-bg);color:var(--green)}
@@ -341,7 +345,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .ratio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .ratio-item{text-align:center;padding:10px 6px;border-radius:8px;border:1px solid var(--border)}
 .ratio-val{font-size:20px;font-weight:900;margin-bottom:2px}
-.ratio-label{font-size:9px;color:var(--gray)}
+.ratio-label{font-size:9px;color:#000;font-weight:700}
 .ratio-seuil{font-size:8px;color:var(--gray);margin-top:2px}
 .r-ok{color:var(--green);background:var(--green-bg)}
 .r-warn{color:#92720A;background:var(--gold-bg)}
@@ -537,12 +541,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <div class="nav-scroll">
   <div class="nav-section">Navigation</div>
-  <div class="nav-item active" onclick="showScreen('vue-exec',this)">
+  <div class="nav-item active" data-nav-key="vue-exec" onclick="showScreen('vue-exec',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Vue d'ensemble
   </div>
 
-  <div class="nav-group" id="navgroup-structure-dette">
+  <div class="nav-group" id="navgroup-structure-dette" data-nav-key="structure-dette">
     <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('structure-dette',this)">
       <span class="nav-item-main">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
@@ -562,24 +566,24 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
   </div>
 
-  <div class="nav-item" onclick="showScreen('ratios',this)">
+  <div class="nav-item" data-nav-key="ratios" onclick="showScreen('ratios',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="1.5"/></svg>
-    Indicateur court et Risque
+    Indicateurs coûts et Risques
   </div>
-  <div class="nav-item" onclick="showScreen('eurobonds',this)">
+  <div class="nav-item" data-nav-key="eurobonds" onclick="showScreen('eurobonds',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-width="1.5"/></svg>
     Eurobonds
   </div>
-  <div class="nav-item" onclick="showScreen('tableau-bord',this)">
+  <div class="nav-item" data-nav-key="tableau-bord" onclick="showScreen('tableau-bord',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" stroke-width="1.5"/></svg>
     Tableau MAD
   </div>
-  <div class="nav-item" onclick="showScreen('template-bs',this)">
+  <div class="nav-item" data-nav-key="template-bs" onclick="showScreen('template-bs',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 8h6M9 12h6M9 16h4" stroke-width="1.5"/></svg>
     Template BS
   </div>
 
-  <div class="nav-group" id="navgroup-nos-productions">
+  <div class="nav-group" id="navgroup-nos-productions" data-nav-key="nos-productions">
     <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('nos-productions',this)">
       <span class="nav-item-main">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke-width="1.3"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="1.3"/></svg>
@@ -603,11 +607,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
   </div>
 
-  <div class="nav-item" onclick="showScreen('comparaison',this)">
+  <div class="nav-item" data-nav-key="comparaison" onclick="showScreen('comparaison',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
     Evolution
   </div>
-  <div class="nav-item" onclick="openDocsUtilesFolder()">
+  <div class="nav-item" data-nav-key="docs-utiles" onclick="openDocsUtilesFolder()">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V4a1 1 0 00-1-1H6.5A2.5 2.5 0 004 5.5v14z" stroke-width="1.5"/></svg>
     Documentations Utiles
   </div>
@@ -1141,7 +1145,7 @@ function optionLabel(key, val) {
 const PAGE_TITLES = {
   'vue-exec':"Vue d'ensemble", 'tableau-bord':'Tableau de Bord MAD',
   'dette-ext':'Dette Extérieure', 'dette-int':'Dette Intérieure',
-  'ratios':'Indicateur court et Risque', 'eurobonds':'Eurobonds',
+  'ratios':'Indicateurs coûts et Risques', 'eurobonds':'Eurobonds',
   'comparaison':'Evolution', 'template-bs':'Template BS'
 };
 
@@ -2640,6 +2644,78 @@ async function saveObservation() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION RÉORGANISABLE — glisser-déposer pour réordonner les
+   éléments du menu (section "Navigation" uniquement). L'ordre choisi
+   est personnel (par navigateur), sauvegardé en local, pas partagé.
+════════════════════════════════════════════════════════════════ */
+const NAV_ORDER_KEY = 'dgf_nav_order_v1';
+let _draggedNavEl = null;
+
+function initNavSortable() {
+  const container = document.querySelector('.nav-scroll');
+  if (!container) return;
+  applySavedNavOrder();
+  container.querySelectorAll('[data-nav-key]').forEach(el => {
+    el.setAttribute('draggable', 'true');
+    el.addEventListener('dragstart', onNavDragStart);
+    el.addEventListener('dragover', onNavDragOver);
+    el.addEventListener('drop', onNavDrop);
+    el.addEventListener('dragend', onNavDragEnd);
+  });
+}
+
+function onNavDragStart(e) {
+  _draggedNavEl = e.currentTarget;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', e.currentTarget.dataset.navKey); } catch (err) {}
+  e.currentTarget.classList.add('nav-dragging');
+}
+
+function onNavDragOver(e) {
+  if (!_draggedNavEl || e.currentTarget === _draggedNavEl) return;
+  e.preventDefault();
+  const rect = e.currentTarget.getBoundingClientRect();
+  const before = (e.clientY - rect.top) < rect.height / 2;
+  e.currentTarget.classList.toggle('nav-drop-before', before);
+  e.currentTarget.classList.toggle('nav-drop-after', !before);
+}
+
+function onNavDrop(e) {
+  e.preventDefault();
+  const target = e.currentTarget;
+  if (!_draggedNavEl || target === _draggedNavEl) return;
+  const before = target.classList.contains('nav-drop-before');
+  target.parentElement.insertBefore(_draggedNavEl, before ? target : target.nextSibling);
+  saveNavOrder();
+  target.classList.remove('nav-drop-before', 'nav-drop-after');
+}
+
+function onNavDragEnd(e) {
+  document.querySelectorAll('.nav-drop-before,.nav-drop-after').forEach(el => el.classList.remove('nav-drop-before', 'nav-drop-after'));
+  e.currentTarget.classList.remove('nav-dragging');
+  _draggedNavEl = null;
+}
+
+function saveNavOrder() {
+  const container = document.querySelector('.nav-scroll');
+  const order = Array.from(container.querySelectorAll('[data-nav-key]')).map(el => el.dataset.navKey);
+  try { localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(order)); } catch (e) {}
+}
+
+function applySavedNavOrder() {
+  const container = document.querySelector('.nav-scroll');
+  let order;
+  try { order = JSON.parse(localStorage.getItem(NAV_ORDER_KEY) || 'null'); } catch (e) { order = null; }
+  if (!Array.isArray(order) || !order.length) return;
+  const items = Array.from(container.querySelectorAll('[data-nav-key]'));
+  const map = {};
+  items.forEach(el => { map[el.dataset.navKey] = el; });
+  const systemHeader = Array.from(container.children).find(el => el.classList.contains('nav-section') && el.textContent.trim() === 'Système');
+  if (!systemHeader) return;
+  order.forEach(key => { if (map[key]) container.insertBefore(map[key], systemHeader); });
+}
+
 /* Ajoute le bouton 💬 et le bloc d'affichage à chaque carte (une seule fois) */
 function injectObservationButtons() {
   document.querySelectorAll('.card-header').forEach(header => {
@@ -2681,6 +2757,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFilterBar();
   updateMadLabels();
   applyFilters();
+  initNavSortable();
   injectObservationButtons();
   loadObservations();
   loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META, l'historique et les libellés)

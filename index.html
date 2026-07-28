@@ -287,7 +287,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .g13{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px}
 
 /* ── CARD ── */
-.card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s}
+.card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green) 0%,var(--green) 45%,var(--orange) 55%,var(--orange) 100%)}
 .card:hover{box-shadow:0 3px 12px rgba(0,0,0,.06)}
 .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;border-bottom:1px solid var(--border)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark)}

@@ -262,19 +262,20 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .kpi-value{font-size:20px;font-weight:800;color:var(--dark);line-height:1;margin-bottom:4px}
 .kpi-unit{font-size:10px;color:var(--gray);font-weight:400}
 .kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;margin-top:5px;padding:2px 7px;border-radius:20px}
-.stat-row{display:flex;flex-direction:column;gap:12px}
-.stat-card{background:#fff;border-radius:8px;border:1px solid var(--border);border-left:4px solid var(--green);padding:16px 18px;position:relative;transition:box-shadow .2s,transform .2s}
-.stat-card:hover{box-shadow:0 10px 24px rgba(0,0,0,.12);transform:translateY(-4px)}
-.stat-card.stat-orange{border-left-color:var(--orange)}
-.stat-card.stat-gold{border-left-color:var(--gold)}
-.stat-card-icon{position:absolute;top:14px;right:16px;font-size:22px;opacity:.4}
-.stat-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray)}
-.stat-value{font-size:26px;font-weight:800;color:var(--navy);margin-top:6px}
-.stat-value .stat-unit{font-size:13px;font-weight:700;color:var(--gray);margin-left:4px}
-.stat-sub{font-size:11.5px;color:var(--gray);margin-top:2px}
-.stat-pib{display:inline-block;margin-top:10px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green)}
-.stat-card.stat-orange .stat-pib{background:var(--orange-bg);color:var(--orange)}
-.stat-card.stat-gold .stat-pib{background:var(--gold-bg);color:var(--gold)}
+.stat-row{display:flex;flex-direction:column;gap:6px}
+.stat-card{text-align:center;padding:8px 8px;border-radius:8px;transition:box-shadow .2s,transform .2s}
+.stat-card:hover{box-shadow:0 6px 16px rgba(0,0,0,.1);transform:translateY(-3px)}
+.stat-card.stat-green{background:var(--green-bg)}
+.stat-card.stat-green .stat-value{color:var(--green)}
+.stat-card.stat-orange{background:var(--orange-bg)}
+.stat-card.stat-orange .stat-value{color:var(--orange)}
+.stat-card.stat-gold{background:var(--gold-bg)}
+.stat-card.stat-gold .stat-value{color:var(--gold)}
+.stat-card-icon{display:none}
+.stat-label{font-size:10px;font-weight:700;color:var(--dark)}
+.stat-value{font-size:16px;font-weight:800;display:block;margin-bottom:1px}
+.stat-sub{display:none}
+.stat-pib{font-size:9px;font-weight:700;color:var(--gray)}
 .kpi-delta.up{background:var(--green-bg);color:var(--green)}
 .kpi-delta.down{background:var(--red-bg);color:var(--red)}
 .kpi-delta.neutral{background:var(--gold-bg);color:#92720A}
@@ -735,9 +736,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div class="card-header"><div><div class="card-title">Encours</div><div class="card-sub">Stock de la dette — <span id="col-enc-period">MAD —</span></div></div></div>
         <div class="card-body">
           <div class="stat-row">
-            <div class="stat-card stat-green"><div class="stat-card-icon">🏛</div><div class="stat-label">Total</div><div class="stat-value" id="col-enc-total">—</div><div class="stat-sub">Milliards FCFA</div><div class="stat-pib" id="col-enc-total-pib"></div></div>
-            <div class="stat-card stat-orange"><div class="stat-card-icon">🏠</div><div class="stat-label">Intérieur</div><div class="stat-value" id="col-enc-int">—</div><div class="stat-sub">Milliards FCFA</div><div class="stat-pib" id="col-enc-int-pib"></div></div>
-            <div class="stat-card stat-gold"><div class="stat-card-icon">🌐</div><div class="stat-label">Extérieur</div><div class="stat-value" id="col-enc-ext">—</div><div class="stat-sub">Milliards FCFA</div><div class="stat-pib" id="col-enc-ext-pib"></div></div>
+            <div class="stat-card stat-green"><div class="stat-value" id="col-enc-total">—</div><div class="stat-label">Total</div><div class="stat-pib" id="col-enc-total-pib"></div></div>
+            <div class="stat-card stat-orange"><div class="stat-value" id="col-enc-int">—</div><div class="stat-label">Intérieur</div><div class="stat-pib" id="col-enc-int-pib"></div></div>
+            <div class="stat-card stat-gold"><div class="stat-value" id="col-enc-ext">—</div><div class="stat-label">Extérieur</div><div class="stat-pib" id="col-enc-ext-pib"></div></div>
           </div>
         </div>
       </div>
@@ -745,9 +746,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div class="card-header"><div><div class="card-title">Mobilisation</div><div class="card-sub">Nouveaux tirages — <span id="col-mob-period">MAD —</span></div></div></div>
         <div class="card-body">
           <div class="stat-row">
-            <div class="stat-card stat-green"><div class="stat-card-icon">📋</div><div class="stat-label">Total</div><div class="stat-value" id="col-mob-total">—</div><div class="stat-sub">Milliards FCFA</div></div>
-            <div class="stat-card stat-orange"><div class="stat-card-icon">🏠</div><div class="stat-label">Intérieur</div><div class="stat-value" id="col-mob-int">—</div><div class="stat-sub">Milliards FCFA</div></div>
-            <div class="stat-card stat-gold"><div class="stat-card-icon">🌐</div><div class="stat-label">Extérieur</div><div class="stat-value" id="col-mob-ext">—</div><div class="stat-sub">Milliards FCFA</div></div>
+            <div class="stat-card stat-green"><div class="stat-value" id="col-mob-total">—</div><div class="stat-label">Total</div></div>
+            <div class="stat-card stat-orange"><div class="stat-value" id="col-mob-int">—</div><div class="stat-label">Intérieur</div></div>
+            <div class="stat-card stat-gold"><div class="stat-value" id="col-mob-ext">—</div><div class="stat-label">Extérieur</div></div>
           </div>
         </div>
       </div>
@@ -755,9 +756,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div class="card-header"><div><div class="card-title">Service</div><div class="card-sub">Capital + Intérêts — <span id="col-svc-period">MAD —</span></div></div></div>
         <div class="card-body">
           <div class="stat-row">
-            <div class="stat-card stat-green"><div class="stat-card-icon">📊</div><div class="stat-label">Total</div><div class="stat-value" id="col-svc-total">—</div><div class="stat-sub">Milliards FCFA</div></div>
-            <div class="stat-card stat-orange"><div class="stat-card-icon">🏠</div><div class="stat-label">Intérieur</div><div class="stat-value" id="col-svc-int">—</div><div class="stat-sub">Milliards FCFA</div></div>
-            <div class="stat-card stat-gold"><div class="stat-card-icon">🌐</div><div class="stat-label">Extérieur</div><div class="stat-value" id="col-svc-ext">—</div><div class="stat-sub">Milliards FCFA</div></div>
+            <div class="stat-card stat-green"><div class="stat-value" id="col-svc-total">—</div><div class="stat-label">Total</div></div>
+            <div class="stat-card stat-orange"><div class="stat-value" id="col-svc-int">—</div><div class="stat-label">Intérieur</div></div>
+            <div class="stat-card stat-gold"><div class="stat-value" id="col-svc-ext">—</div><div class="stat-label">Extérieur</div></div>
           </div>
         </div>
       </div>
@@ -1615,7 +1616,7 @@ function ratioPibPourAnnee(year) {
 
 function setStatValue(id, value) {
   const el = document.getElementById(id);
-  if (el) el.textContent = fmt(value);
+  if (el) el.textContent = fmt(value) + ' Mrds';
 }
 function setStatPib(id, pct) {
   const el = document.getElementById(id);

@@ -271,6 +271,18 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .stat-label{font-size:11px;font-weight:700;color:var(--dark)}
 .stat-value{font-size:17px;font-weight:800}
 .stat-pib{font-size:9px;font-weight:700;color:var(--gray);margin-top:1px}
+
+/* Compaction spécifique à l'écran Vue d'ensemble, pour que les 3 cartes
+   tiennent sur un seul écran sans barre de défilement. */
+#vue-exec-cols{margin-bottom:6px}
+#vue-exec-cols .card-header{padding:8px 12px 6px}
+#vue-exec-cols .card-body{padding:8px 10px}
+#vue-exec-cols .stat-row{gap:5px}
+#vue-exec-cols .stat-box{padding:5px 6px;gap:1px}
+#vue-exec-cols .stat-value{font-size:15px}
+#vue-exec-cols .stat-label{font-size:10px}
+#vue-exec-cols .stat-pib{font-size:8px;margin-top:0}
+#alert-exec{margin-bottom:8px}
 .kpi-delta.up{background:var(--green-bg);color:var(--green)}
 .kpi-delta.down{background:var(--red-bg);color:var(--red)}
 .kpi-delta.neutral{background:var(--gold-bg);color:#92720A}

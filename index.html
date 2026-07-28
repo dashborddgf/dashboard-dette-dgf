@@ -223,8 +223,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .ms-btn .ms-btn-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .ms-caret{width:9px;height:6px;flex-shrink:0;fill:#6B7280;transition:transform .15s}
 .ms-dd.open .ms-caret{transform:rotate(180deg)}
-.ms-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--border);border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:6px;min-width:200px;max-width:260px;max-height:280px;overflow-y:auto;z-index:300}
+.ms-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--border);border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:6px;min-width:200px;max-width:260px;max-height:280px;overflow-y:auto;z-index:9000}
 .ms-dd.open .ms-panel{display:block}
+.card:has(.ms-dd):hover{transform:none}
 .ms-clear-all{display:block;width:100%;text-align:left;background:none;border:none;border-radius:6px;padding:6px 8px;font-size:11px;font-weight:700;color:var(--orange);cursor:pointer;font-family:inherit}
 .ms-clear-all:hover{background:var(--orange-bg)}
 .ms-sep{height:1px;background:var(--border);margin:4px 2px}

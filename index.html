@@ -282,6 +282,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 /* ── ALERT ── */
 .alert-banner{border-radius:8px;padding:9px 14px;display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:11px;font-weight:600}
+.ticker-wrap{overflow:hidden;white-space:nowrap;display:block}
+.ticker-track{display:inline-flex;width:max-content;animation:ticker-scroll 20s linear infinite}
+.ticker-wrap:hover .ticker-track{animation-play-state:paused}
+.ticker-item{padding-right:70px;flex-shrink:0}
+@keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion: reduce){ .ticker-track{animation:none} }
 .alert-green{background:var(--green-bg);border:1px solid var(--green-light);color:var(--green)}
 .alert-blue{background:var(--blue-bg);border:1px solid var(--blue);color:var(--blue)}
 .alert-orange{background:var(--orange-bg);border:1px solid var(--orange);color:var(--orange)}
@@ -293,9 +299,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .g13{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px}
 
 /* ── CARD ── */
-.card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s;position:relative}
+.card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .2s;position:relative}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green) 0%,var(--green) 45%,var(--orange) 55%,var(--orange) 100%)}
-.card:hover{box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.card:hover{box-shadow:0 10px 24px rgba(0,0,0,.12);transform:translateY(-4px)}
 .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;border-bottom:1px solid var(--border)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark)}
 .card-sub{font-size:10px;color:#000;font-weight:700;margin-top:1px}
@@ -712,16 +718,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ VUE EXECUTIVE ══════════════ -->
   <div class="screen active" id="screen-vue-exec">
 
-    <div class="alert-banner alert-green" id="alert-exec">
-      ✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable
+    <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
+      <div class="ticker-track">
+        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
+        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
+      </div>
     </div>
 
-    <div id="vintage-banner" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:10px;color:#374151;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:6px 10px;margin-bottom:10px">
-      <span>📅 <b>Millésimes des données</b> :</span>
-      <span style="background:#EC8D08;color:#fff;padding:1px 8px;border-radius:12px">Encours &amp; service : <b id="vintage-mad">MAD —</b></span>
-      <span style="background:#1F3864;color:#fff;padding:1px 8px;border-radius:12px">Ratios &amp; référentiels : <b>Bulletin T4-2025 (déc. 2025)</b></span>
-      <span style="color:#6B7280">· Périmètre : dette de l'Administration Centrale, hors C2D/PCD (Tabl. 2) et hors dette garantie (239,6 Mrds, 0,4% PIB — Tabl. 11)</span>
-    </div>
 
     <div class="g3" id="vue-exec-cols">
       <div class="card">
@@ -1389,10 +1392,6 @@ function updateDynamicBadges() {
   if(et) et.innerHTML=fmt(euro)+' <span class="kpi-unit">Mrds FCFA</span>';
   setV('kv-samourai', g('Samourai'));
   setT('euro-enc-inline', fmt(euro));
-
-  // Bandeau millésimes (V2)
-  const vb=document.getElementById('vintage-mad');
-  if(vb) vb.textContent='MAD '+(MAD_META.periode||'')+(DATA.meta&&DATA.meta.situationAu?' (au '+DATA.meta.situationAu+')':'');
 }
 
 /* ═══════════════════════════════════════════════════════════════

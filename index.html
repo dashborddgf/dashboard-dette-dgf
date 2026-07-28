@@ -270,7 +270,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 /* ── MULTI-SELECT DROPDOWN FILTERS ── */
 .ms-filter{display:flex;align-items:center;gap:6px}
-.ms-filter>.ms-label{font-size:10px;color:var(--gray);font-weight:600;white-space:nowrap}
+.ms-filter>.ms-label{font-size:10px;color:#fff;font-weight:600;white-space:nowrap}
 .ms-dd{position:relative}
 .ms-btn{display:flex;align-items:center;gap:7px;border:1.5px solid #fff;border-radius:7px;padding:5px 9px;font-size:11px;color:var(--dark);background:#fff;cursor:pointer;transition:border-color .15s;min-width:110px;max-width:170px;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ms-btn:hover{border-color:var(--green)}
@@ -1100,7 +1100,7 @@ const F = {
   creancier: [],
   bailleur:  [],
   devise:    [],   // xof | eur | usd | cny | jpy
-  type:      [],   // don | pret
+  type:      [],   // fixe | variable
   ministere: []
 };
 
@@ -1136,8 +1136,8 @@ const FILTER_DEFS = [
   { key:'devise', label:'Devise', allLabel:'Toutes', options:[
       {v:'xof',l:'XOF'},{v:'eur',l:'EUR'},{v:'usd',l:'USD'},{v:'cny',l:'CNY'},{v:'jpy',l:'JPY'}
     ] },
-  { key:'type', label:'Type', allLabel:'Tout', options:[
-      {v:'don',l:'Don'},{v:'pret',l:'Prêt'}
+  { key:'type', label:'Taux', allLabel:'Tout', options:[
+      {v:'fixe',l:'Taux fixe'},{v:'variable',l:'Taux variable'}
     ] },
   { key:'ministere', label:'Ministère', allLabel:'Tous', options:[
       {v:'MEFB',l:'Min. Économie, Finances & Budget'},{v:'MINADER',l:'Min. Agriculture'},{v:'MINET',l:'Min. Énergie'},
@@ -1412,16 +1412,9 @@ function getFilteredEncours() {
     extKeysAll.forEach(k => { if (!allowedExt.has(k)) delete enc[k]; });
   }
 
-  // Filtre type (Don/Prêt) — simplification métier, union des types sélectionnés
-  if (F.type.length) {
-    const allKeys = Object.keys(DATA.encours);
-    const donKeep = new Set(allKeys.filter(k => !['BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI','Commerciaux','Eurobonds','Samourai','EximbankChine','KFW'].includes(k)));
-    const pretKeep = new Set(allKeys.filter(k => k !== 'FMI'));
-    const keep = new Set();
-    if (F.type.includes('don'))  donKeep.forEach(k => keep.add(k));
-    if (F.type.includes('pret')) pretKeep.forEach(k => keep.add(k));
-    Object.keys(enc).forEach(k => { if(!keep.has(k)) delete enc[k]; });
-  }
+  // Filtre Taux (fixe/variable) : en attente de la classification par instrument
+  // (donnée non disponible dans le MAD actuel, cf. Template BS). Le filtre est
+  // affiché pour préparer l'usage mais n'affecte pas encore l'encours.
 
   return enc;
 }

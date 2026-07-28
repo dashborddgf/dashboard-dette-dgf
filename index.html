@@ -103,7 +103,7 @@
         return;
       }
       /* ── camembert 3D (extrusion + face elliptique) ── */
-      const rx=Math.min(w,h*1.5)*.34, ry=rx*.55, cx=w/2, cy=h*.38, depth=rx*.24;
+      const rx=Math.min(w,h*1.5)*.26, ry=rx*.55, cx=w/2, cy=h*.40, depth=rx*.22;
       let a=-Math.PI/2; const slices=[];
       vals.forEach((v,i)=>{ const ang=v/total*Math.PI*2; slices.push({a0:a,a1:a+ang,color:colorAt(d.backgroundColor,i),label:String(labels[i]),v}); a+=ang; });
       slices.forEach(s=>{ const a0=Math.max(s.a0,0), a1=Math.min(s.a1,Math.PI); if(a0>=a1) return;
@@ -119,12 +119,19 @@
         c.fillStyle=s.color; c.fill(); c.lineWidth=d.borderWidth||2; c.strokeStyle=d.borderColor||'#fff'; c.stroke();
         this._hits.push({type:'wedge',cx,cy,rInner:0,rOuter:rx,ry,angleStart:s.a0,angleEnd:s.a1,html:this._tooltipHtml(s.label,d,s.v,s.v)});
         const ang=s.a1-s.a0;
-        if(ang>0.16){ const mid=(s.a0+s.a1)/2, mr=.6; labelPos.push({x:cx+Math.cos(mid)*rx*mr,y:cy+Math.sin(mid)*ry*mr,pct:s.v/total*100,label:s.label}); }
+        if(ang>0.12){ const mid=(s.a0+s.a1)/2, mr=ang<0.5?.82:.58; labelPos.push({x:cx+Math.cos(mid)*rx*mr,y:cy+Math.sin(mid)*ry*mr,pct:s.v/total*100,val:s.v,label:s.label}); }
       });
-      c.textAlign='center'; c.fillStyle='#fff'; c.font='bold 12px Montserrat,Segoe UI,Arial';
-      labelPos.forEach(p=>{ let lines=wrapLines(c,`${p.label}; ${format(p.pct)}%`,Math.max(60,rx*.85)); if(lines.length>3){ lines=lines.slice(0,3); lines[2]=lines[2].trimEnd()+'…'; } const lh=14; const startY=p.y-(lines.length-1)*lh/2; lines.forEach((ln,idx)=> c.fillText(ln,p.x,startY+idx*lh+4)); });
+      /* anti-collision : écarte les étiquettes de tranches adjacentes trop rapprochées (ex: petites parts voisines) */
+      for(let i=1;i<labelPos.length;i++){ for(let j=0;j<i;j++){
+        const dx=labelPos[i].x-labelPos[j].x, dy=labelPos[i].y-labelPos[j].y, dist=Math.hypot(dx,dy);
+        if(dist<30){ const ang2=dist>0.5?Math.atan2(dy,dx):(i-j); const push=(30-dist)/2+3;
+          labelPos[i].x+=Math.cos(ang2)*push; labelPos[i].y+=Math.sin(ang2)*push;
+          labelPos[j].x-=Math.cos(ang2)*push; labelPos[j].y-=Math.sin(ang2)*push; }
+      }}
+      c.textAlign='center'; c.fillStyle='#fff'; c.font='bold 10px Montserrat,Segoe UI,Arial';
+      labelPos.forEach(p=>{ let lines=wrapLines(c,`${p.label}; ${format(p.val)} Mrds (${format(p.pct)}%)`,Math.max(56,rx*.95)); if(lines.length>3){ lines=lines.slice(0,3); lines[2]=lines[2].trimEnd()+'…'; } const lh=11.5; const startY=p.y-(lines.length-1)*lh/2; lines.forEach((ln,idx)=> c.fillText(ln,p.x,startY+idx*lh+3.5)); });
       c.textAlign='left';
-      c.font='bold 12px Montserrat,Segoe UI,Arial'; let x=18,y=h-16; labels.forEach((lab,i)=>{c.fillStyle=colorAt(d.backgroundColor,i); c.fillRect(x,y-10,13,13); c.fillStyle='#374151'; c.fillText(String(lab).slice(0,24),x+18,y); x+=Math.min(200,String(lab).length*7.5+44); if(x>w-150){x=18;y-=18;}}); }
+      c.font='bold 11px Montserrat,Segoe UI,Arial'; let x=18,y=h-14; labels.forEach((lab,i)=>{c.fillStyle=colorAt(d.backgroundColor,i); c.fillRect(x,y-9,12,12); c.fillStyle='#374151'; c.fillText(String(lab).slice(0,24),x+16,y); x+=Math.min(190,String(lab).length*7+40); if(x>w-140){x=18;y-=16;}}); }
     noData(w,h){const c=this.ctx; c.fillStyle='#6B7280'; c.font='12px Montserrat,Segoe UI,Arial'; c.textAlign='center'; c.fillText('Aucune donnée à afficher',w/2,h/2); c.textAlign='left';}
   }
   MiniChart.defaults={font:{family:"'Montserrat','Segoe UI',system-ui,sans-serif",size:10}};
@@ -364,7 +371,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .cw{position:relative;height:190px}
 .cw-sm{height:155px}
 .cw-lg{height:230px}
-.cw-pie{height:340px}
+.cw-pie{height:250px}
 
 /* ── TABLES ── */
 .tbl{width:100%;border-collapse:collapse;font-size:11px}
@@ -483,7 +490,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   .cw { height: 160px !important; }
   .cw-sm { height: 130px !important; }
   .cw-lg { height: 190px !important; }
-  .cw-pie { height: 260px !important; }
+  .cw-pie { height: 210px !important; }
 
   /* Tables scrollables */
   .mad-table-wrap, .card-body { overflow-x: auto; }
@@ -576,7 +583,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
      de la place aux étiquettes pivotées quand il y a beaucoup de catégories. */
   .cw { height: 260px !important; }
   .cw-lg { height: 300px !important; }
-  .cw-pie { height: 340px !important; }
+  .cw-pie { height: 280px !important; }
 }
 
 /* Impression en paysage par défaut (proposé automatiquement dans la boîte de dialogue) */

@@ -570,9 +570,24 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     Vue d'ensemble
   </div>
 
-  <div class="nav-item" data-nav-key="structure-dette" onclick="showScreen('structure-dette',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
-    Structure Dette
+  <div class="nav-group" id="navgroup-structure-dette" data-nav-key="structure-dette">
+    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('structure-dette',this)">
+      <span class="nav-item-main">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
+        Structure Dette
+      </span>
+      <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
+    </div>
+    <div class="nav-submenu" id="navsub-structure-dette">
+      <div class="nav-item nav-subitem" onclick="showScreen('dette-int',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M12 3v18" stroke-width="1.5"/></svg>
+        Intérieur
+      </div>
+      <div class="nav-item nav-subitem" onclick="showScreen('dette-ext',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M3 12h18" stroke-width="1.5"/></svg>
+        Extérieur
+      </div>
+    </div>
   </div>
 
   <div class="nav-item" data-nav-key="ratios" onclick="showScreen('ratios',this)">
@@ -817,44 +832,40 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   </div><!-- /tableau-bord -->
 
   <!-- ══════════════ DETTE EXT ══════════════ -->
-  <div class="screen" id="screen-structure-dette">
-    <div class="g2" style="align-items:start">
-      <!-- Colonne INTÉRIEUR -->
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Intérieur — Par Instrument</div><div class="card-sub"><span id="fl-int-label" style="color:var(--orange)">Tous instruments</span></div></div></div>
-          <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntRep"></canvas></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Intérieur — Par Créancier</div><div class="card-sub">BCEAO, Banques Commerciales, Valeurs Mobilières</div></div></div>
-          <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntEvol"></canvas></div></div>
-        </div>
-      </div>
-      <!-- Colonne EXTÉRIEUR -->
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Extérieur — Par Créancier</div><div class="card-sub"><span id="fl-ext-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
-          <div class="card-body"><div class="cw cw-lg"><canvas id="chartExtEvol"></canvas></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Extérieur — Par Devise</div><div class="card-sub">Template BS · Trimestriel</div></div></div>
-          <div class="card-body"><div class="cw cw-lg"><canvas id="chartDevise"></canvas></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Extérieur — Par Taux</div><div class="card-sub">Template BS · Trimestriel</div></div></div>
-          <div class="card-body" style="padding:0">
-            <table class="tbl">
-              <thead><tr><th></th><th>2025</th><th>Mars 2026</th></tr></thead>
-              <tbody>
-                <tr><td class="td-b">Dette à taux fixe</td><td>89,4%</td><td>89,8%</td></tr>
-                <tr><td class="td-b">Dette à taux variable</td><td>10,6%</td><td>10,2%</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+  <div class="screen" id="screen-dette-int">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header"><div><div class="card-title">Intérieur — Par Instrument</div><div class="card-sub"><span id="fl-int-label" style="color:var(--orange)">Tous instruments</span></div></div></div>
+      <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntRep"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Intérieur — Par Créancier</div><div class="card-sub">BCEAO, Banques Commerciales, Valeurs Mobilières</div></div></div>
+      <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntEvol"></canvas></div></div>
+    </div>
+  </div><!-- /dette-int -->
+
+  <!-- ══════════════ DETTE EXT ══════════════ -->
+  <div class="screen" id="screen-dette-ext">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header"><div><div class="card-title">Extérieur — Par Créancier</div><div class="card-sub"><span id="fl-ext-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
+      <div class="card-body"><div class="cw cw-lg"><canvas id="chartExtEvol"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header"><div><div class="card-title">Extérieur — Par Devise</div><div class="card-sub">Template BS · Trimestriel</div></div></div>
+      <div class="card-body"><div class="cw cw-lg"><canvas id="chartDevise"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Extérieur — Par Taux</div><div class="card-sub">Template BS · Trimestriel</div></div></div>
+      <div class="card-body" style="padding:0">
+        <table class="tbl">
+          <thead><tr><th></th><th>2025</th><th>Mars 2026</th></tr></thead>
+          <tbody>
+            <tr><td class="td-b">Dette à taux fixe</td><td>89,4%</td><td>89,8%</td></tr>
+            <tr><td class="td-b">Dette à taux variable</td><td>10,6%</td><td>10,2%</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div><!-- /structure-dette -->
+  </div><!-- /dette-ext -->
 
   <!-- ══════════════ RATIOS ══════════════ -->
   <div class="screen" id="screen-ratios">
@@ -1087,7 +1098,7 @@ function optionLabel(key, val) {
 ════════════════════════════════════════════════════════════════ */
 const PAGE_TITLES = {
   'vue-exec':"Vue d'ensemble", 'tableau-bord':'Tableau de Bord MAD',
-  'structure-dette':'Structure Dette',
+  'dette-int':'Structure Dette — Intérieur', 'dette-ext':'Structure Dette — Extérieur',
   'ratios':'Indicateurs coûts et Risques', 'eurobonds':'Eurobonds',
   'comparaison':'Evolution', 'template-bs':'Template BS'
 };
@@ -2654,7 +2665,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" stroke-width="1.5"/></svg>
     MAD
   </div>
-  <div class="mobile-nav-item" onclick="showScreen('structure-dette',null);setMobileActive(this)">
+  <div class="mobile-nav-item" onclick="showScreen('dette-int',null);setMobileActive(this)">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
     Structure
   </div>

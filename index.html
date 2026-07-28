@@ -93,9 +93,9 @@
         const groupW=m.iw/labels.length; const stacked=cfg.options?.scales?.x?.stacked||cfg.options?.scales?.y?.stacked; labels.forEach((lab,i)=>{ c.fillStyle='#374151'; c.save(); c.translate(m.l+i*groupW+groupW/2,m.t+m.ih+12); c.rotate(labels.length>7?-Math.PI/5:0); c.fillText(String(lab).slice(0,10),-12,0); c.restore(); let base=m.t+m.ih; ds.forEach((d,j)=>{let v=+d.data?.[i]||0; let bh=(v/max)*m.ih; let bw=stacked?groupW*.58:(groupW*.75/ds.length); let x=m.l+i*groupW+groupW*.12+(stacked?groupW*.14:j*bw); let y=stacked?base-bh:m.t+m.ih-bh; c.fillStyle=colorAt(d.backgroundColor,j+i); c.fillRect(x,y,bw-2,bh); this._hits.push({type:'rect',x,y,w:Math.max(bw-2,4),h:Math.max(bh,2),html:this._tooltipHtml(String(lab),d,v,{x:v,y:v})}); if(stacked) base-=bh;}); });
       }}
     drawLine(w,h){ const cfg=this.config,data=cfg.data||{},labels=data.labels||[],ds=data.datasets||[]; if(!labels.length||!ds.length) return this.noData(w,h); const m=this.axes(w,h,false); const c=this.ctx; const leg=this.legend(ds,w,h); m.b+=leg; m.ih=h-m.t-m.b; let vals=ds.flatMap(d=>d.data||[]).map(Number); let min=cfg.options?.scales?.y?.min ?? Math.min(0,...vals); let max=cfg.options?.scales?.y?.max ?? niceMax(Math.max(...vals)*1.05); c.font='bold 10px Montserrat,Segoe UI,Arial'; c.strokeStyle='rgba(0,0,0,.08)'; for(let k=0;k<=4;k++){let y=m.t+m.ih-k*m.ih/4; c.beginPath(); c.moveTo(m.l,y); c.lineTo(m.l+m.iw,y); c.stroke(); c.fillStyle='#6B7280'; c.fillText(format(min+(max-min)*k/4),4,y+3);} labels.forEach((lab,i)=>{let x=m.l+i*m.iw/(labels.length-1||1); c.fillStyle='#374151'; c.fillText(String(lab),x-12,m.t+m.ih+14);}); ds.forEach((d,j)=>{c.beginPath(); (d.data||[]).forEach((v,i)=>{let x=m.l+i*m.iw/(labels.length-1||1), y=m.t+m.ih-((v-min)/(max-min))*m.ih; if(i) c.lineTo(x,y); else c.moveTo(x,y);}); c.strokeStyle=d.borderColor||colorAt(d.backgroundColor,j); c.lineWidth=d.borderWidth||2; if(d.borderDash)c.setLineDash(d.borderDash); else c.setLineDash([]); c.stroke(); c.setLineDash([]); (d.data||[]).forEach((v,i)=>{let x=m.l+i*m.iw/(labels.length-1||1), y=m.t+m.ih-((v-min)/(max-min))*m.ih; if((d.pointRadius??3)>0){c.fillStyle=d.pointBackgroundColor||d.borderColor||colorAt(d.backgroundColor,j); c.beginPath(); c.arc(x,y,d.pointRadius||3,0,Math.PI*2); c.fill();} this._hits.push({type:'circle',x,y,r:Math.max(9,(d.pointRadius||3)+6),html:this._tooltipHtml(String(labels[i]),d,v,{x:v,y:v})});});}); }
-    drawPie(w,h,doughnut){ const cfg=this.config,data=cfg.data||{},labels=data.labels||[],d=data.datasets?.[0]||{},vals=(d.data||[]).map(Number); if(!vals.length) return this.noData(w,h); const c=this.ctx,total=vals.reduce((a,b)=>a+b,0)||1; const r=Math.min(w,h)*.32, cx=w/2, cy=h*.43; const rInner=doughnut?r*.58:0; let a=-Math.PI/2; const labelPos=[]; vals.forEach((v,i)=>{let ang=v/total*Math.PI*2; c.beginPath(); c.moveTo(cx,cy); c.arc(cx,cy,r,a,a+ang); c.closePath(); c.fillStyle=colorAt(d.backgroundColor,i); c.fill(); c.lineWidth=d.borderWidth||2; c.strokeStyle=d.borderColor||'#fff'; c.stroke(); this._hits.push({type:'wedge',cx,cy,rInner,rOuter:r,angleStart:a,angleEnd:a+ang,html:this._tooltipHtml(String(labels[i]),d,v,v)}); if(ang>0.22){ const mid=a+ang/2, mr=doughnut?(rInner+r)/2:r*.62; labelPos.push({x:cx+Math.cos(mid)*mr,y:cy+Math.sin(mid)*mr,pct:v/total*100}); } a+=ang;}); if(doughnut){c.globalCompositeOperation='destination-out'; c.beginPath(); c.arc(cx,cy,rInner,0,Math.PI*2); c.fill(); c.globalCompositeOperation='source-over';}
-      c.textAlign='center'; c.font='bold 10px Montserrat,Segoe UI,Arial'; c.fillStyle='#fff'; labelPos.forEach(p=>{ c.fillText(format(p.pct)+'%',p.x,p.y+3); }); c.textAlign='left';
-      c.font='bold 10px Montserrat,Segoe UI,Arial'; let x=18,y=h-26; labels.forEach((lab,i)=>{c.fillStyle=colorAt(d.backgroundColor,i); c.fillRect(x,y-8,10,10); c.fillStyle='#374151'; c.fillText(String(lab).slice(0,24),x+14,y); x+=Math.min(170,String(lab).length*6+35); if(x>w-130){x=18;y-=14;}}); }
+    drawPie(w,h,doughnut){ const cfg=this.config,data=cfg.data||{},labels=data.labels||[],d=data.datasets?.[0]||{},vals=(d.data||[]).map(Number); if(!vals.length) return this.noData(w,h); const c=this.ctx,total=vals.reduce((a,b)=>a+b,0)||1; const r=Math.min(w,h)*.40, cx=w/2, cy=h*.44; const rInner=doughnut?r*.58:0; let a=-Math.PI/2; const labelPos=[]; vals.forEach((v,i)=>{let ang=v/total*Math.PI*2; c.beginPath(); c.moveTo(cx,cy); c.arc(cx,cy,r,a,a+ang); c.closePath(); c.fillStyle=colorAt(d.backgroundColor,i); c.fill(); c.lineWidth=d.borderWidth||2; c.strokeStyle=d.borderColor||'#fff'; c.stroke(); this._hits.push({type:'wedge',cx,cy,rInner,rOuter:r,angleStart:a,angleEnd:a+ang,html:this._tooltipHtml(String(labels[i]),d,v,v)}); if(ang>0.22){ const mid=a+ang/2, mr=doughnut?(rInner+r)/2:r*.64; labelPos.push({x:cx+Math.cos(mid)*mr,y:cy+Math.sin(mid)*mr,pct:v/total*100,label:String(labels[i])}); } a+=ang;}); if(doughnut){c.globalCompositeOperation='destination-out'; c.beginPath(); c.arc(cx,cy,rInner,0,Math.PI*2); c.fill(); c.globalCompositeOperation='source-over';}
+      c.textAlign='center'; c.fillStyle='#fff'; labelPos.forEach(p=>{ const lab=p.label.length>16?p.label.slice(0,15)+'…':p.label; c.font='bold 13px Montserrat,Segoe UI,Arial'; c.fillText(lab,p.x,p.y-5); c.font='bold 16px Montserrat,Segoe UI,Arial'; c.fillText(format(p.pct)+'%',p.x,p.y+15); }); c.textAlign='left';
+      c.font='bold 12px Montserrat,Segoe UI,Arial'; let x=18,y=h-20; labels.forEach((lab,i)=>{c.fillStyle=colorAt(d.backgroundColor,i); c.fillRect(x,y-10,13,13); c.fillStyle='#374151'; c.fillText(String(lab).slice(0,24),x+18,y); x+=Math.min(200,String(lab).length*7.5+44); if(x>w-150){x=18;y-=18;}}); }
     noData(w,h){const c=this.ctx; c.fillStyle='#6B7280'; c.font='12px Montserrat,Segoe UI,Arial'; c.textAlign='center'; c.fillText('Aucune donnée à afficher',w/2,h/2); c.textAlign='left';}
   }
   MiniChart.defaults={font:{family:"'Montserrat','Segoe UI',system-ui,sans-serif",size:10}};
@@ -335,6 +335,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .cw{position:relative;height:190px}
 .cw-sm{height:155px}
 .cw-lg{height:230px}
+.cw-pie{height:340px}
 
 /* ── TABLES ── */
 .tbl{width:100%;border-collapse:collapse;font-size:11px}
@@ -453,6 +454,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   .cw { height: 160px !important; }
   .cw-sm { height: 130px !important; }
   .cw-lg { height: 190px !important; }
+  .cw-pie { height: 260px !important; }
 
   /* Tables scrollables */
   .mad-table-wrap, .card-body { overflow-x: auto; }
@@ -545,6 +547,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
      de la place aux étiquettes pivotées quand il y a beaucoup de catégories. */
   .cw { height: 260px !important; }
   .cw-lg { height: 300px !important; }
+  .cw-pie { height: 340px !important; }
 }
 
 /* Impression en paysage par défaut (proposé automatiquement dans la boîte de dialogue) */
@@ -836,11 +839,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="screen" id="screen-dette-int">
     <div class="card" style="margin-bottom:12px">
       <div class="card-header"><div><div class="card-title">Intérieur — Par Instrument</div><div class="card-sub"><span id="fl-int-label" style="color:var(--orange)">Tous instruments</span></div></div></div>
-      <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntRep"></canvas></div></div>
+      <div class="card-body"><div class="cw cw-pie"><canvas id="chartIntRep"></canvas></div></div>
     </div>
     <div class="card">
       <div class="card-header"><div><div class="card-title">Intérieur — Par Créancier</div><div class="card-sub">BCEAO, Banques Commerciales, Valeurs Mobilières</div></div></div>
-      <div class="card-body"><div class="cw cw-lg"><canvas id="chartIntEvol"></canvas></div></div>
+      <div class="card-body"><div class="cw cw-pie"><canvas id="chartIntEvol"></canvas></div></div>
     </div>
   </div><!-- /dette-int -->
 
@@ -848,7 +851,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="screen" id="screen-dette-ext">
     <div class="card" style="margin-bottom:12px">
       <div class="card-header"><div><div class="card-title">Extérieur — Par Créancier</div><div class="card-sub"><span id="fl-ext-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
-      <div class="card-body"><div class="cw cw-lg"><canvas id="chartExtEvol"></canvas></div></div>
+      <div class="card-body"><div class="cw cw-pie"><canvas id="chartExtEvol"></canvas></div></div>
     </div>
     <div class="card" style="margin-bottom:12px">
       <div class="card-header"><div><div class="card-title">Extérieur — Par Devise</div><div class="card-sub">Template BS · Trimestriel</div></div></div>

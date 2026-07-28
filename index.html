@@ -119,7 +119,9 @@
   --filter-h:58px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4;color:var(--dark);display:flex;min-height:100vh;font-size:13px}
+body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4;color:var(--dark);display:flex;min-height:100vh;font-size:13px;overflow-x:hidden}
+.g2,.g3,.g31,.g13{min-width:0}
+.g2>*,.g3>*,.g31>*,.g13>*{min-width:0}
 
 /* ── SIDEBAR ── */
 .sidebar{width:var(--sidebar-w);background:var(--green);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow:hidden}
@@ -260,11 +262,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .kpi-value{font-size:20px;font-weight:800;color:var(--dark);line-height:1;margin-bottom:4px}
 .kpi-unit{font-size:10px;color:var(--gray);font-weight:400}
 .kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;margin-top:5px;padding:2px 7px;border-radius:20px}
-.stat-row{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
-.stat-row:last-child{border-bottom:none}
-.stat-label{font-size:12px;font-weight:700;color:var(--dark)}
-.stat-value{font-size:17px;font-weight:800;color:var(--dark)}
-.stat-pib{font-size:10px;font-weight:700;color:var(--orange);margin-left:7px}
+.stat-row{display:flex;flex-direction:column;gap:12px}
+.stat-card{background:#fff;border-radius:8px;border:1px solid var(--border);border-left:4px solid var(--green);padding:16px 18px;position:relative;transition:box-shadow .2s,transform .2s}
+.stat-card:hover{box-shadow:0 10px 24px rgba(0,0,0,.12);transform:translateY(-4px)}
+.stat-card.stat-orange{border-left-color:var(--orange)}
+.stat-card.stat-gold{border-left-color:var(--gold)}
+.stat-card-icon{position:absolute;top:14px;right:16px;font-size:22px;opacity:.4}
+.stat-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gray)}
+.stat-value{font-size:26px;font-weight:800;color:var(--navy);margin-top:6px}
+.stat-value .stat-unit{font-size:13px;font-weight:700;color:var(--gray);margin-left:4px}
+.stat-sub{font-size:11.5px;color:var(--gray);margin-top:2px}
+.stat-pib{display:inline-block;margin-top:10px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green)}
+.stat-card.stat-orange .stat-pib{background:var(--orange-bg);color:var(--orange)}
+.stat-card.stat-gold .stat-pib{background:var(--gold-bg);color:var(--gold)}
 .kpi-delta.up{background:var(--green-bg);color:var(--green)}
 .kpi-delta.down{background:var(--red-bg);color:var(--red)}
 .kpi-delta.neutral{background:var(--gold-bg);color:#92720A}
@@ -276,6 +286,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 /* ── ALERT ── */
 .alert-banner{border-radius:8px;padding:9px 14px;display:flex;align-items:center;gap:9px;margin-bottom:14px;font-size:11px;font-weight:600}
+.ticker-wrap{overflow:hidden;white-space:nowrap;display:block}
+.ticker-track{display:inline-flex;width:max-content;animation:ticker-scroll 20s linear infinite}
+.ticker-wrap:hover .ticker-track{animation-play-state:paused}
+.ticker-item{padding-right:70px;flex-shrink:0}
+@keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion: reduce){ .ticker-track{animation:none} }
 .alert-green{background:var(--green-bg);border:1px solid var(--green-light);color:var(--green)}
 .alert-blue{background:var(--blue-bg);border:1px solid var(--blue);color:var(--blue)}
 .alert-orange{background:var(--orange-bg);border:1px solid var(--orange);color:var(--orange)}
@@ -287,8 +303,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .g13{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px}
 
 /* ── CARD ── */
-.card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s}
-.card:hover{box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .2s;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green) 0%,var(--green) 45%,var(--orange) 55%,var(--orange) 100%)}
+.card:hover{box-shadow:0 10px 24px rgba(0,0,0,.12);transform:translateY(-4px)}
 .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;border-bottom:1px solid var(--border)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark)}
 .card-sub{font-size:10px;color:#000;font-weight:700;margin-top:1px}
@@ -705,40 +722,43 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ VUE EXECUTIVE ══════════════ -->
   <div class="screen active" id="screen-vue-exec">
 
-    <div class="alert-banner alert-green" id="alert-exec">
-      ✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable
+    <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
+      <div class="ticker-track">
+        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
+        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
+      </div>
     </div>
 
-    <div id="vintage-banner" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:10px;color:#374151;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:6px 10px;margin-bottom:10px">
-      <span>📅 <b>Millésimes des données</b> :</span>
-      <span style="background:#EC8D08;color:#fff;padding:1px 8px;border-radius:12px">Encours &amp; service : <b id="vintage-mad">MAD —</b></span>
-      <span style="background:#1F3864;color:#fff;padding:1px 8px;border-radius:12px">Ratios &amp; référentiels : <b>Bulletin T4-2025 (déc. 2025)</b></span>
-      <span style="color:#6B7280">· Périmètre : dette de l'Administration Centrale, hors C2D/PCD (Tabl. 2) et hors dette garantie (239,6 Mrds, 0,4% PIB — Tabl. 11)</span>
-    </div>
 
     <div class="g3" id="vue-exec-cols">
       <div class="card">
         <div class="card-header"><div><div class="card-title">Encours</div><div class="card-sub">Stock de la dette — <span id="col-enc-period">MAD —</span></div></div></div>
         <div class="card-body">
-          <div class="stat-row"><span class="stat-label">Total</span><span><span class="stat-value" id="col-enc-total">—</span><span class="stat-pib" id="col-enc-total-pib"></span></span></div>
-          <div class="stat-row"><span class="stat-label">Intérieur</span><span><span class="stat-value" id="col-enc-int">—</span><span class="stat-pib" id="col-enc-int-pib"></span></span></div>
-          <div class="stat-row"><span class="stat-label">Extérieur</span><span><span class="stat-value" id="col-enc-ext">—</span><span class="stat-pib" id="col-enc-ext-pib"></span></span></div>
+          <div class="stat-row">
+            <div class="stat-card stat-green"><div class="stat-card-icon">🏛</div><div class="stat-label">Total</div><div class="stat-value" id="col-enc-total">—</div><div class="stat-sub">Milliards FCFA</div><div class="stat-pib" id="col-enc-total-pib"></div></div>
+            <div class="stat-card stat-orange"><div class="stat-card-icon">🏠</div><div class="stat-label">Intérieur</div><div class="stat-value" id="col-enc-int">—</div><div class="stat-sub">Milliards FCFA</div><div class="stat-pib" id="col-enc-int-pib"></div></div>
+            <div class="stat-card stat-gold"><div class="stat-card-icon">🌐</div><div class="stat-label">Extérieur</div><div class="stat-value" id="col-enc-ext">—</div><div class="stat-sub">Milliards FCFA</div><div class="stat-pib" id="col-enc-ext-pib"></div></div>
+          </div>
         </div>
       </div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">Mobilisation</div><div class="card-sub">Nouveaux tirages — <span id="col-mob-period">MAD —</span></div></div></div>
         <div class="card-body">
-          <div class="stat-row"><span class="stat-label">Total</span><span class="stat-value" id="col-mob-total">—</span></div>
-          <div class="stat-row"><span class="stat-label">Intérieur</span><span class="stat-value" id="col-mob-int">—</span></div>
-          <div class="stat-row"><span class="stat-label">Extérieur</span><span class="stat-value" id="col-mob-ext">—</span></div>
+          <div class="stat-row">
+            <div class="stat-card stat-green"><div class="stat-card-icon">📋</div><div class="stat-label">Total</div><div class="stat-value" id="col-mob-total">—</div><div class="stat-sub">Milliards FCFA</div></div>
+            <div class="stat-card stat-orange"><div class="stat-card-icon">🏠</div><div class="stat-label">Intérieur</div><div class="stat-value" id="col-mob-int">—</div><div class="stat-sub">Milliards FCFA</div></div>
+            <div class="stat-card stat-gold"><div class="stat-card-icon">🌐</div><div class="stat-label">Extérieur</div><div class="stat-value" id="col-mob-ext">—</div><div class="stat-sub">Milliards FCFA</div></div>
+          </div>
         </div>
       </div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">Service</div><div class="card-sub">Capital + Intérêts — <span id="col-svc-period">MAD —</span></div></div></div>
         <div class="card-body">
-          <div class="stat-row"><span class="stat-label">Total</span><span class="stat-value" id="col-svc-total">—</span></div>
-          <div class="stat-row"><span class="stat-label">Intérieur</span><span class="stat-value" id="col-svc-int">—</span></div>
-          <div class="stat-row"><span class="stat-label">Extérieur</span><span class="stat-value" id="col-svc-ext">—</span></div>
+          <div class="stat-row">
+            <div class="stat-card stat-green"><div class="stat-card-icon">📊</div><div class="stat-label">Total</div><div class="stat-value" id="col-svc-total">—</div><div class="stat-sub">Milliards FCFA</div></div>
+            <div class="stat-card stat-orange"><div class="stat-card-icon">🏠</div><div class="stat-label">Intérieur</div><div class="stat-value" id="col-svc-int">—</div><div class="stat-sub">Milliards FCFA</div></div>
+            <div class="stat-card stat-gold"><div class="stat-card-icon">🌐</div><div class="stat-label">Extérieur</div><div class="stat-value" id="col-svc-ext">—</div><div class="stat-sub">Milliards FCFA</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1376,10 +1396,6 @@ function updateDynamicBadges() {
   if(et) et.innerHTML=fmt(euro)+' <span class="kpi-unit">Mrds FCFA</span>';
   setV('kv-samourai', g('Samourai'));
   setT('euro-enc-inline', fmt(euro));
-
-  // Bandeau millésimes (V2)
-  const vb=document.getElementById('vintage-mad');
-  if(vb) vb.textContent='MAD '+(MAD_META.periode||'')+(DATA.meta&&DATA.meta.situationAu?' (au '+DATA.meta.situationAu+')':'');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1599,11 +1615,11 @@ function ratioPibPourAnnee(year) {
 
 function setStatValue(id, value) {
   const el = document.getElementById(id);
-  if (el) el.textContent = fmt(value) + ' Mrds';
+  if (el) el.textContent = fmt(value);
 }
 function setStatPib(id, pct) {
   const el = document.getElementById(id);
-  if (el) el.textContent = '· ' + (Math.round(pct * 10) / 10).toString().replace('.', ',') + '% PIB';
+  if (el) el.textContent = (Math.round(pct * 10) / 10).toString().replace('.', ',') + '% PIB';
 }
 
 /* Onglet Vue d'ensemble — 3 colonnes Encours / Mobilisation / Service,

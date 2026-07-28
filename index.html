@@ -260,11 +260,17 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .kpi-value{font-size:20px;font-weight:800;color:var(--dark);line-height:1;margin-bottom:4px}
 .kpi-unit{font-size:10px;color:var(--gray);font-weight:400}
 .kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;margin-top:5px;padding:2px 7px;border-radius:20px}
-.stat-row{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
-.stat-row:last-child{border-bottom:none}
-.stat-label{font-size:12px;font-weight:700;color:var(--dark)}
-.stat-value{font-size:17px;font-weight:800;color:var(--dark)}
-.stat-pib{font-size:10px;font-weight:700;color:var(--orange);margin-left:7px}
+.stat-row{display:flex;flex-direction:column;gap:8px}
+.stat-box{display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 10px;border-radius:8px;gap:3px}
+.stat-box.stat-green{background:var(--green-bg)}
+.stat-box.stat-green .stat-value{color:var(--green)}
+.stat-box.stat-orange{background:var(--orange-bg)}
+.stat-box.stat-orange .stat-value{color:var(--orange)}
+.stat-box.stat-gold{background:var(--gold-bg)}
+.stat-box.stat-gold .stat-value{color:var(--gold)}
+.stat-label{font-size:11px;font-weight:700;color:var(--dark)}
+.stat-value{font-size:19px;font-weight:800}
+.stat-pib{font-size:9px;font-weight:700;color:var(--gray);margin-top:1px}
 .kpi-delta.up{background:var(--green-bg);color:var(--green)}
 .kpi-delta.down{background:var(--red-bg);color:var(--red)}
 .kpi-delta.neutral{background:var(--gold-bg);color:#92720A}
@@ -721,25 +727,31 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="card">
         <div class="card-header"><div><div class="card-title">Encours</div><div class="card-sub">Stock de la dette — <span id="col-enc-period">MAD —</span></div></div></div>
         <div class="card-body">
-          <div class="stat-row"><span class="stat-label">Total</span><span><span class="stat-value" id="col-enc-total">—</span><span class="stat-pib" id="col-enc-total-pib"></span></span></div>
-          <div class="stat-row"><span class="stat-label">Intérieur</span><span><span class="stat-value" id="col-enc-int">—</span><span class="stat-pib" id="col-enc-int-pib"></span></span></div>
-          <div class="stat-row"><span class="stat-label">Extérieur</span><span><span class="stat-value" id="col-enc-ext">—</span><span class="stat-pib" id="col-enc-ext-pib"></span></span></div>
+          <div class="stat-row">
+            <div class="stat-box stat-green"><div class="stat-value" id="col-enc-total">—</div><div class="stat-label">Total</div><div class="stat-pib" id="col-enc-total-pib"></div></div>
+            <div class="stat-box stat-orange"><div class="stat-value" id="col-enc-int">—</div><div class="stat-label">Intérieur</div><div class="stat-pib" id="col-enc-int-pib"></div></div>
+            <div class="stat-box stat-gold"><div class="stat-value" id="col-enc-ext">—</div><div class="stat-label">Extérieur</div><div class="stat-pib" id="col-enc-ext-pib"></div></div>
+          </div>
         </div>
       </div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">Mobilisation</div><div class="card-sub">Nouveaux tirages — <span id="col-mob-period">MAD —</span></div></div></div>
         <div class="card-body">
-          <div class="stat-row"><span class="stat-label">Total</span><span class="stat-value" id="col-mob-total">—</span></div>
-          <div class="stat-row"><span class="stat-label">Intérieur</span><span class="stat-value" id="col-mob-int">—</span></div>
-          <div class="stat-row"><span class="stat-label">Extérieur</span><span class="stat-value" id="col-mob-ext">—</span></div>
+          <div class="stat-row">
+            <div class="stat-box stat-green"><div class="stat-value" id="col-mob-total">—</div><div class="stat-label">Total</div></div>
+            <div class="stat-box stat-orange"><div class="stat-value" id="col-mob-int">—</div><div class="stat-label">Intérieur</div></div>
+            <div class="stat-box stat-gold"><div class="stat-value" id="col-mob-ext">—</div><div class="stat-label">Extérieur</div></div>
+          </div>
         </div>
       </div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">Service</div><div class="card-sub">Capital + Intérêts — <span id="col-svc-period">MAD —</span></div></div></div>
         <div class="card-body">
-          <div class="stat-row"><span class="stat-label">Total</span><span class="stat-value" id="col-svc-total">—</span></div>
-          <div class="stat-row"><span class="stat-label">Intérieur</span><span class="stat-value" id="col-svc-int">—</span></div>
-          <div class="stat-row"><span class="stat-label">Extérieur</span><span class="stat-value" id="col-svc-ext">—</span></div>
+          <div class="stat-row">
+            <div class="stat-box stat-green"><div class="stat-value" id="col-svc-total">—</div><div class="stat-label">Total</div></div>
+            <div class="stat-box stat-orange"><div class="stat-value" id="col-svc-int">—</div><div class="stat-label">Intérieur</div></div>
+            <div class="stat-box stat-gold"><div class="stat-value" id="col-svc-ext">—</div><div class="stat-label">Extérieur</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1604,7 +1616,7 @@ function setStatValue(id, value) {
 }
 function setStatPib(id, pct) {
   const el = document.getElementById(id);
-  if (el) el.textContent = '· ' + (Math.round(pct * 10) / 10).toString().replace('.', ',') + '% PIB';
+  if (el) el.textContent = (Math.round(pct * 10) / 10).toString().replace('.', ',') + '% PIB';
 }
 
 /* Onglet Vue d'ensemble — 3 colonnes Encours / Mobilisation / Service,

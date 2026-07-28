@@ -805,8 +805,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
     <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
       <div class="ticker-track">
-        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
-        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong>57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
+        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong class="pib-ac-ticker">57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
+        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong class="pib-ac-ticker">57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
       </div>
     </div>
 
@@ -938,7 +938,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs</div></div></div>
       <div class="card-body">
         <div class="ratio-grid">
-          <div class="ratio-item r-ok"><div class="ratio-val">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div></div>
+          <div class="ratio-item r-ok" id="ratio-item-pib"><div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div></div>
           <div class="ratio-item r-warn"><div class="ratio-val">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div></div>
           <div class="ratio-item r-ok"><div class="ratio-val">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div></div>
           <div class="ratio-item r-warn"><div class="ratio-val">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div></div>
@@ -953,7 +953,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <table class="tbl">
           <thead><tr><th style="text-align:left">Indicateur</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>Seuil</th><th>Statut 2025</th></tr></thead>
           <tbody>
-            <tr><td class="td-b">Dette AC / PIB (%)</td><td>50,2%</td><td>56,0%</td><td>56,7%</td><td>59,5%</td><td style="font-weight:700;color:var(--green)">57,1%</td><td style="color:var(--gray)">&lt; 70%</td><td><span class="tag" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
+            <tr><td class="td-b">Dette AC / PIB (%)</td><td>50,2%</td><td id="td-pib-2022">56,0%</td><td id="td-pib-2023">56,7%</td><td id="td-pib-2024">59,5%</td><td id="td-pib-2025" style="font-weight:700;color:var(--green)">57,1%</td><td style="color:var(--gray)">&lt; 70%</td><td><span class="tag" id="tag-pib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
             <tr><td class="td-b">Intérêts / Recettes (%)</td><td>13,2%</td><td>15,0%</td><td>16,6%</td><td>16,7%</td><td style="font-weight:700;color:#92720A">16,5%</td><td style="color:var(--gray)">&lt; 22%</td><td><span class="tag" style="background:var(--gold-bg);color:#92720A">⚠ Vigilance</span></td></tr>
             <tr><td class="td-b">Intérêts / PIB (%)</td><td>1,9%</td><td>2,2%</td><td>2,6%</td><td>2,7%</td><td style="font-weight:700;color:var(--green)">2,7%</td><td style="color:var(--gray)">&lt; 3%</td><td><span class="tag" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
             <tr><td class="td-b">Taux intérêt moyen pondéré</td><td>4,1%</td><td>4,2%</td><td>4,6%</td><td>5,0%</td><td>5,1%</td><td>—</td><td>—</td></tr>
@@ -1804,7 +1804,9 @@ function buildChartIntEvol(enc) {
 
 
 function buildChartRatioPIB() {
-  mkChart('chartRatioPIB',{type:'line',data:{labels:['2021','2022','2023','2024','2025'],datasets:[{label:'Dette/PIB (%)',data:[50.2,56.0,56.7,59.5,57.1],borderColor:C.or,backgroundColor:C.orL,fill:true,tension:.3,pointRadius:5,pointBackgroundColor:C.or,borderWidth:2.5},{label:'Seuil UEMOA 70%',data:[70,70,70,70,70],borderColor:C.rd,borderDash:[7,4],borderWidth:2,pointRadius:0,tension:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{...gO},y:{min:40,max:80,...gO,ticks:{callback:v=>v+'%',...gO.ticks}}}}});
+  const years = ['2021','2022','2023','2024','2025'];
+  const data = years.map(y => RATIO_PIB_PAR_ANNEE[y]);
+  mkChart('chartRatioPIB',{type:'line',data:{labels:years,datasets:[{label:'Dette/PIB (%)',data,borderColor:C.or,backgroundColor:C.orL,fill:true,tension:.3,pointRadius:5,pointBackgroundColor:C.or,borderWidth:2.5},{label:'Seuil UEMOA 70%',data:years.map(()=>70),borderColor:C.rd,borderDash:[7,4],borderWidth:2,pointRadius:0,tension:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{...gO},y:{min:40,max:80,...gO,ticks:{callback:v=>v+'%',...gO.ticks}}}}});
 }
 
 
@@ -2525,7 +2527,7 @@ async function returnToActiveMAD() {
    données figées.
 ════════════════════════════════════════════════════════════════ */
 const BS_DATA_FALLBACK = {
-  meta: { bsName: 'BS1T26', periode: 'Mars 2026' },
+  meta: { bsName: 'BS1T26', periode: 'Mars 2026', situationAu: '2026-03-01' },
   periods: ['2022','2023','2024','2025'],
   rows: [
     { label:'Dette totale', values:[24774.4,27782.6,31406.9,33159.2,34882.3] },
@@ -2537,7 +2539,10 @@ const BS_DATA_FALLBACK = {
     { label:'PIB Nominal', bold:true, values:[44238.8,48998.9,52820.7,58061.1,62340.4] },
     { label:'', spacer:true },
     { label:'Norme Uemoa', pct:true, values:[70,70,70,70,70] }
-  ]
+  ],
+  // Source : onglet "Tableau 3" du fichier BS — Dette de l'Administration
+  // Centrale en % du PIB, 2022 à 2025 (2021 reste une constante historique fixe).
+  pibAC: { '2022':56.0, '2023':56.7, '2024':59.5, '2025':57.1 }
 };
 let BS_DATA = null;
 
@@ -2550,6 +2555,45 @@ async function loadBSData() {
     console.info('ℹ bs_data.json introuvable — utilisation des données Template BS intégrées.');
   }
   renderBSTable();
+  applyPibACData();
+}
+
+/* Répercute le ratio Dette AC/PIB (Tableau 3 du BS) sur tous les affichages
+   qui en dépendaient jusqu'ici d'une constante figée : bandeau défilant,
+   case "Dette/PIB" du Tableau de Bord des Risques, ligne "Dette AC / PIB (%)"
+   du tableau des ratios, graphique "Évolution Ratio Dette/PIB", et le %PIB
+   dérivé par composante dans Vue d'ensemble (via RATIO_PIB_PAR_ANNEE). */
+function applyPibACData() {
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const pibAC = bs.pibAC;
+  if (!pibAC) return;
+  Object.assign(RATIO_PIB_PAR_ANNEE, pibAC);
+
+  const latestYear = Object.keys(pibAC).sort().pop();
+  const latestVal = pibAC[latestYear];
+  const latestTxt = fmt(latestVal) + '%';
+  const ok = latestVal < 70;
+
+  document.querySelectorAll('.pib-ac-ticker').forEach(el => { el.textContent = latestTxt; });
+
+  const boxVal = document.getElementById('ratio-val-pib');
+  if (boxVal) boxVal.textContent = latestTxt;
+  const box = document.getElementById('ratio-item-pib');
+  if (box) { box.classList.remove('r-ok','r-warn'); box.classList.add(ok ? 'r-ok' : 'r-warn'); }
+
+  ['2022','2023','2024','2025'].forEach(y => {
+    const el = document.getElementById('td-pib-' + y);
+    if (el && pibAC[y] != null) el.textContent = fmt(pibAC[y]) + '%';
+  });
+  const tag = document.getElementById('tag-pib-status');
+  if (tag) {
+    tag.textContent = ok ? '✓ OK' : '⚠ Vigilance';
+    tag.style.background = ok ? 'var(--green-bg)' : 'var(--gold-bg)';
+    tag.style.color = ok ? 'var(--green)' : '#92720A';
+  }
+
+  buildChartRatioPIB();
+  refreshAll();
 }
 
 function renderBSTable() {

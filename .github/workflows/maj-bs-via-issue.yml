@@ -1,0 +1,44 @@
+name: MAJ bs_data.json via issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  update:
+    # Sécurité : ne réagir qu'aux issues "BS-UPDATE" créées par le propriétaire du dépôt
+    if: >
+      startsWith(github.event.issue.title, 'BS-UPDATE') &&
+      github.event.issue.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Extraire et valider le JSON du corps de l'issue
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          printf '%s' "$BODY" > /tmp/bs_data.json
+          python3 -c "import json; json.load(open('/tmp/bs_data.json'))"
+
+      - name: Mettre à jour bs_data.json et commiter
+        run: |
+          cp /tmp/bs_data.json bs_data.json
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add bs_data.json
+          git commit -m "MAJ auto bs_data.json via Power Automate - $(date -u +%FT%TZ)" || echo "Aucun changement"
+          git push
+
+      - name: Fermer l'issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue close ${{ github.event.issue.number }} \
+            --repo ${{ github.repository }} \
+            --comment "✅ bs_data.json mis à jour automatiquement. Template BS actualisé."

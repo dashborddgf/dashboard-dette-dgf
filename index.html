@@ -400,6 +400,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .tbl tr:hover td{background:var(--orange-bg)}
 .tbl-lg th{padding:16px 20px;font-size:13px}
 .tbl-lg td{padding:22px 20px;font-size:16px}
+.tbl-bs th,.tbl-bs td{text-align:right;white-space:nowrap}
+.tbl-bs th:first-child,.tbl-bs td:first-child{text-align:left;white-space:normal}
+.tbl-bs thead tr:first-child th{background:#fff;color:var(--dark);border:none;border-bottom:2px solid var(--border);font-size:11px}
+.tbl-bs thead tr:last-child th{background:var(--green);color:#fff}
+.tbl-bs tr.bs-section td{background:var(--orange);color:#fff;font-weight:700}
+.tbl-bs tr.bs-section:hover td{background:var(--orange)}
+.tbl-bs tr.bs-sub td{font-weight:600}
 .td-b{font-weight:700;color:var(--navy)}
 .tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
 .tag-ext{background:var(--blue-bg);color:var(--blue)}
@@ -1055,9 +1062,14 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ TEMPLATE BS (à venir) ══════════════ -->
   <div class="screen" id="screen-template-bs">
-    <div class="card" style="text-align:center;padding:40px 20px;color:var(--gray);font-size:12px">
-      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px">Template BS</div>
-      Contenu à venir.
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Situation de la Dette — Template BS</div><div class="card-sub">Millions USD &amp; Milliards F CFA · Dernière colonne : <span id="bs-active-name">—</span></div></div></div>
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table class="tbl tbl-bs" id="bsTable" style="min-width:900px">
+          <thead id="bsTableHead"></thead>
+          <tbody id="bsTableBody"></tbody>
+        </table>
+      </div>
     </div>
   </div><!-- /template-bs -->
 
@@ -2504,6 +2516,74 @@ async function returnToActiveMAD() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   TEMPLATE BS — Situation de la Dette (Millions USD / Milliards F CFA)
+   Alimenté par bs_data.json (dépôt GitHub), mis à jour à chaque import
+   d'un nouveau fichier BS dans SharePoint via un flow Power Automate
+   (à construire, même principe que data.json) → issue GitHub → workflow
+   "maj-bs-via-issue.yml". La dernière colonne porte toujours le nom du
+   fichier BS Actif (bs_data.json.meta.bsName). En attendant le flow,
+   les valeurs ci-dessous (2022–2025 + BS1T26) servent de données figées.
+════════════════════════════════════════════════════════════════ */
+const BS_DATA_FALLBACK = {
+  meta: { bsName: 'BS1T26' },
+  periods: ['2022','2023','2024','2025'],
+  rows: [
+    { label:'Dette Totale', level:0, section:true, values:[[39992.2,24774.4],[46179.2,27782.6],[50171.8,31406.9],[58434.9,33159.2],[61619.4,34882.3]] },
+    { label:'Dette Extérieure', level:1, values:[[24325.3,15069.1],[28516.6,17156.3],[31868.4,19949.2],[37113.2,21060.1],[38397.6,21736.6]] },
+    { label:'Dette Intérieure', level:1, values:[[15666.9,9705.3],[17662.6,10626.3],[18303.4,11457.7],[21321.7,12099.1],[23221.8,13145.7]] },
+    { label:'Arriérés', level:1, values:[[null,null],[null,null],[null,null],[null,null],[null,null]] },
+    { label:'Émissions', level:0, section:true, values:[[10435.0,6464.3],[8922.4,5368.0],[11653.0,7294.7],[11356.4,6443.3],[5853.3,3313.5]] },
+    { label:'Dette Extérieure', level:1, values:[[5378.8,3332.0],[4836.5,2909.8],[6852.7,4289.7],[4912.8,2787.8],[1906.7,1079.4]] },
+    { label:'Dette Intérieure', level:1, values:[[5056.2,3132.2],[4085.9,2458.2],[4800.4,3005.0],[6443.6,3656.5],[3946.6,2234.1]] },
+    { label:'Total du Service de la Dette (a + b)', level:0, section:true, values:[[4872.3,3018.3],[6115.8,3679.4],[8316.4,5206.0],[11375.3,6455.0],[3655.6,2069.4]] },
+    { label:'Total principal (a)', level:1, values:[[3163.4,1959.7],[3922.2,2359.7],[5863.4,3670.4],[8268.5,4692.0],[2809.4,1590.4]] },
+    { label:'Total intérêt (b)', level:1, values:[[1708.9,1058.7],[2193.6,1319.8],[2453.0,1535.6],[3106.8,1762.9],[846.2,479.0]] },
+    { label:'Service de la Dette Extérieure', level:1, section:true, values:[[1793.6,1111.1],[2586.0,1555.8],[3768.6,2359.1],[4786.7,2716.2],[1314.8,744.3]] },
+    { label:'Principal', level:2, values:[[925.9,573.6],[1367.0,822.4],[2391.1,1496.8],[2955.2,1676.9],[711.6,402.8]] },
+    { label:'Intérêts', level:2, values:[[867.8,537.6],[1219.0,733.4],[1377.5,862.3],[1831.5,1039.3],[603.2,341.4]] },
+    { label:'Service de la Dette Intérieure', level:1, section:true, values:[[3078.7,1907.2],[3529.8,2123.6],[4547.8,2846.9],[6588.6,3738.7],[2340.8,1325.1]] },
+    { label:'Principal', level:2, values:[[2237.5,1386.1],[2555.2,1537.3],[3472.3,2173.6],[5313.3,3015.1],[2097.7,1187.5]] },
+    { label:'Intérêts', level:2, values:[[841.2,521.1],[974.6,586.4],[1075.5,673.3],[1275.2,723.6],[243.1,137.6]] }
+  ]
+};
+let BS_DATA = null;
+
+async function loadBSData() {
+  try {
+    const resp = await fetch('bs_data.json?v=' + Date.now(), { cache: 'no-store' });
+    BS_DATA = resp.ok ? await resp.json() : BS_DATA_FALLBACK;
+  } catch (e) {
+    BS_DATA = BS_DATA_FALLBACK;
+    console.info('ℹ bs_data.json introuvable — utilisation des données Template BS intégrées.');
+  }
+  renderBSTable();
+}
+
+function renderBSTable() {
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const periods = bs.periods.concat([bs.meta?.bsName || 'BS —']);
+  const activeName = bs.meta?.bsName || '—';
+  const nameEl = document.getElementById('bs-active-name'); if (nameEl) nameEl.textContent = activeName;
+
+  const head = document.getElementById('bsTableHead');
+  if (head) head.innerHTML =
+    '<tr><th></th>' + periods.map(p => `<th colspan="2">${escHtmlBS(p)}</th>`).join('') + '</tr>' +
+    '<tr><th></th>' + periods.map(() => '<th>Millions USD</th><th>Milliards F CFA</th>').join('') + '</tr>';
+
+  const body = document.getElementById('bsTableBody');
+  if (body) body.innerHTML = bs.rows.map(r => {
+    const rowClass = r.section ? 'bs-section' : (r.level >= 2 ? '' : 'bs-sub');
+    const pad = 10 + r.level * 16;
+    const cells = r.values.map(pair => {
+      const [usd, xof] = pair;
+      return `<td>${usd == null ? '—' : fmt(usd)}</td><td>${xof == null ? '—' : fmt(xof)}</td>`;
+    }).join('');
+    return `<tr class="${rowClass}"><td style="padding-left:${pad}px">${escHtmlBS(r.label)}</td>${cells}</tr>`;
+  }).join('');
+}
+function escHtmlBS(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+/* ═══════════════════════════════════════════════════════════════
    OBSERVATIONS — un espace de commentaire par graphique/tableau
    Partagées entre tous les utilisateurs via observations.json (dépôt GitHub),
    mis à jour par un flow Power Automate (requête HTTP → issue GitHub →
@@ -2705,6 +2785,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavSortable();
   injectObservationButtons();
   loadObservations();
+  loadBSData();
   loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META, l'historique et les libellés)
 });
 </script>

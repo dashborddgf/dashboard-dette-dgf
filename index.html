@@ -659,6 +659,10 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="1.5"/></svg>
     Indicateurs coûts et Risques
   </div>
+  <div class="nav-item" data-nav-key="comparaison" onclick="showScreen('comparaison',this)">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
+    Evolution
+  </div>
   <div class="nav-item" data-nav-key="eurobonds" onclick="showScreen('eurobonds',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-width="1.5"/></svg>
     Eurobonds
@@ -670,6 +674,26 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="nav-item" data-nav-key="template-bs" onclick="showScreen('template-bs',this)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 8h6M9 12h6M9 16h4" stroke-width="1.5"/></svg>
     Template BS
+  </div>
+
+  <div class="nav-group" id="navgroup-nsh" data-nav-key="nsh">
+    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('nsh',this)">
+      <span class="nav-item-main">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 16l2.5-3 2 2L17 10" stroke-width="1.5"/></svg>
+        NSH
+      </span>
+      <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
+    </div>
+    <div class="nav-submenu" id="navsub-nsh">
+      <div class="nav-item nav-subitem" onclick="openNSHPresentationFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="1.5" stroke-width="1.5"/><path d="M8 21h8M12 18v3" stroke-width="1.5"/></svg>
+        Présentation PowerPoint
+      </div>
+      <div class="nav-item nav-subitem" onclick="openNSHExcelFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke-width="1.5"/><path d="M3 9h18M9 9v11" stroke-width="1.5"/></svg>
+        NSH Excel
+      </div>
+    </div>
   </div>
 
   <div class="nav-group" id="navgroup-nos-productions" data-nav-key="nos-productions">
@@ -696,10 +720,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
   </div>
 
-  <div class="nav-item" data-nav-key="comparaison" onclick="showScreen('comparaison',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
-    Evolution
-  </div>
   <div class="nav-item" data-nav-key="docs-utiles" onclick="openDocsUtilesFolder()">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V4a1 1 0 00-1-1H6.5A2.5 2.5 0 004 5.5v14z" stroke-width="1.5"/></svg>
     Documentations Utiles
@@ -1831,12 +1851,19 @@ const SHAREPOINT_MAD_CONFIG = {
   esgFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FESG&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
   statistiqueFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FStatistiques&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
   strategieFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FStrat%C3%A9gies&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
-  docsUtilesFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FDocumentations%20Utiles&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D'
+  docsUtilesFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FDocumentations%20Utiles&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
+
+  // Dossiers "NSH" — URLs à renseigner
+  nshPresentationFolderUrl: '',
+  nshExcelFolderUrl: ''
 };
 
 function openSharePointFolder(url) {
+  if (!url) { alert('Lien SharePoint non configuré pour le moment.'); return; }
   window.open(url, '_blank', 'noopener,noreferrer');
 }
+function openNSHPresentationFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshPresentationFolderUrl); }
+function openNSHExcelFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshExcelFolderUrl); }
 
 function openMADFolder() {
   const msg = "IMPORT MAD\n\n" +

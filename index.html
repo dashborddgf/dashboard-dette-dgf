@@ -2654,6 +2654,7 @@ const OBSERVATIONS_ENDPOINT_URL = 'https://default9ddae6a36cb440e3a4cd305e2fe8c3
 
 let OBSERVATIONS = {};
 let _obsCurrentSlug = null;
+let _obsCurrentPage = '';
 
 function slugify(s) {
   return (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -2688,8 +2689,9 @@ function renderAllObservationBadges() {
   });
 }
 
-function openObservationModal(slug, title) {
+function openObservationModal(slug, title, pageName) {
   _obsCurrentSlug = slug;
+  _obsCurrentPage = pageName || '';
   const obs = OBSERVATIONS[slug];
   document.getElementById('obsModalTitle').textContent = 'Observation — ' + title;
   document.getElementById('obsModalText').value = (obs && obs.text) || '';
@@ -2700,16 +2702,18 @@ function openObservationModal(slug, title) {
 function closeObservationModal() {
   document.getElementById('obsModalOverlay').classList.remove('open');
   _obsCurrentSlug = null;
+  _obsCurrentPage = '';
 }
 
 async function saveObservation() {
   const slug = _obsCurrentSlug;
   if (!slug) return;
+  const page = _obsCurrentPage;
   const text = document.getElementById('obsModalText').value.trim();
   const author = document.getElementById('obsModalAuthor').value.trim();
   const date = new Date().toISOString();
 
-  OBSERVATIONS[slug] = { text, author, date };
+  OBSERVATIONS[slug] = { text, author, date, page };
   renderAllObservationBadges();
   closeObservationModal();
 
@@ -2721,7 +2725,7 @@ async function saveObservation() {
     await fetch(OBSERVATIONS_ENDPOINT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, text, author, date })
+      body: JSON.stringify({ slug, text, author, date, page })
     });
   } catch (e) {
     console.warn("⚠ Échec de l'enregistrement distant de l'observation.", e);
@@ -2818,13 +2822,17 @@ function injectObservationButtons() {
       Array.from(header.children).slice(1).forEach(c => rightGroup.appendChild(c));
       header.appendChild(rightGroup);
     }
+    const screenEl = header.closest('.screen');
+    const screenId = screenEl ? screenEl.id.replace(/^screen-/, '') : '';
+    const pageName = PAGE_TITLES[screenId] || '';
+
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'obs-btn';
     btn.title = 'Ajouter / voir une observation';
     btn.textContent = '💬';
     btn.dataset.slug = slug;
-    btn.onclick = () => openObservationModal(slug, title);
+    btn.onclick = () => openObservationModal(slug, title, pageName);
     rightGroup.appendChild(btn);
 
     const obsEl = document.createElement('div');

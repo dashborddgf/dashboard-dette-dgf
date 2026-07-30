@@ -31,7 +31,7 @@ jobs:
           [ -f observations.json ] || echo '{}' > observations.json
           SLUG=$(jq -r '.slug' /tmp/payload.json)
           echo "SLUG=$SLUG" >> "$GITHUB_ENV"
-          jq --argjson entry "$(jq '{text, author, date}' /tmp/payload.json)" \
+          jq --argjson entry "$(jq '{text, author, date, page}' /tmp/payload.json)" \
              --arg slug "$SLUG" \
              '.[$slug] = $entry' observations.json > observations.tmp.json
           mv observations.tmp.json observations.json

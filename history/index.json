@@ -18,6 +18,12 @@
     "file": "history/data_2025-01.json"
   },
   {
+    "id": "data_2025-02",
+    "madName": "MAD0225",
+    "periode": "Février 2025",
+    "file": "history/data_2025-02.json"
+  },
+  {
     "id": "data_2025-03",
     "madName": "MAD0325",
     "periode": "Mars 2025",

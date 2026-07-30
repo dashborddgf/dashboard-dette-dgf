@@ -245,6 +245,10 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .mad-nav-btn:hover:not(:disabled){background:var(--orange-bg);color:var(--orange)}
 .mad-nav-btn:disabled{opacity:.3;cursor:not-allowed}
 .hist-banner{display:none;align-items:center;gap:8px;background:#F1F5F9;border-bottom:1px solid var(--border);padding:6px 20px;font-size:11px;color:#374151}
+.bs-hist-nav{display:flex;align-items:center;gap:2px}
+.bs-hist-btn{width:22px;height:22px;border:1px solid var(--border);background:#fff;border-radius:50%;cursor:pointer;font-size:13px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;font-family:inherit;line-height:1;transition:background .15s}
+.bs-hist-btn:hover:not(:disabled){background:var(--orange-bg);color:var(--orange)}
+.bs-hist-btn:disabled{opacity:.3;cursor:not-allowed}
 .hist-banner.visible{display:flex}
 .hist-banner a{color:var(--orange);font-weight:700;cursor:pointer;text-decoration:none}
 .hist-banner a:hover{text-decoration:underline}
@@ -1080,7 +1084,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ TEMPLATE BS (à venir) ══════════════ -->
   <div class="screen" id="screen-template-bs">
     <div class="card">
-      <div class="card-header"><div><div class="card-title">Dette / PIB — Template BS</div><div class="card-sub">Milliards F CFA · Dernière colonne : <span id="bs-active-name">—</span></div></div></div>
+      <div class="card-header">
+        <div><div class="card-title">Dette / PIB — Template BS</div><div class="card-sub">Milliards F CFA · Dernière colonne : <span id="bs-active-name">—</span></div></div>
+        <div class="bs-hist-nav" title="Naviguer entre les BS archivés">
+          <button type="button" class="bs-hist-btn" id="bsHistPrevBtn" onclick="bsHistPrev()" title="BS précédent" disabled>‹</button>
+          <button type="button" class="bs-hist-btn" id="bsHistNextBtn" onclick="bsHistNext()" title="BS suivant / retour à l'actif" disabled>›</button>
+        </div>
+      </div>
       <div class="card-body" style="padding:0;overflow-x:auto">
         <table class="tbl tbl-bs" id="bsTable" style="min-width:640px">
           <thead id="bsTableHead"></thead>
@@ -2573,6 +2583,9 @@ const BS_DATA_FALLBACK = {
 };
 let BS_DATA = null;
 
+let BS_VIEW = null;                    // BS actuellement affiché (Actif ou archivé)
+const BS_HIST = { list: [], idx: -1 }; // idx = -1 → on affiche le BS Actif
+
 async function loadBSData() {
   try {
     const resp = await fetch('bs_data.json?v=' + Date.now(), { cache: 'no-store' });
@@ -2581,8 +2594,69 @@ async function loadBSData() {
     BS_DATA = BS_DATA_FALLBACK;
     console.info('ℹ bs_data.json introuvable — utilisation des données Template BS intégrées.');
   }
+  BS_VIEW = BS_DATA;
   renderBSTable();
   applyPibACData();
+  loadBSHistoryIndex();
+}
+
+/* ─── Navigation historique — BS archivés (bs_history/) ───
+   Purement local à l'affichage du tableau Template BS : ne modifie
+   jamais bs_data.json ni le BS Actif, et n'affecte jamais le ratio
+   Dette/PIB global (ticker, ratio-item, graphique) qui reste toujours
+   celui du BS Actif. */
+async function loadBSHistoryIndex() {
+  try {
+    const resp = await fetch('bs_history/index.json?v=' + Date.now(), { cache: 'no-store' });
+    if (resp.ok) BS_HIST.list = await resp.json();
+  } catch (e) {
+    BS_HIST.list = [];
+  }
+  updateBSHistNav();
+}
+
+function updateBSHistNav() {
+  const prevBtn = document.getElementById('bsHistPrevBtn');
+  const nextBtn = document.getElementById('bsHistNextBtn');
+  if (!prevBtn || !nextBtn) return;
+  prevBtn.disabled = !BS_HIST.list.length || BS_HIST.idx === 0;
+  nextBtn.disabled = BS_HIST.idx === -1;
+}
+
+async function bsHistPrev() {
+  if (!BS_HIST.list.length) return;
+  const target = BS_HIST.idx === -1 ? BS_HIST.list.length - 1 : BS_HIST.idx - 1;
+  if (target < 0) return;
+  await loadHistoricalBS(target);
+}
+
+async function bsHistNext() {
+  if (BS_HIST.idx === -1) return;
+  const target = BS_HIST.idx + 1;
+  if (target >= BS_HIST.list.length) { returnToActiveBS(); return; }
+  await loadHistoricalBS(target);
+}
+
+async function loadHistoricalBS(idx) {
+  const entry = BS_HIST.list[idx];
+  if (!entry) return;
+  try {
+    const resp = await fetch(entry.file + '?v=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('fetch échoué');
+    BS_VIEW = await resp.json();
+    BS_HIST.idx = idx;
+    renderBSTable();
+    updateBSHistNav();
+  } catch (e) {
+    console.warn('⚠ Impossible de charger le BS archivé.', e);
+  }
+}
+
+function returnToActiveBS() {
+  BS_VIEW = BS_DATA;
+  BS_HIST.idx = -1;
+  renderBSTable();
+  updateBSHistNav();
 }
 
 /* Répercute le ratio Dette AC/PIB (Tableau 3 du BS) sur tous les affichages
@@ -2624,10 +2698,11 @@ function applyPibACData() {
 }
 
 function renderBSTable() {
-  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const bs = BS_VIEW || BS_DATA || BS_DATA_FALLBACK;
   const activePeriode = bs.meta?.periode || bs.meta?.bsName || 'BS —';
   const periods = bs.periods.concat([activePeriode]);
-  const nameEl = document.getElementById('bs-active-name'); if (nameEl) nameEl.textContent = activePeriode;
+  const nameEl = document.getElementById('bs-active-name');
+  if (nameEl) nameEl.textContent = activePeriode + (BS_HIST.idx !== -1 ? ' (archivé)' : '');
 
   const head = document.getElementById('bsTableHead');
   if (head) head.innerHTML =

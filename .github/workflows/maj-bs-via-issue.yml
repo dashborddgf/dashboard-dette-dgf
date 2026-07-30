@@ -26,12 +26,38 @@ jobs:
           printf '%s' "$BODY" > /tmp/bs_data.json
           python3 -c "import json; json.load(open('/tmp/bs_data.json'))"
 
+      - name: Archiver l'ancien BS Actif dans bs_history/ avant remplacement
+        run: |
+          mkdir -p bs_history
+          if [ -f bs_data.json ]; then
+            BSNAME=$(jq -r '.meta.bsName // empty' bs_data.json)
+            if [ -n "$BSNAME" ]; then
+              KEY=$(echo "$BSNAME" | tr -c '[:alnum:]' '_')
+              TARGET="bs_history/bs_${KEY}.json"
+              if [ ! -f "$TARGET" ]; then
+                cp bs_data.json "$TARGET"
+                echo "Archivé : $TARGET"
+              else
+                echo "$TARGET existe déjà — ancien BS Actif non ré-archivé (pas d'écrasement)."
+              fi
+              jq -n '[inputs | {
+                id:      (input_filename | split("/") | last | rtrimstr(".json")),
+                bsName:  (.meta.bsName // ""),
+                periode: (.meta.periode // ""),
+                file:    input_filename
+              }]' bs_history/bs_*.json > bs_history/index.json
+              jq empty bs_history/index.json
+            else
+              echo "::warning::Ancien bs_data.json sans meta.bsName exploitable — pas d'archivage automatique dans bs_history/."
+            fi
+          fi
+
       - name: Mettre à jour bs_data.json et commiter
         run: |
           cp /tmp/bs_data.json bs_data.json
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add bs_data.json
+          git add bs_data.json bs_history/
           git commit -m "MAJ auto bs_data.json via Power Automate - $(date -u +%FT%TZ)" || echo "Aucun changement"
           git push
 

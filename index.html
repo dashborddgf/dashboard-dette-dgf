@@ -2579,7 +2579,8 @@ const BS_DATA_FALLBACK = {
   ],
   // Source : onglet "Tableau 3" du fichier BS — Dette de l'Administration
   // Centrale en % du PIB, 2022 à 2025 (2021 reste une constante historique fixe).
-  pibAC: { '2022':56.0, '2023':56.7, '2024':59.5, '2025':57.1 }
+  pibAC: { '2022':56.0, '2023':56.7, '2024':59.5, '2025':57.1 },
+  pibACCurrent: 56.0
 };
 let BS_DATA = null;
 
@@ -2670,8 +2671,9 @@ function applyPibACData() {
   if (!pibAC) return;
   Object.assign(RATIO_PIB_PAR_ANNEE, pibAC);
 
-  const latestYear = Object.keys(pibAC).sort().pop();
-  const latestVal = pibAC[latestYear];
+  // pibACCurrent = ratio du trimestre en cours (Tableau 3), utilisé en priorité pour
+  // le bandeau/la case Risques ; à défaut, on retombe sur la dernière année close.
+  const latestVal = (bs.pibACCurrent != null) ? bs.pibACCurrent : pibAC[Object.keys(pibAC).sort().pop()];
   const latestTxt = fmt(latestVal) + '%';
   const ok = latestVal < 70;
 

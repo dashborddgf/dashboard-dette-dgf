@@ -1,0 +1,17 @@
+{
+  "meta": { "bsName": "BS1T26", "periode": "Mars 2026", "situationAu": "2026-03-01" },
+  "periods": ["2022", "2023", "2024", "2025"],
+  "rows": [
+    { "label": "Dette totale", "values": [24774.4, 27782.6, 31406.9, 33159.2, 34882.3] },
+    { "label": "Dette % PIB", "pct": true, "values": [56.0, 56.7, 59.5, 57.1, 56.0] },
+    { "label": "Dette Extérieure", "values": [15069.1, 17156.3, 19949.2, 21060.1, 21736.6] },
+    { "label": "En % PIB", "pct": true, "values": [34.1, 35.0, 37.8, 36.3, 34.9] },
+    { "label": "Dette Intérieure", "values": [9705.3, 10626.3, 11457.7, 12099.1, 13145.7] },
+    { "label": "En % PIB", "pct": true, "values": [21.9, 21.7, 21.7, 20.8, 21.1] },
+    { "label": "PIB Nominal", "bold": true, "values": [44238.8, 48998.9, 52820.7, 58061.1, 62340.4] },
+    { "label": "", "spacer": true },
+    { "label": "Norme Uemoa", "pct": true, "values": [70, 70, 70, 70, 70] }
+  ],
+  "pibAC": { "2022": 56.0, "2023": 56.7, "2024": 59.5, "2025": 57.1 },
+  "pibACCurrent": 56.0
+}

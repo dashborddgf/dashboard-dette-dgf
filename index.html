@@ -406,8 +406,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .tbl-lg td{padding:22px 20px;font-size:16px}
 .tbl-bs th,.tbl-bs td{text-align:right;white-space:nowrap}
 .tbl-bs th:first-child,.tbl-bs td:first-child{text-align:left;white-space:normal}
-.tbl-bs tr.bs-bold td{font-weight:800}
-.tbl-bs tr.bs-spacer td{padding:3px 0;border:none;background:transparent}
+.tbl-bs tr.bs-section td{background:var(--orange);color:#fff;font-weight:700}
+.tbl-bs tr.bs-section:hover td{background:var(--orange)}
+.tbl-bs tr.bs-sub td{font-weight:600}
 .td-b{font-weight:700;color:var(--navy)}
 .tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
 .tag-ext{background:var(--blue-bg);color:var(--blue)}
@@ -1085,14 +1086,14 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="screen" id="screen-template-bs">
     <div class="card">
       <div class="card-header">
-        <div><div class="card-title">Dette / PIB — Template BS</div><div class="card-sub">Milliards F CFA · Dernière colonne : <span id="bs-active-name">—</span></div></div>
+        <div><div class="card-title">Situation de la Dette — Template BS</div><div class="card-sub">Millions USD &amp; Milliards F CFA · Dernière colonne : <span id="bs-active-name">—</span></div></div>
         <div class="bs-hist-nav" title="Naviguer entre les BS archivés">
           <button type="button" class="bs-hist-btn" id="bsHistPrevBtn" onclick="bsHistPrev()" title="BS précédent" disabled>‹</button>
           <button type="button" class="bs-hist-btn" id="bsHistNextBtn" onclick="bsHistNext()" title="BS suivant / retour à l'actif" disabled>›</button>
         </div>
       </div>
       <div class="card-body" style="padding:0;overflow-x:auto">
-        <table class="tbl tbl-bs" id="bsTable" style="min-width:640px">
+        <table class="tbl tbl-bs" id="bsTable" style="min-width:900px">
           <thead id="bsTableHead"></thead>
           <tbody id="bsTableBody"></tbody>
         </table>
@@ -2567,15 +2568,22 @@ const BS_DATA_FALLBACK = {
   meta: { bsName: 'BS1T26', periode: 'Mars 2026', situationAu: '2026-03-01' },
   periods: ['2022','2023','2024','2025'],
   rows: [
-    { label:'Dette totale', values:[24774.4,27782.6,31406.9,33159.2,34882.3] },
-    { label:'Dette % PIB', pct:true, values:[56.0,56.7,59.5,57.1,56.0] },
-    { label:'Dette Extérieure', values:[15069.1,17156.3,19949.2,21060.1,21736.6] },
-    { label:'En % PIB', pct:true, values:[34.1,35.0,37.8,36.3,34.9] },
-    { label:'Dette Intérieure', values:[9705.3,10626.3,11457.7,12099.1,13145.7] },
-    { label:'En % PIB', pct:true, values:[21.9,21.7,21.7,20.8,21.1] },
-    { label:'PIB Nominal', bold:true, values:[44238.8,48998.9,52820.7,58061.1,62340.4] },
-    { label:'', spacer:true },
-    { label:'Norme Uemoa', pct:true, values:[70,70,70,70,70] }
+    { label:'Dette Totale', level:0, section:true, values:[[39992.2,24774.4],[46179.2,27782.6],[50171.8,31406.9],[58434.9,33159.2],[61619.4,34882.3]] },
+    { label:'Dette Extérieure', level:1, values:[[24325.3,15069.1],[28516.6,17156.3],[31868.4,19949.2],[37113.2,21060.1],[38397.6,21736.6]] },
+    { label:'Dette Intérieure', level:1, values:[[15666.9,9705.3],[17662.6,10626.3],[18303.4,11457.7],[21321.7,12099.1],[23221.8,13145.7]] },
+    { label:'Arriérés', level:1, values:[[null,null],[null,null],[null,null],[null,null],[null,null]] },
+    { label:'Total de Tirages / Emissions', level:0, section:true, values:[[10435.0,6464.3],[8922.4,5368.0],[11653.0,7294.7],[11356.4,6443.3],[5853.3,3313.5]] },
+    { label:'Dette Extérieure', level:1, values:[[5378.8,3332.0],[4836.5,2909.8],[6852.7,4289.7],[4912.8,2787.8],[1906.7,1079.4]] },
+    { label:'Dette Intérieure', level:1, values:[[5056.2,3132.2],[4085.9,2458.2],[4800.4,3005.0],[6443.6,3656.5],[3946.6,2234.1]] },
+    { label:'Total du Service de la Dette (a + b)', level:0, section:true, values:[[4872.3,3018.3],[6115.8,3679.4],[8316.4,5206.0],[11375.3,6455.0],[3655.6,2069.4]] },
+    { label:'Total principal (a)', level:1, values:[[3163.4,1959.7],[3922.2,2359.7],[5863.4,3670.4],[8268.5,4692.0],[2809.4,1590.4]] },
+    { label:'Total intérêt (b)', level:1, values:[[1708.9,1058.7],[2193.6,1319.8],[2453.0,1535.6],[3106.8,1762.9],[846.2,479.0]] },
+    { label:'Service de la Dette Extérieure', level:1, section:true, values:[[1793.6,1111.1],[2586.0,1555.8],[3768.6,2359.1],[4786.7,2716.2],[1314.8,744.3]] },
+    { label:'Principal', level:2, values:[[925.9,573.6],[1367.0,822.4],[2391.1,1496.8],[2955.2,1676.9],[711.6,402.8]] },
+    { label:'Intérêts', level:2, values:[[867.8,537.6],[1219.0,733.4],[1377.5,862.3],[1831.5,1039.3],[603.2,341.4]] },
+    { label:'Service de la Dette Intérieure', level:1, section:true, values:[[3078.7,1907.2],[3529.8,2123.6],[4547.8,2846.9],[6588.6,3738.7],[2340.8,1325.1]] },
+    { label:'Principal', level:2, values:[[2237.5,1386.1],[2555.2,1537.3],[3472.3,2173.6],[5313.3,3015.1],[2097.7,1187.5]] },
+    { label:'Intérêts', level:2, values:[[841.2,521.1],[974.6,586.4],[1075.5,673.3],[1275.2,723.6],[243.1,137.6]] }
   ],
   // Source : onglet "Tableau 3" du fichier BS — Dette de l'Administration
   // Centrale en % du PIB, 2022 à 2025 (2021 reste une constante historique fixe).
@@ -2708,13 +2716,18 @@ function renderBSTable() {
 
   const head = document.getElementById('bsTableHead');
   if (head) head.innerHTML =
-    '<tr><th>(Milliards F CFA)</th>' + periods.map(p => `<th>${escHtmlBS(p)}</th>`).join('') + '</tr>';
+    '<tr><th></th>' + periods.map(p => `<th colspan="2">${escHtmlBS(p)}</th>`).join('') + '</tr>' +
+    '<tr><th></th>' + periods.map(() => '<th>Millions USD</th><th>Milliards F CFA</th>').join('') + '</tr>';
 
   const body = document.getElementById('bsTableBody');
   if (body) body.innerHTML = bs.rows.map(r => {
-    if (r.spacer) return `<tr class="bs-spacer"><td colspan="${periods.length + 1}"></td></tr>`;
-    const cells = r.values.map(v => `<td>${v == null ? '—' : fmt(v) + (r.pct ? '%' : '')}</td>`).join('');
-    return `<tr class="${r.bold ? 'bs-bold' : ''}"><td>${escHtmlBS(r.label)}</td>${cells}</tr>`;
+    const rowClass = r.section ? 'bs-section' : (r.level >= 2 ? '' : 'bs-sub');
+    const pad = 10 + (r.level || 0) * 16;
+    const cells = r.values.map(pair => {
+      const [usd, xof] = pair;
+      return `<td>${usd == null ? '—' : fmt(usd)}</td><td>${xof == null ? '—' : fmt(xof)}</td>`;
+    }).join('');
+    return `<tr class="${rowClass}"><td style="padding-left:${pad}px">${escHtmlBS(r.label)}</td>${cells}</tr>`;
   }).join('');
 }
 function escHtmlBS(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }

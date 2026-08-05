@@ -26,13 +26,16 @@ jobs:
           printf '%s' "$BODY" > /tmp/bs_data.json
           python3 -c "import json; json.load(open('/tmp/bs_data.json'))"
 
-      - name: Archiver l'ancien BS Actif dans bs_history/ avant remplacement
+      - name: Archiver l'ancien BS Actif et décider si le nouveau doit le remplacer
         run: |
           mkdir -p bs_history
+          NEW_SIT=$(jq -r '.meta.situationAu // empty' /tmp/bs_data.json)
+          REPLACE=true
           if [ -f bs_data.json ]; then
-            BSNAME=$(jq -r '.meta.bsName // empty' bs_data.json)
-            if [ -n "$BSNAME" ]; then
-              KEY=$(echo "$BSNAME" | tr -c '[:alnum:]' '_')
+            OLD_BSNAME=$(jq -r '.meta.bsName // empty' bs_data.json)
+            OLD_SIT=$(jq -r '.meta.situationAu // empty' bs_data.json)
+            if [ -n "$OLD_BSNAME" ]; then
+              KEY=$(echo "$OLD_BSNAME" | tr -c '[:alnum:]' '_')
               TARGET="bs_history/bs_${KEY}.json"
               if [ ! -f "$TARGET" ]; then
                 cp bs_data.json "$TARGET"
@@ -40,21 +43,36 @@ jobs:
               else
                 echo "$TARGET existe déjà — ancien BS Actif non ré-archivé (pas d'écrasement)."
               fi
-              jq -n '[inputs | {
-                id:      (input_filename | split("/") | last | rtrimstr(".json")),
-                bsName:  (.meta.bsName // ""),
-                periode: (.meta.periode // ""),
-                file:    input_filename
-              }]' bs_history/bs_*.json > bs_history/index.json
-              jq empty bs_history/index.json
-            else
-              echo "::warning::Ancien bs_data.json sans meta.bsName exploitable — pas d'archivage automatique dans bs_history/."
+            fi
+            # Si le BS déposé couvre une période antérieure au BS Actif (ex: correction
+            # d'un trimestre passé), on ne le fait PAS remplacer le BS Actif : il est
+            # seulement archivé (ci-dessous) à sa propre place dans l'historique.
+            if [ -n "$OLD_SIT" ] && [ -n "$NEW_SIT" ] && [[ "$NEW_SIT" < "$OLD_SIT" ]]; then
+              REPLACE=false
+              echo "::notice::BS déposé ($NEW_SIT) plus ancien que le BS Actif ($OLD_SIT) — archivé sans remplacer le BS Actif."
             fi
           fi
+          echo "REPLACE=$REPLACE" >> "$GITHUB_ENV"
+
+          if [ "$REPLACE" = "false" ]; then
+            NEW_BSNAME=$(jq -r '.meta.bsName // empty' /tmp/bs_data.json)
+            KEY2=$(echo "$NEW_BSNAME" | tr -c '[:alnum:]' '_')
+            cp /tmp/bs_data.json "bs_history/bs_${KEY2}.json"
+          fi
+
+          jq -n '[inputs | {
+            id:      (input_filename | split("/") | last | rtrimstr(".json")),
+            bsName:  (.meta.bsName // ""),
+            periode: (.meta.periode // ""),
+            file:    input_filename
+          }]' bs_history/bs_*.json > bs_history/index.json 2>/dev/null || echo '[]' > bs_history/index.json
+          jq empty bs_history/index.json
 
       - name: Mettre à jour bs_data.json et commiter
         run: |
-          cp /tmp/bs_data.json bs_data.json
+          if [ "$REPLACE" = "true" ]; then
+            cp /tmp/bs_data.json bs_data.json
+          fi
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add bs_data.json bs_history/

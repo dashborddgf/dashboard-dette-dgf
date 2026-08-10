@@ -1638,17 +1638,17 @@ function renderMADTable(enc) {
   if(enc.BCEAO||enc.BanqComm||enc.TitriseesDomestique){
     const dc=(enc.BanqComm||0), di=(s.BanqComm?s.BanqComm[1]:0), dm=(m.BanqComm||0);
     html += row('r-sub','1. Dette Conventionnée',1,dm,0,dm,(s.BanqComm?s.BanqComm[0]:0),di,(s.BanqComm?s.BanqComm[0]:0)+di,(enc.BCEAO||0)+(enc.BanqComm||0)+(enc.TitriseesDomestique||0));
-    if(enc.BCEAO) html += row('r-sub','BCEAO',2,0,0,0,0,0,0,enc.BCEAO);
-    if(enc.BanqComm) html += row('r-sub','Banques Commerciales',2,dm,0,dm,s.BanqComm[0],s.BanqComm[1],s.BanqComm[0]+s.BanqComm[1],enc.BanqComm);
+    if(enc.BCEAO !== 0) html += row('r-sub','BCEAO',2,0,0,0,0,0,0,enc.BCEAO);
+    if(enc.BanqComm !== 0) html += row('r-sub','Banques Commerciales',2,dm,0,dm,s.BanqComm[0],s.BanqComm[1],s.BanqComm[0]+s.BanqComm[1],enc.BanqComm);
   }
 
   const mvKeys=['BT','TPCI','OAT','Sukuk','RCI'];
   const mvEnc=mvKeys.reduce((a,k)=>a+(enc[k]||0),0);
   if(mvEnc>0){
     html += row('r-sub','2. Valeurs Mobilières',1,sumM(mvKeys),0,sumM(mvKeys),sumS(mvKeys,0),sumS(mvKeys,1),sumS(mvKeys,0)+sumS(mvKeys,1),mvEnc);
-    if(enc.BT) html += row('r-sub','Bons du Trésor (BT)',2,m.BT||0,0,m.BT||0,s.BT[0],s.BT[1],s.BT[0]+s.BT[1],enc.BT);
-    if(enc.TPCI) html += row('r-sub','TPCI',2,m.TPCI||0,67.2,(m.TPCI||0)+67.2,s.TPCI[0],s.TPCI[1],s.TPCI[0]+s.TPCI[1],enc.TPCI);
-    if(enc.OAT) html += row('r-sub','OAT',2,m.OAT||0,0,m.OAT||0,s.OAT[0],s.OAT[1],s.OAT[0]+s.OAT[1],enc.OAT);
+    if(enc.BT !== 0) html += row('r-sub','Bons du Trésor (BT)',2,m.BT||0,0,m.BT||0,s.BT[0],s.BT[1],s.BT[0]+s.BT[1],enc.BT);
+    if(enc.TPCI !== 0) html += row('r-sub','TPCI',2,m.TPCI||0,67.2,(m.TPCI||0)+67.2,s.TPCI[0],s.TPCI[1],s.TPCI[0]+s.TPCI[1],enc.TPCI);
+    if(enc.OAT !== 0) html += row('r-sub','OAT',2,m.OAT||0,0,m.OAT||0,s.OAT[0],s.OAT[1],s.OAT[0]+s.OAT[1],enc.OAT);
   }
 
   html += row('r-ext','II. DETTE EXTÉRIEURE',0,extM,129.1,extM+129.1,extC,extI,extC+extI,extE);
@@ -1657,33 +1657,33 @@ function renderMADTable(enc) {
   const multiE=sum(multiKeys,enc);
   if(multiE>0){
     html += row('r-sub','1. Multilatéraux',1,sumM(multiKeys),0,sumM(multiKeys),sumS(multiKeys,0),sumS(multiKeys,1),sumS(multiKeys,0)+sumS(multiKeys,1),multiE);
-    if(enc.FMI) html += row('r-sub','FMI',2,0,0,0,0,0,0,enc.FMI);
-    if(enc.BM) html += row('r-sub','Banque Mondiale',2,0,0,0,s.BM[0],s.BM[1],s.BM[0]+s.BM[1],enc.BM);
-    if(enc.BAD) html += row('r-sub','BAD',2,m.BAD||0,0,m.BAD||0,s.BAD[0],s.BAD[1],s.BAD[0]+s.BAD[1],enc.BAD);
-    if(enc.BID) html += row('r-sub','BID',2,0,0,0,s.BID[0],s.BID[1],s.BID[0]+s.BID[1],enc.BID);
-    if(enc.AutresMulti) html += row('r-sub','Autres Multilatéraux',2,m.AutresMulti||0,0,m.AutresMulti||0,s.AutresMulti[0],s.AutresMulti[1],s.AutresMulti[0]+s.AutresMulti[1],enc.AutresMulti);
+    if(enc.FMI !== 0) html += row('r-sub','FMI',2,0,0,0,0,0,0,enc.FMI);
+    if(enc.BM !== 0) html += row('r-sub','Banque Mondiale',2,0,0,0,s.BM[0],s.BM[1],s.BM[0]+s.BM[1],enc.BM);
+    if(enc.BAD !== 0) html += row('r-sub','BAD',2,m.BAD||0,0,m.BAD||0,s.BAD[0],s.BAD[1],s.BAD[0]+s.BAD[1],enc.BAD);
+    if(enc.BID !== 0) html += row('r-sub','BID',2,0,0,0,s.BID[0],s.BID[1],s.BID[0]+s.BID[1],enc.BID);
+    if(enc.AutresMulti !== 0) html += row('r-sub','Autres Multilatéraux',2,m.AutresMulti||0,0,m.AutresMulti||0,s.AutresMulti[0],s.AutresMulti[1],s.AutresMulti[0]+s.AutresMulti[1],enc.AutresMulti);
   }
 
   const bilatKeys=['AFD','KFW','EximbankChine','JICA','AutresBil'];
   const bilatE=sum(bilatKeys,enc);
   if(bilatE>0){
     html += row('r-sub','2. Bilatéraux',1,sumM(bilatKeys),0,sumM(bilatKeys),sumS(bilatKeys,0),sumS(bilatKeys,1),sumS(bilatKeys,0)+sumS(bilatKeys,1),bilatE);
-    if(enc.AFD) html += row('r-sub','AFD (France)',2,0,0,0,s.AFD[0],s.AFD[1],s.AFD[0]+s.AFD[1],enc.AFD);
-    if(enc.KFW) html += row('r-sub','KFW (Allemagne)',2,0,0,0,s.KFW[0],s.KFW[1],s.KFW[0]+s.KFW[1],enc.KFW);
-    if(enc.EximbankChine) html += row('r-sub','Eximbank Chine',2,0,0,0,s.EximbankChine[0],s.EximbankChine[1],s.EximbankChine[0]+s.EximbankChine[1],enc.EximbankChine);
-    if(enc.JICA) html += row('r-sub','JICA (Japon)',2,0,0,0,s.JICA[0],s.JICA[1],s.JICA[0]+s.JICA[1],enc.JICA);
-    if(enc.AutresBil) html += row('r-sub','Autres Bilatéraux',2,m.AutresBil||0,0,m.AutresBil||0,s.AutresBil[0],s.AutresBil[1],s.AutresBil[0]+s.AutresBil[1],enc.AutresBil);
+    if(enc.AFD !== 0) html += row('r-sub','AFD (France)',2,0,0,0,s.AFD[0],s.AFD[1],s.AFD[0]+s.AFD[1],enc.AFD);
+    if(enc.KFW !== 0) html += row('r-sub','KFW (Allemagne)',2,0,0,0,s.KFW[0],s.KFW[1],s.KFW[0]+s.KFW[1],enc.KFW);
+    if(enc.EximbankChine !== 0) html += row('r-sub','Eximbank Chine',2,0,0,0,s.EximbankChine[0],s.EximbankChine[1],s.EximbankChine[0]+s.EximbankChine[1],enc.EximbankChine);
+    if(enc.JICA !== 0) html += row('r-sub','JICA (Japon)',2,0,0,0,s.JICA[0],s.JICA[1],s.JICA[0]+s.JICA[1],enc.JICA);
+    if(enc.AutresBil !== 0) html += row('r-sub','Autres Bilatéraux',2,m.AutresBil||0,0,m.AutresBil||0,s.AutresBil[0],s.AutresBil[1],s.AutresBil[0]+s.AutresBil[1],enc.AutresBil);
   }
 
   const titresKeys=['Eurobonds','Samourai'];
   const titresE=sum(titresKeys,enc);
   if(titresE>0){
     html += row('r-sub','3. Titres Internationaux',1,0,0,0,sumS(titresKeys,0),sumS(titresKeys,1),sumS(titresKeys,1),titresE);
-    if(enc.Eurobonds) html += row('r-sub','Eurobonds',2,0,0,0,s.Eurobonds[0],s.Eurobonds[1],s.Eurobonds[1],enc.Eurobonds);
-    if(enc.Samourai) html += row('r-sub','Samourai Bond (JPY)',2,0,0,0,s.Samourai[0],s.Samourai[1],s.Samourai[1],enc.Samourai);
+    if(enc.Eurobonds !== 0) html += row('r-sub','Eurobonds',2,0,0,0,s.Eurobonds[0],s.Eurobonds[1],s.Eurobonds[1],enc.Eurobonds);
+    if(enc.Samourai !== 0) html += row('r-sub','Samourai Bond (JPY)',2,0,0,0,s.Samourai[0],s.Samourai[1],s.Samourai[1],enc.Samourai);
   }
 
-  if(enc.Commerciaux){
+  if(enc.Commerciaux !== 0){
     html += row('r-sub','4. Commerciaux',1,m.Commerciaux||0,129.1,(m.Commerciaux||0)+129.1,s.Commerciaux[0],s.Commerciaux[1],s.Commerciaux[0]+s.Commerciaux[1],enc.Commerciaux);
   }
 

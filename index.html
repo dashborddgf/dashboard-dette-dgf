@@ -964,11 +964,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="card-body">
         <div class="ratio-grid">
           <div class="ratio-item r-ok" id="ratio-item-pib"><div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div></div>
-          <div class="ratio-item r-warn"><div class="ratio-val">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div></div>
-          <div class="ratio-item r-ok"><div class="ratio-val">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div></div>
-          <div class="ratio-item r-warn"><div class="ratio-val">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div></div>
-          <div class="ratio-item r-ok"><div class="ratio-val">89,4%</div><div class="ratio-label">Taux Fixe</div><div class="ratio-seuil">Cible: &gt;80%</div></div>
-          <div class="ratio-item r-ok"><div class="ratio-val">53,3%</div><div class="ratio-label">Devise Étr.</div><div class="ratio-seuil">Seuil: &lt;60%</div></div>
+          <div class="ratio-item r-warn" id="ratio-item-intrec"><div class="ratio-val" id="ratio-val-intrec">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div></div>
+          <div class="ratio-item r-ok" id="ratio-item-duree"><div class="ratio-val" id="ratio-val-duree">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div></div>
+          <div class="ratio-item r-warn" id="ratio-item-ct"><div class="ratio-val" id="ratio-val-ct">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div></div>
+          <div class="ratio-item r-ok" id="ratio-item-fixe"><div class="ratio-val" id="ratio-val-fixe">89,4%</div><div class="ratio-label">Taux Fixe</div><div class="ratio-seuil">Cible: &gt;80%</div></div>
+          <div class="ratio-item r-ok" id="ratio-item-devises"><div class="ratio-val" id="ratio-val-devises">53,3%</div><div class="ratio-label">Devise Étr.</div><div class="ratio-seuil">Seuil: &lt;60%</div></div>
         </div>
       </div>
     </div>
@@ -979,15 +979,15 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
           <thead><tr><th style="text-align:left">Indicateur</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>Seuil</th><th>Statut 2025</th></tr></thead>
           <tbody>
             <tr><td class="td-b">Dette AC / PIB (%)</td><td>50,2%</td><td id="td-pib-2022">56,0%</td><td id="td-pib-2023">56,7%</td><td id="td-pib-2024">59,5%</td><td id="td-pib-2025" style="font-weight:700;color:var(--green)">57,1%</td><td style="color:var(--gray)">&lt; 70%</td><td><span class="tag" id="tag-pib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Intérêts / Recettes (%)</td><td>13,2%</td><td>15,0%</td><td>16,6%</td><td>16,7%</td><td style="font-weight:700;color:#92720A">16,5%</td><td style="color:var(--gray)">&lt; 22%</td><td><span class="tag" style="background:var(--gold-bg);color:#92720A">⚠ Vigilance</span></td></tr>
-            <tr><td class="td-b">Intérêts / PIB (%)</td><td>1,9%</td><td>2,2%</td><td>2,6%</td><td>2,7%</td><td style="font-weight:700;color:var(--green)">2,7%</td><td style="color:var(--gray)">&lt; 3%</td><td><span class="tag" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Taux intérêt moyen pondéré</td><td>4,1%</td><td>4,2%</td><td>4,6%</td><td>5,0%</td><td>5,1%</td><td>—</td><td>—</td></tr>
-            <tr><td class="td-b" style="padding-left:18px">• Extérieure</td><td>3,6%</td><td>3,6%</td><td>4,4%</td><td>4,7%</td><td>4,8%</td><td></td><td></td></tr>
-            <tr><td class="td-b" style="padding-left:18px">• Intérieure</td><td>5,0%</td><td>5,1%</td><td>5,3%</td><td>5,5%</td><td>5,4%</td><td></td><td></td></tr>
-            <tr><td class="td-b">Durée moy. vie (années)</td><td>7,5</td><td>6,9</td><td>7,1</td><td>7,0</td><td style="font-weight:700;color:var(--green)">7,2</td><td style="color:var(--gray)">&gt; 7 ans</td><td><span class="tag" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Dette à court terme (%)</td><td>9,3%</td><td>9,3%</td><td>10,9%</td><td>14,6%</td><td style="font-weight:700;color:#92720A">14,8%</td><td style="color:var(--gray)">&lt; 15%</td><td><span class="tag" style="background:var(--gold-bg);color:#92720A">⚠ Limite</span></td></tr>
-            <tr><td class="td-b">Dette en devises (% total)</td><td>59,7%</td><td>59,9%</td><td>61,7%</td><td>55,7%</td><td style="font-weight:700;color:var(--green)">53,3%</td><td style="color:var(--gray)">&lt; 60%</td><td><span class="tag" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Dette à taux fixe (%)</td><td>92,3%</td><td>89,2%</td><td>89,8%</td><td>89,3%</td><td style="font-weight:700;color:var(--green)">89,4%</td><td style="color:var(--gray)">&gt; 80%</td><td><span class="tag" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
+            <tr><td class="td-b">Intérêts / Recettes (%)</td><td>13,2%</td><td id="td-intrec-2022">15,0%</td><td id="td-intrec-2023">16,6%</td><td id="td-intrec-2024">16,7%</td><td id="td-intrec-2025" style="font-weight:700;color:#92720A">16,5%</td><td style="color:var(--gray)">&lt; 22%</td><td><span class="tag" id="tag-intrec-status" style="background:var(--gold-bg);color:#92720A">⚠ Vigilance</span></td></tr>
+            <tr><td class="td-b">Intérêts / PIB (%)</td><td>1,9%</td><td id="td-intpib-2022">2,2%</td><td id="td-intpib-2023">2,6%</td><td id="td-intpib-2024">2,7%</td><td id="td-intpib-2025" style="font-weight:700;color:var(--green)">2,7%</td><td style="color:var(--gray)">&lt; 3%</td><td><span class="tag" id="tag-intpib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
+            <tr><td class="td-b">Taux intérêt moyen pondéré</td><td>4,1%</td><td id="td-tauxmoy-2022">4,2%</td><td id="td-tauxmoy-2023">4,6%</td><td id="td-tauxmoy-2024">5,0%</td><td id="td-tauxmoy-2025">5,1%</td><td>—</td><td>—</td></tr>
+            <tr><td class="td-b" style="padding-left:18px">• Extérieure</td><td>3,6%</td><td id="td-tauxmoyext-2022">3,6%</td><td id="td-tauxmoyext-2023">4,4%</td><td id="td-tauxmoyext-2024">4,7%</td><td id="td-tauxmoyext-2025">4,8%</td><td></td><td></td></tr>
+            <tr><td class="td-b" style="padding-left:18px">• Intérieure</td><td>5,0%</td><td id="td-tauxmoyint-2022">5,1%</td><td id="td-tauxmoyint-2023">5,3%</td><td id="td-tauxmoyint-2024">5,5%</td><td id="td-tauxmoyint-2025">5,4%</td><td></td><td></td></tr>
+            <tr><td class="td-b">Durée moy. vie (années)</td><td>7,5</td><td id="td-duree-2022">6,9</td><td id="td-duree-2023">7,1</td><td id="td-duree-2024">7,0</td><td id="td-duree-2025" style="font-weight:700;color:var(--green)">7,2</td><td style="color:var(--gray)">&gt; 7 ans</td><td><span class="tag" id="tag-duree-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
+            <tr><td class="td-b">Dette à court terme (%)</td><td>9,3%</td><td id="td-ct-2022">9,3%</td><td id="td-ct-2023">10,9%</td><td id="td-ct-2024">14,6%</td><td id="td-ct-2025" style="font-weight:700;color:#92720A">14,8%</td><td style="color:var(--gray)">&lt; 15%</td><td><span class="tag" id="tag-ct-status" style="background:var(--gold-bg);color:#92720A">⚠ Limite</span></td></tr>
+            <tr><td class="td-b">Dette en devises (% total)</td><td>59,7%</td><td id="td-devises-2022">59,9%</td><td id="td-devises-2023">61,7%</td><td id="td-devises-2024">55,7%</td><td id="td-devises-2025" style="font-weight:700;color:var(--green)">53,3%</td><td style="color:var(--gray)">&lt; 60%</td><td><span class="tag" id="tag-devises-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
+            <tr><td class="td-b">Dette à taux fixe (%)</td><td>92,3%</td><td id="td-fixe-2022">89,2%</td><td id="td-fixe-2023">89,8%</td><td id="td-fixe-2024">89,3%</td><td id="td-fixe-2025" style="font-weight:700;color:var(--green)">89,4%</td><td style="color:var(--gray)">&gt; 80%</td><td><span class="tag" id="tag-fixe-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -1480,7 +1480,13 @@ function calcTotals() {
   return { total, intTotal, extTotal, capital:cap, interets:int_, service:cap+int_ };
 }
 
-function fmt(n){ return n ? n.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1}) : '—'; }
+/* Donnée manquante (null/undefined/NaN, ex: valeur introuvable dans le
+   MAD ou le BS importé) -> affichage explicite "NULL" plutôt qu'un tiret
+   ou un zéro silencieux, pour repérer immédiatement les trous de données. */
+function fmt(n){
+  if (n === null || n === undefined || n === '' || (typeof n === 'number' && isNaN(n))) return 'NULL';
+  return Number(n).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+}
 
 function currentServiceYear(){
   const m = ((DATA.meta && DATA.meta.periode) || MAD_META.periode || '').match(/\d{4}/);
@@ -2588,7 +2594,25 @@ const BS_DATA_FALLBACK = {
   // Source : onglet "Tableau 3" du fichier BS — Dette de l'Administration
   // Centrale en % du PIB, 2022 à 2025 (2021 reste une constante historique fixe).
   pibAC: { '2022':56.0, '2023':56.7, '2024':59.5, '2025':57.1 },
-  pibACCurrent: 56.0
+  pibACCurrent: 56.0,
+  // Source : onglet "Tableau 3" du fichier BS — autres indicateurs de risque
+  // (2022 à 2025 ; 2021 reste une constante historique fixe dans le tableau).
+  ratios: {
+    intrec:      [15.0, 16.6, 16.7, 16.5],
+    intpib:      [2.2, 2.6, 2.7, 2.8],
+    tauxmoy:     [4.2, 4.6, 5.0, 5.1],
+    tauxmoyext:  [3.6, 4.4, 4.7, 4.8],
+    tauxmoyint:  [5.1, 5.3, 5.5, 5.4],
+    duree:       [6.9, 7.1, 7.0, 7.2],
+    dureeext:    [8.1, 8.8, 8.5, 8.7],
+    dureeint:    [5.0, 4.3, 4.0, 4.1],
+    ct:          [9.3, 10.9, 14.6, 14.8],
+    revision:    [6.4, 6.6, 6.1, 5.8],
+    revisionext: [8.6, 8.0, 7.5, 7.3],
+    revisionint: [4.9, 4.6, 3.8, 3.4],
+    devises:     [59.9, 61.7, 55.7, 53.3],
+    fixe:        [89.2, 89.8, 89.3, 89.4]
+  }
 };
 let BS_DATA = null;
 
@@ -2606,7 +2630,55 @@ async function loadBSData() {
   BS_VIEW = BS_DATA;
   renderBSTable();
   applyPibACData();
+  applyRatiosData();
   loadBSHistoryIndex();
+}
+
+/* Répercute les indicateurs de Tableau 3 (hors Dette/PIB, déjà géré par
+   applyPibACData) sur le Tableau de Bord des Risques et le tableau
+   "Principaux Ratios et Indicateurs d'Endettement" : Intérêts/Recettes,
+   Intérêts/PIB, Taux moyen pondéré (+Ext/Int), Durée de vie, Dette CT,
+   Dette en devises, Dette à taux fixe. 2021 reste une constante
+   historique fixe ; 2022-2025 et le statut/seuil deviennent dynamiques. */
+function applyRatiosData() {
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const ratios = bs.ratios;
+  if (!ratios) return;
+  const configs = [
+    { key:'intrec', box:true, boxUnit:'%', threshold:22, dir:'below' },
+    { key:'intpib', box:false, threshold:3, dir:'below' },
+    { key:'tauxmoy', box:false },
+    { key:'tauxmoyext', box:false },
+    { key:'tauxmoyint', box:false },
+    { key:'duree', box:true, boxUnit:' ans', tableUnit:'', threshold:7, dir:'above' },
+    { key:'ct', box:true, boxUnit:'%', threshold:15, dir:'below' },
+    { key:'devises', box:true, boxUnit:'%', threshold:60, dir:'below' },
+    { key:'fixe', box:true, boxUnit:'%', threshold:80, dir:'above' }
+  ];
+  configs.forEach(cfg => {
+    const arr = ratios[cfg.key];
+    if (!Array.isArray(arr) || arr.length < 4) return;
+    const tableUnit = cfg.tableUnit != null ? cfg.tableUnit : '%';
+    ['2022','2023','2024','2025'].forEach((y, i) => {
+      const el = document.getElementById('td-' + cfg.key + '-' + y);
+      if (el && arr[i] != null) el.textContent = fmt(arr[i]) + tableUnit;
+    });
+    if (cfg.threshold == null) return;
+    const latest = arr[3];
+    const ok = cfg.dir === 'below' ? latest < cfg.threshold : latest > cfg.threshold;
+    const tag = document.getElementById('tag-' + cfg.key + '-status');
+    if (tag) {
+      tag.textContent = ok ? '✓ OK' : '⚠ Vigilance';
+      tag.style.background = ok ? 'var(--green-bg)' : 'var(--gold-bg)';
+      tag.style.color = ok ? 'var(--green)' : '#92720A';
+    }
+    if (cfg.box) {
+      const boxVal = document.getElementById('ratio-val-' + cfg.key);
+      const box = document.getElementById('ratio-item-' + cfg.key);
+      if (boxVal) boxVal.textContent = fmt(latest) + cfg.boxUnit;
+      if (box) { box.classList.remove('r-ok','r-warn'); box.classList.add(ok ? 'r-ok' : 'r-warn'); }
+    }
+  });
 }
 
 /* ─── Navigation historique — BS archivés (bs_history/) ───
@@ -2725,7 +2797,7 @@ function renderBSTable() {
     const pad = 10 + (r.level || 0) * 16;
     const cells = r.values.map(pair => {
       const [usd, xof] = pair;
-      return `<td>${usd == null ? '—' : fmt(usd)}</td><td>${xof == null ? '—' : fmt(xof)}</td>`;
+      return `<td>${fmt(usd)}</td><td>${fmt(xof)}</td>`;
     }).join('');
     return `<tr class="${rowClass}"><td style="padding-left:${pad}px">${escHtmlBS(r.label)}</td>${cells}</tr>`;
   }).join('');

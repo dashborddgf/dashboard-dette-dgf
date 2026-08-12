@@ -944,13 +944,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="card-body"><div class="cw cw-lg"><canvas id="chartDevise"></canvas></div></div>
     </div>
     <div class="card">
-      <div class="card-header"><div><div class="card-title">Extérieur — Par Taux</div><div class="card-sub">Template BS · Trimestriel</div></div></div>
+      <div class="card-header"><div><div class="card-title">Extérieur — Par Taux</div><div class="card-sub">Source : Tableau 3 du BS · <span id="taux-periode-label">Trimestriel</span></div></div></div>
       <div class="card-body" style="padding:0">
         <table class="tbl tbl-lg">
-          <thead><tr><th></th><th>2025</th><th>Mars 2026</th></tr></thead>
+          <thead><tr><th></th><th>2025</th><th id="th-taux-current">Actuel</th></tr></thead>
           <tbody>
-            <tr><td class="td-b">Dette à taux fixe</td><td>89,4%</td><td>89,8%</td></tr>
-            <tr><td class="td-b">Dette à taux variable</td><td>10,6%</td><td>10,2%</td></tr>
+            <tr><td class="td-b">Dette à taux fixe</td><td id="td-taux-fixe-2025">89,4%</td><td id="td-taux-fixe-current">89,8%</td></tr>
+            <tr><td class="td-b">Dette à taux variable</td><td id="td-taux-var-2025">10,6%</td><td id="td-taux-var-current">10,2%</td></tr>
           </tbody>
         </table>
       </div>
@@ -2650,10 +2650,10 @@ function applyRatiosData() {
     { key:'tauxmoy', box:false },
     { key:'tauxmoyext', box:false },
     { key:'tauxmoyint', box:false },
-    { key:'duree', box:true, boxUnit:' ans', tableUnit:'', threshold:7, dir:'above' },
-    { key:'ct', box:true, boxUnit:'%', threshold:15, dir:'below' },
-    { key:'devises', box:true, boxUnit:'%', threshold:60, dir:'below' },
-    { key:'fixe', box:true, boxUnit:'%', threshold:80, dir:'above' }
+    { key:'duree', box:true, boxUnit:' ans', tableUnit:'', threshold:7, dir:'above', useCurrent:true },
+    { key:'ct', box:true, boxUnit:'%', threshold:15, dir:'below', useCurrent:true },
+    { key:'devises', box:true, boxUnit:'%', threshold:60, dir:'below', useCurrent:true },
+    { key:'fixe', box:true, boxUnit:'%', threshold:80, dir:'above', useCurrent:true }
   ];
   configs.forEach(cfg => {
     const arr = ratios[cfg.key];
@@ -2664,7 +2664,7 @@ function applyRatiosData() {
       if (el && arr[i] != null) el.textContent = fmt(arr[i]) + tableUnit;
     });
     if (cfg.threshold == null) return;
-    const latest = arr[3];
+    const latest = (cfg.useCurrent && arr.length > 4 && arr[4] != null) ? arr[4] : arr[3];
     const ok = cfg.dir === 'below' ? latest < cfg.threshold : latest > cfg.threshold;
     const tag = document.getElementById('tag-' + cfg.key + '-status');
     if (tag) {
@@ -2679,6 +2679,22 @@ function applyRatiosData() {
       if (box) { box.classList.remove('r-ok','r-warn'); box.classList.add(ok ? 'r-ok' : 'r-warn'); }
     }
   });
+
+  /* "Extérieur — Par Taux" : dérivé de ratios.fixe (2025 + trimestre en cours),
+     taux variable = 100 - taux fixe (pas de ligne dédiée dans Tableau 3). */
+  const fixeArr = ratios.fixe;
+  if (Array.isArray(fixeArr) && fixeArr.length >= 4) {
+    const fixe2025 = fixeArr[3];
+    const fixeCurrent = (fixeArr.length > 4 && fixeArr[4] != null) ? fixeArr[4] : fixeArr[3];
+    const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v) + '%'; };
+    setTxt('td-taux-fixe-2025', fixe2025);
+    setTxt('td-taux-fixe-current', fixeCurrent);
+    setTxt('td-taux-var-2025', fixe2025 == null ? null : 100 - fixe2025);
+    setTxt('td-taux-var-current', fixeCurrent == null ? null : 100 - fixeCurrent);
+    const periodeLbl = bs.meta?.periode || 'Actuel';
+    const thCur = document.getElementById('th-taux-current'); if (thCur) thCur.textContent = periodeLbl;
+    const subLbl = document.getElementById('taux-periode-label'); if (subLbl) subLbl.textContent = 'Trimestriel · ' + periodeLbl;
+  }
 }
 
 /* ─── Navigation historique — BS archivés (bs_history/) ───

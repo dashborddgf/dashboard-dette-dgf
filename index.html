@@ -622,6 +622,94 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 </style>
 </head>
 <body>
+<script>document.body.classList.add('dgf-locked');</script>
+
+<!-- ═══════════ ÉCRAN DE CONNEXION ═══════════
+     Barrière d'accès simple, côté navigateur : empêche un visiteur
+     occasionnel d'ouvrir le tableau de bord sans le code partagé.
+     ⚠️ Ce n'est PAS une authentification sécurisée : le code (haché)
+     reste techniquement visible dans le code source par quiconque
+     l'inspecterait. Une vraie authentification par utilisateur
+     nécessite une infrastructure côté DSI (voir note technique dédiée). -->
+<style>
+  .login-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#037B3D 0%,#0a3d22 100%);padding:20px}
+  body:not(.dgf-locked) .login-gate{display:none}
+  .login-card{background:#fff;border-radius:16px;padding:36px 32px 30px;width:100%;max-width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center;font-family:inherit}
+  .login-logo{width:56px;height:56px;border-radius:14px;margin:0 auto 14px;
+    background:linear-gradient(135deg,#037B3D,#EC8D08);
+    color:#fff;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
+  .login-title{font-size:16px;font-weight:800;color:#182620;margin-bottom:4px}
+  .login-sub{font-size:12px;color:#6B7280;margin-bottom:22px}
+  .login-label{display:block;text-align:left;font-size:11px;font-weight:700;color:#374151;
+    text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .login-input{width:100%;padding:11px 13px;border:1.5px solid #D9D5C7;border-radius:9px;
+    font-size:15px;font-family:inherit;margin-bottom:6px;box-sizing:border-box}
+  .login-input:focus{outline:none;border-color:#037B3D}
+  .login-error{color:#B4471F;font-size:12.5px;text-align:left;margin:4px 0 10px}
+  .login-btn{width:100%;padding:11px;border:none;border-radius:9px;background:#037B3D;color:#fff;
+    font-weight:700;font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit}
+  .login-btn:hover{background:#04a350}
+  .login-foot{margin-top:16px;font-size:10.5px;color:#9CA3AF}
+</style>
+<div id="loginGate" class="login-gate">
+  <form class="login-card" id="loginForm" autocomplete="off">
+    <div class="login-logo">DGF</div>
+    <div class="login-title">Tableau de Bord de la Dette</div>
+    <div class="login-sub">Direction Générale des Financements · Côte d'Ivoire</div>
+    <label class="login-label" for="loginPass">Code d'accès</label>
+    <input type="password" id="loginPass" class="login-input" placeholder="Code d'accès" autocomplete="current-password">
+    <div class="login-error" id="loginError" hidden>Code incorrect — réessayez.</div>
+    <button type="submit" class="login-btn">Accéder au tableau de bord</button>
+    <div class="login-foot">Accès réservé au personnel autorisé de la DGF</div>
+  </form>
+</div>
+<script>
+(function(){
+  // Empreinte SHA-256 du code d'accès (jamais le code en clair dans ce fichier).
+  // Valeur par défaut : "DGF2026" — À CHANGER avant mise en production.
+  // Pour changer le code : ouvrir la console du navigateur (F12) sur cette
+  // page et exécuter :
+  //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('NouveauCode')).then(b=>console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')))
+  // puis remplacer la valeur ci-dessous par le résultat affiché.
+  const DGF_ACCESS_HASH = '7fb3724608e8769c47a22b8e84805d445ad01994329562fc8a64e1730019188d';
+  const STORAGE_KEY = 'dgf_dashboard_unlocked_v1';
+
+  async function sha256(text){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function unlock(){
+    document.body.classList.remove('dgf-locked');
+    const gate = document.getElementById('loginGate');
+    if (gate) gate.remove();
+  }
+  window.dgfLogout = function(){
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    location.reload();
+  };
+  try {
+    if (localStorage.getItem(STORAGE_KEY) === DGF_ACCESS_HASH) unlock();
+  } catch (e) { /* localStorage indisponible : la barrière reste affichée */ }
+
+  const form = document.getElementById('loginForm');
+  if (form) form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const val = document.getElementById('loginPass').value;
+    const hash = await sha256(val);
+    if (hash === DGF_ACCESS_HASH) {
+      try { localStorage.setItem(STORAGE_KEY, hash); } catch (e) {}
+      unlock();
+    } else {
+      document.getElementById('loginError').hidden = false;
+      document.getElementById('loginPass').value = '';
+      document.getElementById('loginPass').focus();
+    }
+  });
+})();
+</script>
+<!-- ═══════════ FIN ÉCRAN DE CONNEXION ═══════════ -->
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -749,6 +837,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div class="role">Service Stats · DGF</div>
       </div>
     </div>
+    <div class="logout-link" onclick="dgfLogout()" title="Verrouiller à nouveau le tableau de bord sur cet appareil" style="cursor:pointer;font-size:10.5px;color:rgba(255,255,255,.55);text-align:center;margin-top:6px">Se déconnecter</div>
   </div>
 </aside>
 

@@ -770,7 +770,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 8h6M9 12h6M9 16h4" stroke-width="1.5"/></svg>
         Fiches de la Dette
       </div>
-      <div class="nav-item nav-subitem" onclick="openStrategieFolder()">
+      <div class="nav-item nav-subitem" onclick="openSDMTFolder()">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke-width="1.5"/><circle cx="12" cy="12" r="1.3" stroke-width="1.5"/></svg>
         SDMT
       </div>
@@ -786,25 +786,17 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="1.5"/></svg>
         MAD
       </div>
-      <div class="nav-item nav-subitem" onclick="openNSHPresentationFolder()">
+      <div class="nav-item nav-subitem" onclick="openNSHFolder()">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="1.5" stroke-width="1.5"/><path d="M8 21h8M12 18v3" stroke-width="1.5"/></svg>
-        NSH — Présentation PowerPoint
-      </div>
-      <div class="nav-item nav-subitem" onclick="openNSHExcelFolder()">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke-width="1.5"/><path d="M3 9h18M9 9v11" stroke-width="1.5"/></svg>
-        NSH — Excel
+        NSH
       </div>
       <div class="nav-item nav-subitem" onclick="openESGFolder()">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M8 12l3 3 5-6" stroke-width="1.5"/></svg>
-        Rapport ESG
+        ESG
       </div>
       <div class="nav-item nav-subitem" onclick="openNotesFolder()">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V4a1 1 0 00-1-1H6.5A2.5 2.5 0 004 5.5v14z" stroke-width="1.5"/></svg>
         Notes
-      </div>
-      <div class="nav-item nav-subitem" onclick="openStatistiqueFolder()">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="10" width="4" height="11"/><rect x="10" y="4" width="4" height="17"/><rect x="17" y="7" width="4" height="14"/></svg>
-        Statistique
       </div>
     </div>
   </div>
@@ -1955,26 +1947,24 @@ const SHAREPOINT_MAD_CONFIG = {
 
   // Dossiers "Nos Productions" et "Documentations Utiles"
   esgFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FESG&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
-  statistiqueFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FStatistiques&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
-  strategieFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FStrat%C3%A9gies&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
   docsUtilesFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FDocumentations%20Utiles&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
 
-  // Dossiers "NSH"
-  nshPresentationFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNSH%2FPr%C3%A9sentations%20PowerPoints&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
-  nshExcelFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNSH%2FNsh%20Excel&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
+  // Dossier "NSH"
+  nshFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FNSH&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
 
-  // Dossiers "Nos Productions" additionnels — URL à renseigner (encore vides)
-  fichesDetteFolderUrl: '',
-  avdFolderUrl: '',
-  notesFolderUrl: ''
+  // Dossiers "Nos Productions" additionnels
+  fichesDetteFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FFICHE%20DE%20LA%20DETTE&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
+  sdmtFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FSDMT&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
+  avdFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FAVD&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
+  notesFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FNOTEs&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D'
 };
 
 function openSharePointFolder(url) {
   if (!url) { alert('Lien SharePoint non configuré pour le moment.'); return; }
   window.open(url, '_blank', 'noopener,noreferrer');
 }
-function openNSHPresentationFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshPresentationFolderUrl); }
-function openNSHExcelFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshExcelFolderUrl); }
+function openNSHFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshFolderUrl); }
+function openSDMTFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.sdmtFolderUrl); }
 
 function openMADFolder() {
   const msg = "IMPORT MAD\n\n" +
@@ -1999,8 +1989,6 @@ function openBSFolder() {
 }
 
 function openESGFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.esgFolderUrl); }
-function openStatistiqueFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.statistiqueFolderUrl); }
-function openStrategieFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.strategieFolderUrl); }
 function openDocsUtilesFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.docsUtilesFolderUrl); }
 function openFichesDetteFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.fichesDetteFolderUrl); }
 function openAVDFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.avdFolderUrl); }

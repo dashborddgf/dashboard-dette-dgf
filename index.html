@@ -723,27 +723,27 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <div class="nav-scroll">
   <div class="nav-section">Navigation</div>
-  <div class="nav-item active" data-nav-key="vue-exec" onclick="showScreen('vue-exec',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Vue d'ensemble
-  </div>
 
-  <div class="nav-group" id="navgroup-structure-dette" data-nav-key="structure-dette">
-    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('structure-dette',this)">
+  <div class="nav-group open" id="navgroup-vue-ensemble" data-nav-key="vue-ensemble">
+    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('vue-ensemble',this)">
       <span class="nav-item-main">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
-        Structure Dette
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Vue d'ensemble
       </span>
       <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
     </div>
-    <div class="nav-submenu" id="navsub-structure-dette">
+    <div class="nav-submenu" id="navsub-vue-ensemble">
+      <div class="nav-item nav-subitem active" data-nav-key="vue-exec" onclick="showScreen('vue-exec',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 1v22M5 8l7-7 7 7M5 16l7 7 7-7" stroke-width="1.5"/></svg>
+        Encours de la dette
+      </div>
       <div class="nav-item nav-subitem" onclick="showScreen('dette-int',this)">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M12 3v18" stroke-width="1.5"/></svg>
-        Intérieur
+        Structure de la dette — Intérieur
       </div>
       <div class="nav-item nav-subitem" onclick="showScreen('dette-ext',this)">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M3 12h18" stroke-width="1.5"/></svg>
-        Extérieur
+        Structure de la dette — Extérieur
       </div>
     </div>
   </div>
@@ -756,38 +756,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
     Evolution
   </div>
-  <div class="nav-item" data-nav-key="eurobonds" onclick="showScreen('eurobonds',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-width="1.5"/></svg>
-    Eurobonds
-  </div>
-  <div class="nav-item" data-nav-key="tableau-bord" onclick="showScreen('tableau-bord',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" stroke-width="1.5"/></svg>
-    Tableau MAD
-  </div>
-  <div class="nav-item" data-nav-key="template-bs" onclick="showScreen('template-bs',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 8h6M9 12h6M9 16h4" stroke-width="1.5"/></svg>
-    Template BS
-  </div>
-
-  <div class="nav-group" id="navgroup-nsh" data-nav-key="nsh">
-    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('nsh',this)">
-      <span class="nav-item-main">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 16l2.5-3 2 2L17 10" stroke-width="1.5"/></svg>
-        NSH
-      </span>
-      <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
-    </div>
-    <div class="nav-submenu" id="navsub-nsh">
-      <div class="nav-item nav-subitem" onclick="openNSHPresentationFolder()">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="1.5" stroke-width="1.5"/><path d="M8 21h8M12 18v3" stroke-width="1.5"/></svg>
-        Présentation PowerPoint
-      </div>
-      <div class="nav-item nav-subitem" onclick="openNSHExcelFolder()">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke-width="1.5"/><path d="M3 9h18M9 9v11" stroke-width="1.5"/></svg>
-        NSH Excel
-      </div>
-    </div>
-  </div>
 
   <div class="nav-group" id="navgroup-nos-productions" data-nav-key="nos-productions">
     <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('nos-productions',this)">
@@ -798,17 +766,45 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
     </div>
     <div class="nav-submenu" id="navsub-nos-productions">
+      <div class="nav-item nav-subitem" onclick="openFichesDetteFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-width="1.5"/><path d="M9 8h6M9 12h6M9 16h4" stroke-width="1.5"/></svg>
+        Fiches de la Dette
+      </div>
       <div class="nav-item nav-subitem" onclick="openStrategieFolder()">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke-width="1.5"/><circle cx="12" cy="12" r="1.3" stroke-width="1.5"/></svg>
-        Stratégie
+        SDMT
+      </div>
+      <div class="nav-item nav-subitem" onclick="openAVDFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
+        AVD
+      </div>
+      <div class="nav-item nav-subitem" onclick="openBSFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="10" width="4" height="11"/><rect x="10" y="4" width="4" height="17"/><rect x="17" y="7" width="4" height="14"/></svg>
+        BS
+      </div>
+      <div class="nav-item nav-subitem" onclick="openMADFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="1.5"/></svg>
+        MAD
+      </div>
+      <div class="nav-item nav-subitem" onclick="openNSHPresentationFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="1.5" stroke-width="1.5"/><path d="M8 21h8M12 18v3" stroke-width="1.5"/></svg>
+        NSH — Présentation PowerPoint
+      </div>
+      <div class="nav-item nav-subitem" onclick="openNSHExcelFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke-width="1.5"/><path d="M3 9h18M9 9v11" stroke-width="1.5"/></svg>
+        NSH — Excel
+      </div>
+      <div class="nav-item nav-subitem" onclick="openESGFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M8 12l3 3 5-6" stroke-width="1.5"/></svg>
+        Rapport ESG
+      </div>
+      <div class="nav-item nav-subitem" onclick="openNotesFolder()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V4a1 1 0 00-1-1H6.5A2.5 2.5 0 004 5.5v14z" stroke-width="1.5"/></svg>
+        Notes
       </div>
       <div class="nav-item nav-subitem" onclick="openStatistiqueFolder()">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="10" width="4" height="11"/><rect x="10" y="4" width="4" height="17"/><rect x="17" y="7" width="4" height="14"/></svg>
         Statistique
-      </div>
-      <div class="nav-item nav-subitem" onclick="openESGFolder()">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M8 12l3 3 5-6" stroke-width="1.5"/></svg>
-        ESG
       </div>
     </div>
   </div>
@@ -826,6 +822,10 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="nav-item" onclick="openBSFolder()" title="Import Bilan / Balance de Situation (à venir)">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="1.5"/></svg>
     Import BS
+  </div>
+  <div class="nav-item" onclick="openHistoriqueFolder()" title="Consulter les MAD archivés">
+    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3M3.05 11a9 9 0 1 1 .5 3.5" stroke-width="1.5"/><path d="M3 5v5h5" stroke-width="1.5"/></svg>
+    Historiques
   </div>
   </div><!-- /nav-scroll -->
 
@@ -1062,21 +1062,21 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
     </div>
     <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Principaux Ratios et Indicateurs d'Endettement</div><div class="card-sub">2021–2025 · Source : DGF / FMI</div></div></div>
+      <div class="card-header"><div><div class="card-title">Tableau pour Commentaire</div><div class="card-sub">Valeur actuelle par indicateur · cliquer 💬 pour commenter une ligne</div></div></div>
       <div class="card-body" style="padding:0">
         <table class="tbl">
-          <thead><tr><th style="text-align:left">Indicateur</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>Seuil</th><th>Statut 2025</th></tr></thead>
+          <thead><tr><th style="text-align:left">Indicateur</th><th>Valeur actuelle</th><th>Seuil</th><th>Statut</th><th>Commentaire</th></tr></thead>
           <tbody>
-            <tr><td class="td-b">Dette AC / PIB (%)</td><td>50,2%</td><td id="td-pib-2022">56,0%</td><td id="td-pib-2023">56,7%</td><td id="td-pib-2024">59,5%</td><td id="td-pib-2025" style="font-weight:700;color:var(--green)">57,1%</td><td style="color:var(--gray)">&lt; 70%</td><td><span class="tag" id="tag-pib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Intérêts / Recettes (%)</td><td>13,2%</td><td id="td-intrec-2022">15,0%</td><td id="td-intrec-2023">16,6%</td><td id="td-intrec-2024">16,7%</td><td id="td-intrec-2025" style="font-weight:700;color:#92720A">16,5%</td><td style="color:var(--gray)">&lt; 22%</td><td><span class="tag" id="tag-intrec-status" style="background:var(--gold-bg);color:#92720A">⚠ Vigilance</span></td></tr>
-            <tr><td class="td-b">Intérêts / PIB (%)</td><td>1,9%</td><td id="td-intpib-2022">2,2%</td><td id="td-intpib-2023">2,6%</td><td id="td-intpib-2024">2,7%</td><td id="td-intpib-2025" style="font-weight:700;color:var(--green)">2,7%</td><td style="color:var(--gray)">&lt; 3%</td><td><span class="tag" id="tag-intpib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Taux intérêt moyen pondéré</td><td>4,1%</td><td id="td-tauxmoy-2022">4,2%</td><td id="td-tauxmoy-2023">4,6%</td><td id="td-tauxmoy-2024">5,0%</td><td id="td-tauxmoy-2025">5,1%</td><td>—</td><td>—</td></tr>
-            <tr><td class="td-b" style="padding-left:18px">• Extérieure</td><td>3,6%</td><td id="td-tauxmoyext-2022">3,6%</td><td id="td-tauxmoyext-2023">4,4%</td><td id="td-tauxmoyext-2024">4,7%</td><td id="td-tauxmoyext-2025">4,8%</td><td></td><td></td></tr>
-            <tr><td class="td-b" style="padding-left:18px">• Intérieure</td><td>5,0%</td><td id="td-tauxmoyint-2022">5,1%</td><td id="td-tauxmoyint-2023">5,3%</td><td id="td-tauxmoyint-2024">5,5%</td><td id="td-tauxmoyint-2025">5,4%</td><td></td><td></td></tr>
-            <tr><td class="td-b">Durée moy. vie (années)</td><td>7,5</td><td id="td-duree-2022">6,9</td><td id="td-duree-2023">7,1</td><td id="td-duree-2024">7,0</td><td id="td-duree-2025" style="font-weight:700;color:var(--green)">7,2</td><td style="color:var(--gray)">&gt; 7 ans</td><td><span class="tag" id="tag-duree-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Dette à court terme (%)</td><td>9,3%</td><td id="td-ct-2022">9,3%</td><td id="td-ct-2023">10,9%</td><td id="td-ct-2024">14,6%</td><td id="td-ct-2025" style="font-weight:700;color:#92720A">14,8%</td><td style="color:var(--gray)">&lt; 15%</td><td><span class="tag" id="tag-ct-status" style="background:var(--gold-bg);color:#92720A">⚠ Limite</span></td></tr>
-            <tr><td class="td-b">Dette en devises (% total)</td><td>59,7%</td><td id="td-devises-2022">59,9%</td><td id="td-devises-2023">61,7%</td><td id="td-devises-2024">55,7%</td><td id="td-devises-2025" style="font-weight:700;color:var(--green)">53,3%</td><td style="color:var(--gray)">&lt; 60%</td><td><span class="tag" id="tag-devises-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
-            <tr><td class="td-b">Dette à taux fixe (%)</td><td>92,3%</td><td id="td-fixe-2022">89,2%</td><td id="td-fixe-2023">89,8%</td><td id="td-fixe-2024">89,3%</td><td id="td-fixe-2025" style="font-weight:700;color:var(--green)">89,4%</td><td style="color:var(--gray)">&gt; 80%</td><td><span class="tag" id="tag-fixe-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td></tr>
+            <tr><td class="td-b">Dette AC / PIB (%)</td><td id="td-pib-2025" style="font-weight:700;color:var(--green)">57,1%</td><td style="color:var(--gray)">&lt; 70%</td><td><span class="tag" id="tag-pib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-pib" onclick="openObservationModal('ratio-pib','Dette AC / PIB','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b">Intérêts / Recettes (%)</td><td id="td-intrec-2025" style="font-weight:700;color:#92720A">16,5%</td><td style="color:var(--gray)">&lt; 22%</td><td><span class="tag" id="tag-intrec-status" style="background:var(--gold-bg);color:#92720A">⚠ Vigilance</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-intrec" onclick="openObservationModal('ratio-intrec','Intérêts / Recettes','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b">Intérêts / PIB (%)</td><td id="td-intpib-2025" style="font-weight:700;color:var(--green)">2,7%</td><td style="color:var(--gray)">&lt; 3%</td><td><span class="tag" id="tag-intpib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-intpib" onclick="openObservationModal('ratio-intpib','Intérêts / PIB','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b">Taux intérêt moyen pondéré</td><td id="td-tauxmoy-2025">5,1%</td><td>—</td><td>—</td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-tauxmoy" onclick="openObservationModal('ratio-tauxmoy','Taux intérêt moyen pondéré','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b" style="padding-left:18px">• Extérieure</td><td id="td-tauxmoyext-2025">4,8%</td><td></td><td></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-tauxmoyext" onclick="openObservationModal('ratio-tauxmoyext','Taux intérêt moyen — Extérieure','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b" style="padding-left:18px">• Intérieure</td><td id="td-tauxmoyint-2025">5,4%</td><td></td><td></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-tauxmoyint" onclick="openObservationModal('ratio-tauxmoyint','Taux intérêt moyen — Intérieure','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b">Durée moy. vie (années)</td><td id="td-duree-2025" style="font-weight:700;color:var(--green)">7,2</td><td style="color:var(--gray)">&gt; 7 ans</td><td><span class="tag" id="tag-duree-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-duree" onclick="openObservationModal('ratio-duree','Durée moyenne de vie','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b">Dette à court terme (%)</td><td id="td-ct-2025" style="font-weight:700;color:#92720A">14,8%</td><td style="color:var(--gray)">&lt; 15%</td><td><span class="tag" id="tag-ct-status" style="background:var(--gold-bg);color:#92720A">⚠ Limite</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-ct" onclick="openObservationModal('ratio-ct','Dette à court terme','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b">Dette en devises (% total)</td><td id="td-devises-2025" style="font-weight:700;color:var(--green)">53,3%</td><td style="color:var(--gray)">&lt; 60%</td><td><span class="tag" id="tag-devises-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-devises" onclick="openObservationModal('ratio-devises','Dette en devises','Indicateurs coûts et Risques')">💬</button></td></tr>
+            <tr><td class="td-b">Dette à taux fixe (%)</td><td id="td-fixe-2025" style="font-weight:700;color:var(--green)">89,4%</td><td style="color:var(--gray)">&gt; 80%</td><td><span class="tag" id="tag-fixe-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-fixe" onclick="openObservationModal('ratio-fixe','Dette à taux fixe','Indicateurs coûts et Risques')">💬</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -1287,10 +1287,10 @@ function optionLabel(key, val) {
    NAVIGATION
 ════════════════════════════════════════════════════════════════ */
 const PAGE_TITLES = {
-  'vue-exec':"Vue d'ensemble", 'tableau-bord':'Tableau de Bord MAD',
+  'vue-exec':'Encours de la dette',
   'dette-int':'Structure Dette — Intérieur', 'dette-ext':'Structure Dette — Extérieur',
-  'ratios':'Indicateurs coûts et Risques', 'eurobonds':'Eurobonds',
-  'comparaison':'Evolution', 'template-bs':'Template BS'
+  'ratios':'Indicateurs coûts et Risques',
+  'comparaison':'Evolution'
 };
 
 function toggleNavGroup(id, el) {
@@ -1961,7 +1961,12 @@ const SHAREPOINT_MAD_CONFIG = {
 
   // Dossiers "NSH"
   nshPresentationFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNSH%2FPr%C3%A9sentations%20PowerPoints&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
-  nshExcelFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNSH%2FNsh%20Excel&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D'
+  nshExcelFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNSH%2FNsh%20Excel&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
+
+  // Dossiers "Nos Productions" additionnels — URL à renseigner (encore vides)
+  fichesDetteFolderUrl: '',
+  avdFolderUrl: '',
+  notesFolderUrl: ''
 };
 
 function openSharePointFolder(url) {
@@ -1997,6 +2002,10 @@ function openESGFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.esgFolderU
 function openStatistiqueFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.statistiqueFolderUrl); }
 function openStrategieFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.strategieFolderUrl); }
 function openDocsUtilesFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.docsUtilesFolderUrl); }
+function openFichesDetteFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.fichesDetteFolderUrl); }
+function openAVDFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.avdFolderUrl); }
+function openNotesFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.notesFolderUrl); }
+function openHistoriqueFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.historyFolderUrl); }
 
 /* Télécharge l'onglet actuellement affiché en PDF via l'impression native du navigateur
    (aucune dépendance externe requise — cohérent avec la CSP qui bloque les scripts tiers).
@@ -2725,7 +2734,7 @@ async function loadBSData() {
 
 /* Répercute les indicateurs de Tableau 3 (hors Dette/PIB, déjà géré par
    applyPibACData) sur le Tableau de Bord des Risques et le tableau
-   "Principaux Ratios et Indicateurs d'Endettement" : Intérêts/Recettes,
+   "Tableau pour Commentaire" : Intérêts/Recettes,
    Intérêts/PIB, Taux moyen pondéré (+Ext/Int), Durée de vie, Dette CT,
    Dette en devises, Dette à taux fixe. 2021 reste une constante
    historique fixe ; 2022-2025 et le statut/seuil deviennent dynamiques. */
@@ -3130,10 +3139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Accueil
   </div>
-  <div class="mobile-nav-item" onclick="showScreen('tableau-bord',null);setMobileActive(this)">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" stroke-width="1.5"/></svg>
-    MAD
-  </div>
   <div class="mobile-nav-item" onclick="showScreen('dette-int',null);setMobileActive(this)">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
     Structure
@@ -3142,9 +3147,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10" stroke-width="1.5"/></svg>
     Ratios
   </div>
-  <div class="mobile-nav-item" onclick="showScreen('eurobonds',null);setMobileActive(this)">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-width="1.5"/></svg>
-    Bonds
+  <div class="mobile-nav-item" onclick="showScreen('comparaison',null);setMobileActive(this)">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
+    Evolution
   </div>
 </nav>
 

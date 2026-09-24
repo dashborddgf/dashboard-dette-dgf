@@ -1,29 +1,5 @@
 [
   {
-    "id": "data_2021-12",
-    "madName": "MAD1221",
-    "periode": "Décembre 2021",
-    "file": "history/data_2021-12.json"
-  },
-  {
-    "id": "data_2022-12",
-    "madName": "MAD1224",
-    "periode": "Décembre 2022",
-    "file": "history/data_2022-12.json"
-  },
-  {
-    "id": "data_2023-12",
-    "madName": "MAD1223",
-    "periode": "Décembre 2023",
-    "file": "history/data_2023-12.json"
-  },
-  {
-    "id": "data_2024-12",
-    "madName": "MAD1224",
-    "periode": "Décembre 2024",
-    "file": "history/data_2024-12.json"
-  },
-  {
     "id": "data_2025-01",
     "madName": "MAD0125",
     "periode": "Janvier 2025",

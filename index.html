@@ -459,6 +459,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .enc-box-tag.orange{background:var(--orange-bg);color:var(--orange)}
 @media (max-width:900px){.enc-grid-4,.enc-grid-3{grid-template-columns:repeat(2,1fr)}}
 
+/* PORTEFEUILLE DE LA DETTE — répartition par type de créanciers */
+.cred-header{background:var(--green);color:#fff;font-size:14px;font-weight:800;padding:11px 16px;border-radius:8px 8px 0 0}
+.cred-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;background:var(--white)}
+.cred-col{padding:18px 20px}
+.cred-col:first-child{border-right:1px solid var(--border)}
+.cred-col-title{text-align:center;color:var(--green);font-weight:800;font-size:13px;margin-bottom:16px}
+.cred-row{display:grid;grid-template-columns:minmax(90px,auto) 1fr 44px;align-items:center;gap:10px;margin-bottom:12px}
+.cred-label{font-size:11px;color:var(--dark);text-align:right}
+.cred-track{background:#EDE7D8;border-radius:3px;height:14px;overflow:hidden}
+.cred-fill{height:100%;border-radius:3px}
+.cred-pct{font-size:11px;font-weight:800;color:var(--dark)}
+@media (max-width:700px){.cred-cols{grid-template-columns:1fr}.cred-col:first-child{border-right:none;border-bottom:1px solid var(--border)}.cred-row{grid-template-columns:80px 1fr 40px}}
+
 /* PROGRESS */
 .pb-wrap{flex:1;background:var(--border);border-radius:4px;height:5px;overflow:hidden}
 .pb{height:5px;border-radius:4px}
@@ -1017,37 +1030,17 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
   </div><!-- /tableau-bord -->
 
-  <!-- ══════════════ DETTE EXT ══════════════ -->
+  <!-- ══════════════ PORTEFEUILLE DE LA DETTE ══════════════ -->
   <div class="screen" id="screen-portefeuille-dette">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange);margin:0 0 8px">Intérieur</div>
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Intérieur — Par Instrument</div><div class="card-sub"><span id="fl-int-label" style="color:var(--orange)">Tous instruments</span></div></div></div>
-      <div class="card-body"><div class="cw cw-pie"><canvas id="chartIntRep"></canvas></div></div>
-    </div>
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header"><div><div class="card-title">Intérieur — Par Créancier</div><div class="card-sub">BCEAO, Banques Commerciales, Valeurs Mobilières</div></div></div>
-      <div class="card-body"><div class="cw cw-pie"><canvas id="chartIntEvol"></canvas></div></div>
-    </div>
-
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange);margin:0 0 8px">Extérieur</div>
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Extérieur — Par Créancier</div><div class="card-sub"><span id="fl-ext-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
-      <div class="card-body"><div class="cw cw-pie"><canvas id="chartExtEvol"></canvas></div></div>
-    </div>
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Extérieur — Par Devise</div><div class="card-sub">Template BS · Trimestriel</div></div></div>
-      <div class="card-body"><div class="cw cw-lg"><canvas id="chartDevise"></canvas></div></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">Extérieur — Par Taux</div><div class="card-sub">Source : Tableau 3 du BS · <span id="taux-periode-label">Trimestriel</span></div></div></div>
-      <div class="card-body" style="padding:0">
-        <table class="tbl tbl-lg">
-          <thead><tr><th></th><th>2025</th><th id="th-taux-current">Actuel</th></tr></thead>
-          <tbody>
-            <tr><td class="td-b">Dette à taux fixe</td><td id="td-taux-fixe-2025">89,4%</td><td id="td-taux-fixe-current">89,8%</td></tr>
-            <tr><td class="td-b">Dette à taux variable</td><td id="td-taux-var-2025">10,6%</td><td id="td-taux-var-current">10,2%</td></tr>
-          </tbody>
-        </table>
+    <div class="cred-header">Répartition de la dette par type de créanciers</div>
+    <div class="cred-cols">
+      <div class="cred-col">
+        <div class="cred-col-title">Dette extérieure</div>
+        <div id="creancier-ext-bars"></div>
+      </div>
+      <div class="cred-col">
+        <div class="cred-col-title">Dette intérieure</div>
+        <div id="creancier-int-bars"></div>
       </div>
     </div>
   </div><!-- /portefeuille-dette -->
@@ -1691,10 +1684,7 @@ function refreshAll() {
   refreshVueEnsembleColonnes(enc);
   buildChartMADEncours(enc);
   buildChartMADService(enc);
-  buildChartExtEvol(enc);
-  buildChartDevise();
-  buildChartIntRep(enc);
-  buildChartIntEvol(enc);
+  buildCreancierBars(enc);
   buildChartRatioPIB();
 }
 
@@ -1935,61 +1925,49 @@ function buildChartMADService(enc) {
   mkChart('chartMADService',{type:'bar',data:{labels:keys.map(k=>lblMap[k]||k),datasets:[{label:'Capital',data:keys.map(k=>DATA.service[k][0]),backgroundColor:C.orA,borderRadius:3},{label:'Intérêts',data:keys.map(k=>DATA.service[k][1]),backgroundColor:C.blA,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
 }
 
-function buildChartExtEvol(enc) {
+/* Écran "Portefeuille de la Dette" — répartition par type de créanciers.
+   Extérieur : reprend le regroupement déjà utilisé pour le filtre "Créancier"
+   (Multilatéraux/Bilatéraux/Titres.../Commerciaux), vérifié cohérent avec
+   meta.detteExt. Intérieur : mappage BT→Bons du Trésor, OAT→Obligations par
+   adjudication, TPCI→Obligations par syndication, TitriseesDomestique→
+   Certificats d'obligations, BCEAO+Sukuk+RCI+BanqComm→Autres emprunts (Dont
+   Alloc. DTS) — à confirmer avec la DGF, aucune source ne documente ce
+   détail dans le MAD actuel au-delà de ces 8 instruments. */
+function buildCreancierBars(enc) {
   const g = k => enc[k] || 0;
-  let items=[
-    {cat:'Bilatéral',label:'Bilatéraux',value:g('AFD')+g('KFW')+g('EximbankChine')+g('JICA')+g('AutresBil'),color:C.grA},
-    {cat:'Multilatéral',label:'Multilatéraux',value:g('FMI')+g('BM')+g('BAD')+g('BID')+g('AutresMulti'),color:C.blA},
-    {cat:'Titres Internationaux',label:'Eurobonds',value:g('Eurobonds')+g('Samourai'),color:C.orA},
-    {cat:'Commercial',label:'Commerciaux',value:g('Commerciaux'),color:C.rd+'BB'}
-  ];
-  // Filtrer selon créancier(s) sélectionné(s)
-  if(F.creancier.length) items=items.filter(x=>F.creancier.includes(x.cat));
-  mkChart('chartExtEvol',{type:'pie',data:{labels:items.map(x=>x.label),datasets:[{
-    data:items.map(x=>x.value),
-    backgroundColor:items.map(x=>x.color),
-    borderWidth:2,borderColor:'#fff'
-  }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}});
+  const extItems = [
+    { label:'Multilatéraux', value: g('FMI')+g('BM')+g('BAD')+g('BID')+g('AutresMulti') },
+    { label:'Porteurs de titres', value: g('Eurobonds')+g('Samourai') },
+    { label:'Bilatéraux', value: g('AFD')+g('KFW')+g('EximbankChine')+g('JICA')+g('AutresBil') },
+    { label:'Autres créanciers', value: g('Commerciaux') }
+  ].sort((a,b) => b.value - a.value);
+
+  const intItems = [
+    { label:'Obligations par adjudication', value: g('OAT') },
+    { label:'Obligations par syndication', value: g('TPCI') },
+    { label:'Autres emprunts (Dont Alloc. DTS)', value: g('BCEAO')+g('Sukuk')+g('RCI')+g('BanqComm') },
+    { label:'Certificats d\'obligations', value: g('TitriseesDomestique') },
+    { label:'Bons du Trésor', value: g('BT') }
+  ].sort((a,b) => b.value - a.value);
+
+  renderCreancierBars('creancier-ext-bars', extItems);
+  renderCreancierBars('creancier-int-bars', intItems);
 }
 
-/* Répartition par devise — source Template BS (trimestriel), valeurs figées en
-   attendant la mise en place d'un pipeline d'import BS équivalent à celui du MAD. */
-const BS_DEVISE = { EUR: 68.3, USD: 11.1, XOF: 15.5, CNY: 1.9, Autres: 3.3 };
-
-function buildChartDevise() {
-  let d = { ...BS_DEVISE };
-  // Filtrer devise(s) sélectionnée(s)
-  if (F.devise.length) {
-    const newD = {};
-    Object.keys(d).forEach(k => { if (F.devise.includes(k.toLowerCase())) newD[k] = d[k]; });
-    d = newD;
-  }
-  const keys = Object.keys(d), vals = keys.map(k => d[k]);
-  const cols = { EUR: C.blA, USD: C.orA, XOF: C.grA, CNY: C.rd + 'BB', Autres: C.go + 'BB' };
-  mkChart('chartDevise', { type:'bar', data:{ labels:keys, datasets:[{ label:'Part (%)', data:vals, backgroundColor:keys.map(k=>cols[k]||C.go), borderRadius:4 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.parsed.x)}%`}} }, scales:{ x:{...gO, ticks:{callback:v=>v+'%',...gO.ticks}}, y:{...gO} } } });
+function renderCreancierBars(hostId, items) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  const palette = ['#037B3D','#EC8D08','#8FBF9E','#EFC873','#F4DFAE'];
+  const total = items.reduce((a,x) => a + (x.value || 0), 0);
+  host.innerHTML = items.map((x,i) => {
+    const pct = total ? (x.value / total * 100) : 0;
+    return '<div class="cred-row">' +
+      '<div class="cred-label">' + x.label + '</div>' +
+      '<div class="cred-track"><div class="cred-fill" style="width:' + Math.max(pct,1.2) + '%;background:' + palette[i % palette.length] + '"></div></div>' +
+      '<div class="cred-pct">' + fmt(pct) + '%</div>' +
+    '</div>';
+  }).join('');
 }
-
-function buildChartIntRep(enc) {
-  const k=['BT','OAT','TPCI'].filter(x=>enc[x]>0);
-  const lbl={BT:'BT',OAT:'OAT',TPCI:'TPCI'};
-  const cols={BT:C.blA,OAT:C.orA,TPCI:C.goA};
-  mkChart('chartIntRep',{type:'pie',data:{labels:k.map(x=>lbl[x]),datasets:[{data:k.map(x=>enc[x]),backgroundColor:k.map(x=>cols[x]),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
-}
-
-function buildChartIntEvol(enc) {
-  const g = k => enc[k] || 0;
-  const bceao  = g('BCEAO');
-  const banques = g('BanqComm') + g('TitriseesDomestique');
-  const titres  = g('BT') + g('TPCI') + g('OAT');
-  const autres  = g('Sukuk') + g('RCI');
-
-  mkChart('chartIntEvol',{type:'pie',data:{labels:['BCEAO','Banques&Assimilés','Titres Publics','Autres'],datasets:[{
-    data:[bceao,banques,titres,autres],
-    backgroundColor:[C.goA,C.rd+'BB',C.orA,C.go+'77'],
-    borderWidth:2,borderColor:'#fff'
-  }]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
-}
-
 
 function buildChartRatioPIB() {
   const years = ['2021','2022','2023','2024','2025'];
@@ -2834,21 +2812,6 @@ function applyRatiosData() {
     }
   });
 
-  /* "Extérieur — Par Taux" : dérivé de ratios.fixe (2025 + trimestre en cours),
-     taux variable = 100 - taux fixe (pas de ligne dédiée dans Tableau 3). */
-  const fixeArr = ratios.fixe;
-  if (Array.isArray(fixeArr) && fixeArr.length >= 4) {
-    const fixe2025 = fixeArr[3];
-    const fixeCurrent = (fixeArr.length > 4 && fixeArr[4] != null) ? fixeArr[4] : fixeArr[3];
-    const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v) + '%'; };
-    setTxt('td-taux-fixe-2025', fixe2025);
-    setTxt('td-taux-fixe-current', fixeCurrent);
-    setTxt('td-taux-var-2025', fixe2025 == null ? null : 100 - fixe2025);
-    setTxt('td-taux-var-current', fixeCurrent == null ? null : 100 - fixeCurrent);
-    const periodeLbl = bs.meta?.periode || 'Actuel';
-    const thCur = document.getElementById('th-taux-current'); if (thCur) thCur.textContent = periodeLbl;
-    const subLbl = document.getElementById('taux-periode-label'); if (subLbl) subLbl.textContent = 'Trimestriel · ' + periodeLbl;
-  }
 }
 
 /* ─── Navigation historique — BS archivés (bs_history/) ───

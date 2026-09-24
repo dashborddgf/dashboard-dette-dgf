@@ -737,13 +737,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 1v22M5 8l7-7 7 7M5 16l7 7 7-7" stroke-width="1.5"/></svg>
         Encours de la dette
       </div>
-      <div class="nav-item nav-subitem" onclick="showScreen('dette-int',this)">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M12 3v18" stroke-width="1.5"/></svg>
-        Structure de la dette — Intérieur
-      </div>
-      <div class="nav-item nav-subitem" onclick="showScreen('dette-ext',this)">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M3 12h18" stroke-width="1.5"/></svg>
-        Structure de la dette — Extérieur
+      <div class="nav-item nav-subitem" onclick="showScreen('portefeuille-dette',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="1.5"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
+        Portefeuille de la Dette
       </div>
     </div>
   </div>
@@ -998,19 +994,18 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   </div><!-- /tableau-bord -->
 
   <!-- ══════════════ DETTE EXT ══════════════ -->
-  <div class="screen" id="screen-dette-int">
+  <div class="screen" id="screen-portefeuille-dette">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange);margin:0 0 8px">Intérieur</div>
     <div class="card" style="margin-bottom:12px">
       <div class="card-header"><div><div class="card-title">Intérieur — Par Instrument</div><div class="card-sub"><span id="fl-int-label" style="color:var(--orange)">Tous instruments</span></div></div></div>
       <div class="card-body"><div class="cw cw-pie"><canvas id="chartIntRep"></canvas></div></div>
     </div>
-    <div class="card">
+    <div class="card" style="margin-bottom:20px">
       <div class="card-header"><div><div class="card-title">Intérieur — Par Créancier</div><div class="card-sub">BCEAO, Banques Commerciales, Valeurs Mobilières</div></div></div>
       <div class="card-body"><div class="cw cw-pie"><canvas id="chartIntEvol"></canvas></div></div>
     </div>
-  </div><!-- /dette-int -->
 
-  <!-- ══════════════ DETTE EXT ══════════════ -->
-  <div class="screen" id="screen-dette-ext">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange);margin:0 0 8px">Extérieur</div>
     <div class="card" style="margin-bottom:12px">
       <div class="card-header"><div><div class="card-title">Extérieur — Par Créancier</div><div class="card-sub"><span id="fl-ext-label" style="color:var(--orange)">Tous créanciers</span></div></div></div>
       <div class="card-body"><div class="cw cw-pie"><canvas id="chartExtEvol"></canvas></div></div>
@@ -1031,7 +1026,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         </table>
       </div>
     </div>
-  </div><!-- /dette-ext -->
+  </div><!-- /portefeuille-dette -->
 
   <!-- ══════════════ RATIOS ══════════════ -->
   <div class="screen" id="screen-ratios">
@@ -1275,7 +1270,7 @@ function optionLabel(key, val) {
 ════════════════════════════════════════════════════════════════ */
 const PAGE_TITLES = {
   'vue-exec':'Encours de la dette',
-  'dette-int':'Structure Dette — Intérieur', 'dette-ext':'Structure Dette — Extérieur',
+  'portefeuille-dette':'Portefeuille de la Dette',
   'ratios':'Indicateurs coûts et Risques',
   'comparaison':'Evolution'
 };
@@ -3120,9 +3115,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Accueil
   </div>
-  <div class="mobile-nav-item" onclick="showScreen('dette-int',null);setMobileActive(this)">
+  <div class="mobile-nav-item" onclick="showScreen('portefeuille-dette',null);setMobileActive(this)">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke-width="1.5"/></svg>
-    Structure
+    Portefeuille
   </div>
   <div class="mobile-nav-item" onclick="showScreen('ratios',null);setMobileActive(this)">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10" stroke-width="1.5"/></svg>

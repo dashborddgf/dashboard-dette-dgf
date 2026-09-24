@@ -801,11 +801,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
   </div>
 
-  <div class="nav-item" data-nav-key="docs-utiles" onclick="openDocsUtilesFolder()">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V4a1 1 0 00-1-1H6.5A2.5 2.5 0 004 5.5v14z" stroke-width="1.5"/></svg>
-    Documentations Utiles
-  </div>
-
   <div class="nav-section" style="margin-top:6px">Système</div>
   <div class="nav-item" onclick="openMADFolder()" title="Ouvrir le dossier SharePoint MAD mensuel">
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="1.5"/></svg>
@@ -1945,9 +1940,8 @@ const SHAREPOINT_MAD_CONFIG = {
   // Dossier où l'agent dépose le nouveau fichier BS (Bilan / Balance de Situation)
   bsFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FSharepoint%20BS&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
 
-  // Dossiers "Nos Productions" et "Documentations Utiles"
+  // Dossier "Nos Productions"
   esgFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FESG&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
-  docsUtilesFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FDocumentations%20Utiles&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
 
   // Dossier "NSH"
   nshFolderUrl: 'https://directiongledesfinancements.sharepoint.com/teams/DGF-GestionDette/Documents%20partages/Forms/AllItems.aspx?RootFolder=%2Fteams%2FDGF%2DGestionDette%2FDocuments%20partages%2FNos%20Productions%2FNSH&FolderCTID=0x0120008863BC4E711F55409F07EC8D426DDFC1&View=%7B1023A01D%2D9EA9%2D4488%2DAB19%2DD5BE18666728%7D',
@@ -1989,7 +1983,6 @@ function openBSFolder() {
 }
 
 function openESGFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.esgFolderUrl); }
-function openDocsUtilesFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.docsUtilesFolderUrl); }
 function openFichesDetteFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.fichesDetteFolderUrl); }
 function openAVDFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.avdFolderUrl); }
 function openNotesFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.notesFolderUrl); }

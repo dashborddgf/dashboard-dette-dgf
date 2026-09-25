@@ -70,47 +70,5 @@
     "madName": "MAD1225",
     "periode": "Décembre 2025",
     "file": "history/data_2025-12.json"
-  },
-  {
-    "id": "data_2026-01",
-    "madName": "MAD0126",
-    "periode": "Janvier 2026",
-    "file": "history/data_2026-01.json"
-  },
-  {
-    "id": "data_2026-02",
-    "madName": "MAD0226",
-    "periode": "Février 2026",
-    "file": "history/data_2026-02.json"
-  },
-  {
-    "id": "data_2026-03",
-    "madName": "MAD0326",
-    "periode": "Mars 2026",
-    "file": "history/data_2026-03.json"
-  },
-  {
-    "id": "data_2026-04",
-    "madName": "MAD0426",
-    "periode": "Avril 2026",
-    "file": "history/data_2026-04.json"
-  },
-  {
-    "id": "data_2026-05",
-    "madName": "MAD0526",
-    "periode": "Mai 2026",
-    "file": "history/data_2026-05.json"
-  },
-  {
-    "id": "data_2026-06",
-    "madName": "MAD0626",
-    "periode": "Juin 2026",
-    "file": "history/data_2026-06.json"
-  },
-  {
-    "id": "data_2026-07",
-    "madName": "MAD0726",
-    "periode": "Juillet 2026",
-    "file": "history/data_2026-07.json"
   }
 ]

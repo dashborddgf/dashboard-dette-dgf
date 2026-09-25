@@ -76,5 +76,11 @@
     "madName": "MAD0126",
     "periode": "Janvier 2026",
     "file": "history/data_2026-01.json"
+  },
+  {
+    "id": "data_2026-02",
+    "madName": "MAD0226",
+    "periode": "Février 2026",
+    "file": "history/data_2026-02.json"
   }
 ]

@@ -447,7 +447,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .enc-header{background:var(--green);color:#fff;font-size:14px;font-weight:800;padding:11px 16px;border-radius:8px 8px 0 0}
 .enc-grid{display:grid;gap:10px;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:14px;background:var(--white)}
 .enc-grid.enc-grid-3{margin-top:-2px;border-top:1px solid var(--border);border-radius:8px}
-.enc-grid-4{grid-template-columns:repeat(4,1fr)}
+.enc-grid-2{grid-template-columns:repeat(2,1fr)}
 .enc-grid-3{grid-template-columns:repeat(3,1fr)}
 .enc-box{border:1px solid var(--gold);border-radius:6px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;gap:6px;justify-content:center}
 .enc-box-label{font-size:10.5px;color:var(--dark);font-weight:600}
@@ -457,7 +457,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .enc-box-tag{font-size:9.5px;font-weight:700;border-radius:4px;padding:3px 7px;align-self:center}
 .enc-box-tag.green{background:var(--green-bg);color:var(--green)}
 .enc-box-tag.orange{background:var(--orange-bg);color:var(--orange)}
-@media (max-width:900px){.enc-grid-4,.enc-grid-3{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:900px){.enc-grid-3{grid-template-columns:repeat(2,1fr)}}
 
 /* PORTEFEUILLE DE LA DETTE — répartition par type de créanciers */
 .cred-header{background:var(--green);color:#fff;font-size:14px;font-weight:800;padding:11px 16px;border-radius:8px 8px 0 0}
@@ -948,7 +948,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 
     <div class="enc-header">Encours de la dette publique</div>
-    <div class="enc-grid enc-grid-4">
+    <div class="enc-grid enc-grid-2">
       <div class="enc-box">
         <div class="enc-box-label">Encours total de la dette</div>
         <div class="enc-box-value green" id="enc-total-value">—</div>
@@ -958,16 +958,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div class="enc-box-label">Dette / PIB</div>
         <div class="enc-box-value green" id="enc-pib-value">—</div>
         <div class="enc-box-tag green">Norme UEMOA : 70%</div>
-      </div>
-      <div class="enc-box">
-        <div class="enc-box-label">Taux d'intérêt moyen pondéré</div>
-        <div class="enc-box-value orange" id="enc-taux-value">—</div>
-        <div class="enc-box-tag orange" id="enc-taux-tag">—</div>
-      </div>
-      <div class="enc-box">
-        <div class="enc-box-label">Durée moyenne de vie</div>
-        <div class="enc-box-value orange" id="enc-duree-value">—</div>
-        <div class="enc-box-tag orange" id="enc-duree-tag">—</div>
       </div>
     </div>
     <div class="enc-grid enc-grid-3">
@@ -1860,10 +1850,10 @@ function refreshVueEnsembleColonnes(enc) {
 }
 
 /* Écran "Encours de la dette publique" (1er écran de Vue d'ensemble).
-   Total/Intérieur/Extérieur viennent du MAD Actif ; PIB, taux moyen pondéré,
-   durée de vie et l'équivalent USD viennent du BS (Tableau 3 + "Dette Totale"),
-   seule source qui les porte actuellement. "Dette garantie par l'Etat" n'a
-   pour l'instant aucune source de donnée (ni MAD ni BS) → affichée en NULL. */
+   Total/Intérieur/Extérieur viennent du MAD Actif ; PIB et l'équivalent
+   USD viennent du BS (Tableau 3 + "Dette Totale"), seule source qui les
+   porte actuellement. "Dette garantie par l'Etat" n'a pour l'instant
+   aucune source de donnée (ni MAD ni BS) → affichée en NULL. */
 function refreshEncoursPublique() {
   const intKeys=['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
   const extKeys=['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
@@ -1873,8 +1863,6 @@ function refreshEncoursPublique() {
   const encTotal = encInt + encExt;
 
   const bs = BS_DATA || BS_DATA_FALLBACK;
-  const ratios = bs.ratios || {};
-  const latest = arr => (Array.isArray(arr) && arr.length > 4 && arr[4] != null) ? arr[4] : (Array.isArray(arr) && arr.length > 3 ? arr[3] : null);
 
   const pibPct = (bs.pibACCurrent != null) ? bs.pibACCurrent
     : (bs.pibAC ? bs.pibAC[Object.keys(bs.pibAC).sort().pop()] : null);
@@ -1893,14 +1881,6 @@ function refreshEncoursPublique() {
   setTxt('enc-total-value', fmt(encTotal) + ' Md FCFA');
   setTxt('enc-total-usd', encTotalUSD != null ? '(' + fmt(encTotalUSD) + ' M USD)' : 'NULL');
   setTxt('enc-pib-value', pctTxt(pibPct));
-
-  const tauxMoy = latest(ratios.tauxmoy), tauxExt = latest(ratios.tauxmoyext), tauxInt = latest(ratios.tauxmoyint);
-  setTxt('enc-taux-value', pctTxt(tauxMoy));
-  setTxt('enc-taux-tag', 'Ext. ' + pctTxt(tauxExt) + ' / Int. ' + pctTxt(tauxInt));
-
-  const duree = latest(ratios.duree), dureeExt = latest(ratios.dureeext), dureeInt = latest(ratios.dureeint);
-  setTxt('enc-duree-value', duree == null ? 'NULL' : fmt(duree) + ' ans');
-  setTxt('enc-duree-tag', 'Ext. ' + (dureeExt == null ? 'NULL' : fmt(dureeExt)) + ' / Int. ' + (dureeInt == null ? 'NULL' : fmt(dureeInt)) + ' ans');
 
   setTxt('enc-ext-value', fmt(encExt) + ' Md FCFA');
   setTxt('enc-ext-tag', (encTotal ? fmt(encExt/encTotal*100) : 'NULL') + '% de l\'encours' + (pibValue ? ' ; ' + fmt(encExt/pibValue*100) + '% du PIB' : ''));

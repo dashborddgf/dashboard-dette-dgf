@@ -6,9 +6,9 @@
     "page": "Vue d'ensemble"
   },
   "tableau-commentaire-log": {
-    "text": "[{\"num\":1,\"date\":\"250926\",\"author\":\"\",\"text\":\"tableau ok\"}]",
-    "author": "",
-    "date": "2026-09-25T09:11:27.162Z",
+    "text": "[{\"num\":1,\"date\":\"250926\",\"author\":\"\",\"text\":\"tableau ok\"},{\"num\":2,\"date\":\"250926\",\"author\":\"jonas\",\"text\":\"revoir la courbe\"}]",
+    "author": "jonas",
+    "date": "2026-09-25T09:32:24.913Z",
     "page": "Indicateurs coûts et Risques"
   }
 }

@@ -6,9 +6,9 @@
     "page": "Vue d'ensemble"
   },
   "tableau-commentaire-log": {
-    "text": "[{\"num\":1,\"date\":\"250926\",\"author\":\"\",\"text\":\"tableau ok\"},{\"num\":2,\"date\":\"250926\",\"author\":\"jonas\",\"text\":\"revoir la courbe\"},{\"num\":3,\"date\":\"250926\",\"author\":\"M. Bakayoko\",\"text\":\"enlever les filtres\"}]",
+    "text": "[{\"num\":1,\"date\":\"250926\",\"author\":\"\",\"text\":\"tableau ok\"},{\"num\":2,\"date\":\"250926\",\"author\":\"jonas\",\"text\":\"revoir la courbe\"},{\"num\":3,\"date\":\"250926\",\"author\":\"M. Bakayoko\",\"text\":\"enlever les filtres\"},{\"num\":4,\"date\":\"250926\",\"author\":\"M. Bakayoko\",\"text\":\"changer la couleur du graph\"}]",
     "author": "M. Bakayoko",
-    "date": "2026-09-25T09:33:13.350Z",
+    "date": "2026-09-25T09:33:35.105Z",
     "page": "Indicateurs coûts et Risques"
   }
 }

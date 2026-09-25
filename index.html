@@ -1911,6 +1911,38 @@ function refreshEncoursPublique() {
   // Aucune source de donnée pour l'instant (ni MAD ni BS)
   setTxt('enc-garantie-value', 'NULL');
   setTxt('enc-garantie-tag', 'NULL');
+
+  refreshRisqueDepuisMAD(encInt, encExt, encTotal);
+}
+
+/* Cases "CT / Total" et "Devise Étr." du Tableau de Bord des Risques :
+   calculées depuis le MAD actuellement consulté (Actif ou historique),
+   pas depuis le BS, pour suivre le MAD affiché quand on navigue dans
+   l'historique. Approximations faute de détail plus fin dans le MAD :
+   - CT / Total  ≈ Bons du Trésor (BT) / Encours total (BT = seul
+     instrument à échéance courte identifiable dans le MAD).
+   - Devise Étr. ≈ Dette Extérieure / Encours total (la dette
+     extérieure est presque intégralement en devises, la dette
+     intérieure presque intégralement en FCFA).
+   "Durée Vie" reste sur le BS : la durée de vie moyenne pondérée ne
+   peut pas être recalculée depuis le MAD (pas d'échéance par
+   instrument dans les données actuelles). */
+function refreshRisqueDepuisMAD(encInt, encExt, encTotal) {
+  const setBox = (key, pct, threshold, dir) => {
+    if (!encTotal) return;
+    const boxVal = document.getElementById('ratio-val-' + key);
+    const box = document.getElementById('ratio-item-' + key);
+    if (boxVal) boxVal.textContent = fmt(pct) + '%';
+    if (box) {
+      const ok = dir === 'below' ? pct < threshold : pct > threshold;
+      box.classList.remove('r-ok', 'r-warn');
+      box.classList.add(ok ? 'r-ok' : 'r-warn');
+    }
+  };
+  const ctPct = encTotal ? (DATA.encours.BT || 0) / encTotal * 100 : 0;
+  const devisesPct = encTotal ? encExt / encTotal * 100 : 0;
+  setBox('ct', ctPct, 15, 'below');
+  setBox('devises', devisesPct, 60, 'below');
 }
 
 function buildChartMADEncours(enc) {
@@ -2779,9 +2811,10 @@ function applyRatiosData() {
     { key:'tauxmoyext', box:false },
     { key:'tauxmoyint', box:false },
     { key:'duree', box:true, boxUnit:' ans', tableUnit:'', threshold:7, dir:'above', useCurrent:true },
-    { key:'ct', box:true, boxUnit:'%', threshold:15, dir:'below', useCurrent:true },
-    { key:'devises', box:true, boxUnit:'%', threshold:60, dir:'below', useCurrent:true },
     { key:'fixe', box:true, boxUnit:'%', threshold:80, dir:'above', useCurrent:true }
+    // 'ct' et 'devises' retirés d'ici : calculés depuis le MAD en cours
+    // (voir refreshRisqueDepuisMAD), pas depuis le BS, pour suivre le MAD
+    // consulté (actif ou historique) plutôt que rester figés sur le BS.
   ];
   configs.forEach(cfg => {
     const arr = ratios[cfg.key];

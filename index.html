@@ -1072,9 +1072,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="tc-header">TABLEAU POUR COMMENTAIRES</div>
       <div class="card-body" style="padding:0">
         <table class="tbl" style="min-height:420px">
-          <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="text-align:left">Commentaire</th></tr></thead>
+          <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="width:120px">Auteur</th><th style="text-align:left">Commentaire</th></tr></thead>
           <tbody id="commentaire-tbody">
-            <tr><td colspan="3" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>
+            <tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>
           </tbody>
         </table>
         <div class="tc-add-row">
@@ -2991,12 +2991,13 @@ function renderCommentaireTable() {
   if (!tbody) return;
   const entries = getCommentaireEntries();
   if (!entries.length) {
-    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>';
     return;
   }
-  tbody.innerHTML = entries.map(e => {
-    const auteur = e.author ? ' <span style="color:var(--gray);font-size:10px">— ' + String(e.author).replace(/</g, '&lt;') + '</span>' : '';
-    return '<tr><td class="td-b">' + e.num + '</td><td>' + e.date + '</td><td style="text-align:left">' + String(e.text).replace(/</g, '&lt;') + auteur + '</td></tr>';
+  // Le plus récent en tête du tableau (numérotation conservée dans l'ordre d'ajout).
+  tbody.innerHTML = entries.slice().reverse().map(e => {
+    const auteur = e.author ? String(e.author).replace(/</g, '&lt;') : '—';
+    return '<tr><td class="td-b">' + e.num + '</td><td>' + e.date + '</td><td>' + auteur + '</td><td style="text-align:left">' + String(e.text).replace(/</g, '&lt;') + '</td></tr>';
   }).join('');
 }
 

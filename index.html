@@ -1043,6 +1043,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div id="creancier-int-bars"></div>
       </div>
     </div>
+
+    <div class="cred-header" style="margin-top:16px">Répartition de la dette par type de devise</div>
+    <div class="cred-cols" style="grid-template-columns:1fr">
+      <div class="cred-col" style="max-width:520px;margin:0 auto;width:100%;border-right:none">
+        <div id="devise-bars"></div>
+      </div>
+    </div>
   </div><!-- /portefeuille-dette -->
 
   <!-- ══════════════ RATIOS ══════════════ -->
@@ -1967,9 +1974,21 @@ function buildCreancierBars(enc) {
   renderCreancierBars('creancier-int-bars', intItems);
 }
 
+/* Répartition du portefeuille par devise — source BS, onglet "Graphique 2,3 & 4"
+   (tableau "Total"), mise à jour à chaque nouveau BS. */
+function buildDeviseBars() {
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const total = bs.devisePortefeuille && bs.devisePortefeuille.total;
+  if (!total) { renderCreancierBars('devise-bars', []); return; }
+  const order = ['EUR', 'XOF', 'USD', 'CNY', 'Autres'];
+  const items = order.filter(k => total[k]).map(k => ({ label: k, value: total[k].value || 0 }));
+  renderCreancierBars('devise-bars', items);
+}
+
 function renderCreancierBars(hostId, items) {
   const host = document.getElementById(hostId);
   if (!host) return;
+  if (!items.length) { host.innerHTML = '<div style="text-align:center;color:var(--gray);font-size:11px;padding:10px">Donnée non disponible pour le BS actuel.</div>'; return; }
   const palette = ['#037B3D','#EC8D08','#8FBF9E','#EFC873','#F4DFAE'];
   const total = items.reduce((a,x) => a + (x.value || 0), 0);
   host.innerHTML = items.map((x,i) => {
@@ -2752,6 +2771,16 @@ const BS_DATA_FALLBACK = {
     revisionint: [4.9, 4.6, 3.8, 3.4],
     devises:     [59.9, 61.7, 55.7, 53.3],
     fixe:        [89.2, 89.8, 89.3, 89.4]
+  },
+  devisePortefeuille: {
+    total: {
+      EUR: { value: 14840.1, pct: 42.5 }, XOF: { value: 16511.4, pct: 47.3 },
+      USD: { value: 2408.2, pct: 6.9 }, CNY: { value: 415.4, pct: 1.2 }, Autres: { value: 707.3, pct: 2.0 }
+    },
+    exterieur: {
+      EUR: { value: 14840.1, pct: 68.3 }, XOF: { value: 3365.7, pct: 15.5 },
+      USD: { value: 2408.2, pct: 11.1 }, CNY: { value: 415.4, pct: 1.9 }, Autres: { value: 707.3, pct: 3.3 }
+    }
   }
 };
 let BS_DATA = null;
@@ -2771,6 +2800,7 @@ async function loadBSData() {
   renderBSTable();
   applyPibACData();
   applyRatiosData();
+  buildDeviseBars();
   loadBSHistoryIndex();
 }
 

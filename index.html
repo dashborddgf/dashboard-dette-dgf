@@ -1068,10 +1068,10 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         </div>
       </div>
     </div>
-    <div class="card" style="margin-bottom:12px">
-      <div class="tc-header">TABLEAU POUR COMMENTAIRE</div>
+    <div class="card">
+      <div class="tc-header">TABLEAU POUR COMMENTAIRES</div>
       <div class="card-body" style="padding:0">
-        <table class="tbl">
+        <table class="tbl" style="min-height:420px">
           <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="text-align:left">Commentaire</th></tr></thead>
           <tbody id="commentaire-tbody">
             <tr><td colspan="3" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>
@@ -1083,10 +1083,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
           <button type="button" onclick="addCommentaireEntry()">Ajouter</button>
         </div>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">Évolution Ratio Dette/PIB</div><div class="card-sub">2021–2025 vs seuil UEMOA 70%</div></div></div>
-      <div class="card-body"><div class="cw cw-lg"><canvas id="chartRatioPIB"></canvas></div></div>
     </div>
   </div><!-- /ratios -->
 
@@ -1689,7 +1685,6 @@ function refreshAll() {
   buildChartMADEncours(enc);
   buildChartMADService(enc);
   buildCreancierBars(enc);
-  buildChartRatioPIB();
 }
 
 /* ─── Tableau MAD dynamique ─── */
@@ -1973,11 +1968,6 @@ function renderCreancierBars(hostId, items) {
   }).join('');
 }
 
-function buildChartRatioPIB() {
-  const years = ['2021','2022','2023','2024','2025'];
-  const data = years.map(y => RATIO_PIB_PAR_ANNEE[y]);
-  mkChart('chartRatioPIB',{type:'line',data:{labels:years,datasets:[{label:'Dette/PIB (%)',data,borderColor:C.or,backgroundColor:C.orL,fill:true,tension:.3,pointRadius:5,pointBackgroundColor:C.or,borderWidth:2.5},{label:'Seuil UEMOA 70%',data:years.map(()=>70),borderColor:C.rd,borderDash:[7,4],borderWidth:2,pointRadius:0,tension:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{...gO},y:{min:40,max:80,...gO,ticks:{callback:v=>v+'%',...gO.ticks}}}}});
-}
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2912,7 +2902,6 @@ function applyPibACData() {
     tag.style.color = ok ? 'var(--green)' : '#92720A';
   }
 
-  buildChartRatioPIB();
   refreshAll();
 }
 

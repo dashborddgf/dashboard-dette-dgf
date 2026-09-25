@@ -472,6 +472,14 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .cred-pct{font-size:11px;font-weight:800;color:var(--dark)}
 @media (max-width:700px){.cred-cols{grid-template-columns:1fr}.cred-col:first-child{border-right:none;border-bottom:1px solid var(--border)}.cred-row{grid-template-columns:80px 1fr 40px}}
 
+/* TABLEAU POUR COMMENTAIRE — archive de commentaires numérotés/datés */
+.tc-header{background:var(--green);color:#fff;font-size:13px;font-weight:800;padding:11px 16px;letter-spacing:.3px}
+.tc-add-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)}
+.tc-add-row input[type="text"]{flex:1;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit}
+.tc-add-row input[type="text"]:focus{outline:none;border-color:var(--orange)}
+.tc-add-row button{background:var(--green);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer}
+.tc-add-row button:hover{background:var(--green-light)}
+
 /* PROGRESS */
 .pb-wrap{flex:1;background:var(--border);border-radius:4px;height:5px;overflow:hidden}
 .pb{height:5px;border-radius:4px}
@@ -1061,23 +1069,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
     </div>
     <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Tableau pour Commentaire</div><div class="card-sub">Valeur actuelle par indicateur · cliquer 💬 pour commenter une ligne</div></div></div>
+      <div class="tc-header">TABLEAU POUR COMMENTAIRE</div>
       <div class="card-body" style="padding:0">
         <table class="tbl">
-          <thead><tr><th style="text-align:left">Indicateur</th><th>Valeur actuelle</th><th>Seuil</th><th>Statut</th><th>Commentaire</th></tr></thead>
-          <tbody>
-            <tr><td class="td-b">Dette AC / PIB (%)</td><td id="td-pib-2025" style="font-weight:700;color:var(--green)">57,1%</td><td style="color:var(--gray)">&lt; 70%</td><td><span class="tag" id="tag-pib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-pib" onclick="openObservationModal('ratio-pib','Dette AC / PIB','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b">Intérêts / Recettes (%)</td><td id="td-intrec-2025" style="font-weight:700;color:#92720A">16,5%</td><td style="color:var(--gray)">&lt; 22%</td><td><span class="tag" id="tag-intrec-status" style="background:var(--gold-bg);color:#92720A">⚠ Vigilance</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-intrec" onclick="openObservationModal('ratio-intrec','Intérêts / Recettes','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b">Intérêts / PIB (%)</td><td id="td-intpib-2025" style="font-weight:700;color:var(--green)">2,7%</td><td style="color:var(--gray)">&lt; 3%</td><td><span class="tag" id="tag-intpib-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-intpib" onclick="openObservationModal('ratio-intpib','Intérêts / PIB','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b">Taux intérêt moyen pondéré</td><td id="td-tauxmoy-2025">5,1%</td><td>—</td><td>—</td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-tauxmoy" onclick="openObservationModal('ratio-tauxmoy','Taux intérêt moyen pondéré','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b" style="padding-left:18px">• Extérieure</td><td id="td-tauxmoyext-2025">4,8%</td><td></td><td></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-tauxmoyext" onclick="openObservationModal('ratio-tauxmoyext','Taux intérêt moyen — Extérieure','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b" style="padding-left:18px">• Intérieure</td><td id="td-tauxmoyint-2025">5,4%</td><td></td><td></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-tauxmoyint" onclick="openObservationModal('ratio-tauxmoyint','Taux intérêt moyen — Intérieure','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b">Durée moy. vie (années)</td><td id="td-duree-2025" style="font-weight:700;color:var(--green)">7,2</td><td style="color:var(--gray)">&gt; 7 ans</td><td><span class="tag" id="tag-duree-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-duree" onclick="openObservationModal('ratio-duree','Durée moyenne de vie','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b">Dette à court terme (%)</td><td id="td-ct-2025" style="font-weight:700;color:#92720A">14,8%</td><td style="color:var(--gray)">&lt; 15%</td><td><span class="tag" id="tag-ct-status" style="background:var(--gold-bg);color:#92720A">⚠ Limite</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-ct" onclick="openObservationModal('ratio-ct','Dette à court terme','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b">Dette en devises (% total)</td><td id="td-devises-2025" style="font-weight:700;color:var(--green)">53,3%</td><td style="color:var(--gray)">&lt; 60%</td><td><span class="tag" id="tag-devises-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-devises" onclick="openObservationModal('ratio-devises','Dette en devises','Indicateurs coûts et Risques')">💬</button></td></tr>
-            <tr><td class="td-b">Dette à taux fixe (%)</td><td id="td-fixe-2025" style="font-weight:700;color:var(--green)">89,4%</td><td style="color:var(--gray)">&gt; 80%</td><td><span class="tag" id="tag-fixe-status" style="background:var(--green-bg);color:var(--green)">✓ OK</span></td><td style="text-align:center"><button class="obs-btn" data-slug="ratio-fixe" onclick="openObservationModal('ratio-fixe','Dette à taux fixe','Indicateurs coûts et Risques')">💬</button></td></tr>
+          <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="text-align:left">Commentaire</th></tr></thead>
+          <tbody id="commentaire-tbody">
+            <tr><td colspan="3" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>
           </tbody>
         </table>
+        <div class="tc-add-row">
+          <input type="text" id="commentaire-input" placeholder="Écrire un commentaire…" onkeydown="if(event.key==='Enter')addCommentaireEntry()">
+          <input type="text" id="commentaire-author" placeholder="Auteur (optionnel)" style="max-width:160px">
+          <button type="button" onclick="addCommentaireEntry()">Ajouter</button>
+        </div>
       </div>
     </div>
     <div class="card">
@@ -2964,6 +2968,78 @@ async function loadObservations() {
     console.info('ℹ Aucune observation disponible (observations.json absent ou invalide).');
   }
   renderAllObservationBadges();
+  renderCommentaireTable();
+}
+
+/* ─── Tableau pour Commentaire (Indicateurs coûts et Risques) ───
+   Archive de commentaires numérotés/datés (DDMMYY), indépendante des
+   observations par carte : réutilise le même canal de sauvegarde
+   partagé (OBSERVATIONS_ENDPOINT_URL → GitHub → observations.json),
+   mais stocke un tableau JSON d'entrées sous un seul slug dédié,
+   plutôt qu'une note unique remplacée à chaque sauvegarde. */
+const TABLEAU_COMMENTAIRE_SLUG = 'tableau-commentaire-log';
+
+function getCommentaireEntries() {
+  const obs = OBSERVATIONS[TABLEAU_COMMENTAIRE_SLUG];
+  if (!obs || !obs.text) return [];
+  try {
+    const arr = JSON.parse(obs.text);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function fmtDateDDMMYY(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yy = String(d.getFullYear()).slice(-2);
+  return dd + mm + yy;
+}
+
+function renderCommentaireTable() {
+  const tbody = document.getElementById('commentaire-tbody');
+  if (!tbody) return;
+  const entries = getCommentaireEntries();
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(e => {
+    const auteur = e.author ? ' <span style="color:var(--gray);font-size:10px">— ' + String(e.author).replace(/</g, '&lt;') + '</span>' : '';
+    return '<tr><td class="td-b">' + e.num + '</td><td>' + e.date + '</td><td style="text-align:left">' + String(e.text).replace(/</g, '&lt;') + auteur + '</td></tr>';
+  }).join('');
+}
+
+async function addCommentaireEntry() {
+  const input = document.getElementById('commentaire-input');
+  const authorInput = document.getElementById('commentaire-author');
+  const text = (input.value || '').trim();
+  if (!text) return;
+  const author = (authorInput.value || '').trim();
+
+  const entries = getCommentaireEntries();
+  entries.push({ num: entries.length + 1, date: fmtDateDDMMYY(new Date()), author, text });
+  input.value = '';
+
+  const nowIso = new Date().toISOString();
+  const payload = { slug: TABLEAU_COMMENTAIRE_SLUG, text: JSON.stringify(entries), author, date: nowIso, page: 'Indicateurs coûts et Risques' };
+  OBSERVATIONS[TABLEAU_COMMENTAIRE_SLUG] = { text: payload.text, author, date: nowIso, page: payload.page };
+  renderCommentaireTable();
+
+  if (!OBSERVATIONS_ENDPOINT_URL) {
+    console.warn('⚠ OBSERVATIONS_ENDPOINT_URL non configuré — commentaire gardé localement seulement pour cette session.');
+    return;
+  }
+  try {
+    await fetch(OBSERVATIONS_ENDPOINT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    console.warn("⚠ Échec de l'enregistrement distant du commentaire.", e);
+  }
 }
 
 function renderAllObservationBadges() {

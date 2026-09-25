@@ -479,6 +479,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .tc-add-row input[type="text"]:focus{outline:none;border-color:var(--orange)}
 .tc-add-row button{background:var(--green);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer}
 .tc-add-row button:hover{background:var(--green-light)}
+.tc-table td{padding:3px 9px;line-height:1.25}
+.tc-table th{padding:5px 9px}
 
 /* PROGRESS */
 .pb-wrap{flex:1;background:var(--border);border-radius:4px;height:5px;overflow:hidden}
@@ -1071,7 +1073,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <div class="card">
       <div class="tc-header">TABLEAU POUR COMMENTAIRES</div>
       <div class="card-body" style="padding:0">
-        <table class="tbl" style="min-height:420px">
+        <table class="tbl tc-table" style="min-height:420px">
           <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="width:120px">Auteur</th><th style="text-align:left">Commentaire</th></tr></thead>
           <tbody id="commentaire-tbody">
             <tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>

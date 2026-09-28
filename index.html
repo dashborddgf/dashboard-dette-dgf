@@ -1222,8 +1222,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 const F = {
   src:       [],   // int | ext
   creancier: [],
-  devise:    [],   // xof | eur | usd | cny | jpy
-  type:      []    // fixe | variable
+  devise:    []    // xof | eur | usd | cny | jpy
 };
 
 /* ─── Définition des filtres : source unique pour la barre de filtres,
@@ -1243,9 +1242,6 @@ const FILTER_DEFS = [
     ] },
   { key:'devise', label:'Devise', allLabel:'Toutes', options:[
       {v:'xof',l:'XOF'},{v:'eur',l:'EUR'},{v:'usd',l:'USD'},{v:'cny',l:'CNY'},{v:'jpy',l:'JPY'}
-    ] },
-  { key:'type', label:'Taux', allLabel:'Tout', options:[
-      {v:'fixe',l:'Taux fixe'},{v:'variable',l:'Taux variable'}
     ] }
 ];
 
@@ -1503,10 +1499,6 @@ function getFilteredEncours() {
     if (!F.devise.includes('xof')) intKeysAll.forEach(k => delete enc[k]);
     extKeysAll.forEach(k => { if (!allowedExt.has(k)) delete enc[k]; });
   }
-
-  // Filtre Taux (fixe/variable) : en attente de la classification par instrument
-  // (donnée non disponible dans le MAD actuel, cf. Template BS). Le filtre est
-  // affiché pour préparer l'usage mais n'affecte pas encore l'encours.
 
   return enc;
 }

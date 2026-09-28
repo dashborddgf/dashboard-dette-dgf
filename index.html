@@ -436,13 +436,29 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 /* RATIOS */
 .ratio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .ratio-item{position:relative;text-align:center;padding:10px 6px;border-radius:8px;border:1px solid var(--border)}
-.ratio-obs-btn{position:absolute;top:5px;right:5px}
 .ratio-val{font-size:20px;font-weight:900;margin-bottom:2px}
 .ratio-label{font-size:9px;color:#000;font-weight:700}
 .ratio-seuil{font-size:8px;color:#000;font-weight:700;margin-top:2px}
 .r-ok{color:var(--green);background:var(--green-bg)}
 .r-warn{color:#92720A;background:var(--gold-bg)}
 .r-alert{color:var(--red);background:var(--red-bg)}
+
+/* Écran Indicateurs coûts et Risques — bandeau vert DGF + grille plus
+   spacieuse pour occuper l'espace laissé par le retrait du tableau de
+   commentaires (une seule bulle 💬, celle du bandeau, subsiste). */
+.ratios-card{min-height:calc(100vh - 180px);display:flex;flex-direction:column}
+.ratios-card .card-header{background:var(--green);padding:16px 20px;border-bottom:none;border-radius:8px 8px 0 0;flex-shrink:0}
+.ratios-card .card-title{color:#fff;font-size:15px}
+.ratios-card .card-sub{color:rgba(255,255,255,.85)}
+.ratios-card .obs-btn{border-color:rgba(255,255,255,.6);color:#fff}
+.ratios-card .obs-btn:hover,.ratios-card .obs-btn.has-obs{background:rgba(255,255,255,.18);border-color:#fff;color:#fff}
+.ratios-card .card-body{padding:32px 24px;flex:1;display:flex;align-items:center;justify-content:center}
+.ratio-grid-lg{gap:20px;max-width:900px;margin:0 auto}
+.ratio-grid-lg .ratio-item{padding:28px 16px;border-width:1.5px}
+.ratio-grid-lg .ratio-val{font-size:30px;margin-bottom:6px}
+.ratio-grid-lg .ratio-label{font-size:12px;margin-top:2px}
+.ratio-grid-lg .ratio-seuil{font-size:10px;margin-top:6px}
+@media (max-width:700px){.ratio-grid-lg{grid-template-columns:repeat(2,1fr)}}
 
 /* ENCOURS DE LA DETTE PUBLIQUE */
 .enc-header{background:var(--green);color:#fff;font-size:14px;font-weight:800;padding:11px 16px;border-radius:8px 8px 0 0}
@@ -1041,32 +1057,26 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ RATIOS ══════════════ -->
   <div class="screen" id="screen-ratios">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs · cliquer 💬 pour commenter un indicateur</div></div></div>
+    <div class="card ratios-card">
+      <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs</div></div></div>
       <div class="card-body">
-        <div class="ratio-grid">
+        <div class="ratio-grid ratio-grid-lg">
           <div class="ratio-item r-ok" id="ratio-item-pib">
-            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-pib" onclick="openObservationModal('ratio-pib','Dette AC / PIB','Indicateurs coûts et Risques')">💬</button>
             <div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div>
           </div>
           <div class="ratio-item r-warn" id="ratio-item-intrec">
-            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-intrec" onclick="openObservationModal('ratio-intrec','Intérêts / Recettes','Indicateurs coûts et Risques')">💬</button>
             <div class="ratio-val" id="ratio-val-intrec">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div>
           </div>
           <div class="ratio-item r-ok" id="ratio-item-duree">
-            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-duree" onclick="openObservationModal('ratio-duree','Durée moyenne de vie','Indicateurs coûts et Risques')">💬</button>
             <div class="ratio-val" id="ratio-val-duree">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div>
           </div>
           <div class="ratio-item r-warn" id="ratio-item-ct">
-            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-ct" onclick="openObservationModal('ratio-ct','Dette à court terme','Indicateurs coûts et Risques')">💬</button>
             <div class="ratio-val" id="ratio-val-ct">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div>
           </div>
           <div class="ratio-item r-ok" id="ratio-item-fixe">
-            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-fixe" onclick="openObservationModal('ratio-fixe','Dette à taux fixe','Indicateurs coûts et Risques')">💬</button>
             <div class="ratio-val" id="ratio-val-fixe">89,4%</div><div class="ratio-label">Taux Fixe</div><div class="ratio-seuil">Cible: &gt;80%</div>
           </div>
           <div class="ratio-item r-ok" id="ratio-item-devises">
-            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-devises" onclick="openObservationModal('ratio-devises','Dette en devises','Indicateurs coûts et Risques')">💬</button>
             <div class="ratio-val" id="ratio-val-devises">53,3%</div><div class="ratio-label">Devise Étr.</div><div class="ratio-seuil">Seuil: &lt;60%</div>
           </div>
         </div>

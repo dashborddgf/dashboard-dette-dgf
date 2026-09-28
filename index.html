@@ -1222,10 +1222,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 const F = {
   src:       [],   // int | ext
   creancier: [],
-  bailleur:  [],
   devise:    [],   // xof | eur | usd | cny | jpy
-  type:      [],   // fixe | variable
-  ministere: []
+  type:      []    // fixe | variable
 };
 
 /* ─── Définition des filtres : source unique pour la barre de filtres,
@@ -1243,29 +1241,11 @@ const FILTER_DEFS = [
         {v:'Domestique',l:'Domestique (Conv.)'},{v:'Marché',l:'Marché (BT/OAT/TPCI)'}
       ]}
     ] },
-  { key:'bailleur', label:'Bailleur', allLabel:'Tous', groups:[
-      { label:'Multilatéraux', options:[
-        {v:'FMI',l:'FMI'},{v:'BM',l:'Banque Mondiale (BM)'},{v:'BAD',l:'BAD'},{v:'BID',l:'BID'},{v:'Autres Multilatéraux',l:'Autres Multilatéraux'}
-      ]},
-      { label:'Bilatéraux', options:[
-        {v:'AFD',l:'AFD (France)'},{v:'KFW',l:'KFW (Allemagne)'},{v:'Eximbank Chine',l:'Eximbank Chine'},{v:'JICA',l:'JICA (Japon)'},{v:'Autres Bilatéraux',l:'Autres Bilatéraux'}
-      ]},
-      { label:'Marchés', options:[
-        {v:'Eurobonds',l:'Eurobonds'},{v:'Samourai bond',l:'Samourai Bond (JPY)'},{v:'commerciaux',l:'Commerciaux'}
-      ]},
-      { label:'Intérieur', options:[
-        {v:'BCEAO',l:'BCEAO'},{v:'Banques Commerciales',l:'Banques Commerciales'},{v:'BT',l:'Bons du Trésor (BT)'},{v:'TPCI',l:'TPCI'},{v:'OAT',l:'OAT'}
-      ]}
-    ] },
   { key:'devise', label:'Devise', allLabel:'Toutes', options:[
       {v:'xof',l:'XOF'},{v:'eur',l:'EUR'},{v:'usd',l:'USD'},{v:'cny',l:'CNY'},{v:'jpy',l:'JPY'}
     ] },
   { key:'type', label:'Taux', allLabel:'Tout', options:[
       {v:'fixe',l:'Taux fixe'},{v:'variable',l:'Taux variable'}
-    ] },
-  { key:'ministere', label:'Ministère', allLabel:'Tous', options:[
-      {v:'MEFB',l:'Min. Économie, Finances & Budget'},{v:'MINADER',l:'Min. Agriculture'},{v:'MINET',l:'Min. Énergie'},
-      {v:'MINTRANS',l:'Min. Transport & Infra.'},{v:'MINSANTE',l:'Min. Santé'},{v:'MINEDUCATION',l:'Min. Éducation'},{v:'AUTRES',l:'Autres Ministères'}
     ] }
 ];
 
@@ -1512,18 +1492,6 @@ function getFilteredEncours() {
     };
     const keep = new Set(F.creancier.flatMap(c => catKeys[c] || []));
     Object.keys(enc).forEach(k => { if(!keep.has(k)) delete enc[k]; });
-  }
-
-  // Filtre bailleur — union des bailleurs sélectionnés
-  if (F.bailleur.length) {
-    const bMap = {
-      'FMI':'FMI','BM':'BM','BAD':'BAD','BID':'BID','Autres Multilatéraux':'AutresMulti',
-      'AFD':'AFD','KFW':'KFW','Eximbank Chine':'EximbankChine','JICA':'JICA','Autres Bilatéraux':'AutresBil',
-      'Eurobonds':'Eurobonds','Samourai bond':'Samourai','commerciaux':'Commerciaux',
-      'BCEAO':'BCEAO','Banques Commerciales':'BanqComm','BT':'BT','TPCI':'TPCI','OAT':'OAT'
-    };
-    const keep = new Set(F.bailleur.map(b => bMap[b]).filter(Boolean));
-    if (keep.size) Object.keys(enc).forEach(k => { if(!keep.has(k)) delete enc[k]; });
   }
 
   // Filtre devise — affecte uniquement la dette extérieure ; XOF conserve la dette intérieure

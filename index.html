@@ -1032,21 +1032,16 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ PORTEFEUILLE DE LA DETTE ══════════════ -->
   <div class="screen" id="screen-portefeuille-dette">
-    <div class="cred-header">Répartition de la dette par type de créanciers</div>
+    <div class="cred-header">Répartition de la dette par type de créanciers et de devise</div>
     <div class="cred-cols">
       <div class="cred-col">
         <div class="cred-col-title">Dette extérieure</div>
         <div id="creancier-ext-bars"></div>
-      </div>
-      <div class="cred-col">
-        <div class="cred-col-title">Dette intérieure</div>
+        <div class="cred-col-title" style="margin-top:18px">Dette intérieure</div>
         <div id="creancier-int-bars"></div>
       </div>
-    </div>
-
-    <div class="cred-header" style="margin-top:16px">Répartition de la dette par type de devise</div>
-    <div class="cred-cols" style="grid-template-columns:1fr">
-      <div class="cred-col" style="max-width:520px;margin:0 auto;width:100%;border-right:none">
+      <div class="cred-col" style="border-right:none">
+        <div class="cred-col-title">Répartition par type de devise</div>
         <div id="devise-bars"></div>
       </div>
     </div>

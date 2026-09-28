@@ -435,7 +435,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 /* RATIOS */
 .ratio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.ratio-item{text-align:center;padding:10px 6px;border-radius:8px;border:1px solid var(--border)}
+.ratio-item{position:relative;text-align:center;padding:10px 6px;border-radius:8px;border:1px solid var(--border)}
+.ratio-obs-btn{position:absolute;top:5px;right:5px}
 .ratio-val{font-size:20px;font-weight:900;margin-bottom:2px}
 .ratio-label{font-size:9px;color:#000;font-weight:700}
 .ratio-seuil{font-size:8px;color:#000;font-weight:700;margin-top:2px}
@@ -472,17 +473,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .cred-pct{font-size:11px;font-weight:800;color:var(--dark)}
 @media (max-width:700px){.cred-cols{grid-template-columns:1fr}.cred-col:first-child{border-right:none;border-bottom:1px solid var(--border)}.cred-row{grid-template-columns:80px 1fr 40px}}
 
-/* TABLEAU POUR COMMENTAIRE — archive de commentaires numérotés/datés */
-.tc-header{background:var(--green);color:#fff;font-size:13px;font-weight:800;padding:11px 16px;letter-spacing:.3px}
-.tc-add-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)}
-.tc-add-row input[type="text"]{flex:1;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit}
-.tc-add-row input[type="text"]:focus{outline:none;border-color:var(--orange)}
-.tc-add-row button{background:var(--green);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer}
-.tc-add-row button:hover{background:var(--green-light)}
-.tc-table td{padding:3px 9px;line-height:1.25}
-.tc-table th{padding:5px 9px}
-.tc-edit-btn{background:transparent;border:1px solid var(--border);border-radius:6px;width:22px;height:20px;font-size:10px;line-height:1;cursor:pointer;color:var(--gray);padding:0}
-.tc-edit-btn:hover{border-color:var(--orange);background:var(--orange-bg);color:var(--orange)}
 
 /* PROGRESS */
 .pb-wrap{flex:1;background:var(--border);border-radius:4px;height:5px;overflow:hidden}
@@ -1051,33 +1041,34 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ RATIOS ══════════════ -->
   <div class="screen" id="screen-ratios">
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs</div></div></div>
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs · cliquer 💬 pour commenter un indicateur</div></div></div>
       <div class="card-body">
         <div class="ratio-grid">
-          <div class="ratio-item r-ok" id="ratio-item-pib"><div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div></div>
-          <div class="ratio-item r-warn" id="ratio-item-intrec"><div class="ratio-val" id="ratio-val-intrec">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div></div>
-          <div class="ratio-item r-ok" id="ratio-item-duree"><div class="ratio-val" id="ratio-val-duree">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div></div>
-          <div class="ratio-item r-warn" id="ratio-item-ct"><div class="ratio-val" id="ratio-val-ct">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div></div>
-          <div class="ratio-item r-ok" id="ratio-item-fixe"><div class="ratio-val" id="ratio-val-fixe">89,4%</div><div class="ratio-label">Taux Fixe</div><div class="ratio-seuil">Cible: &gt;80%</div></div>
-          <div class="ratio-item r-ok" id="ratio-item-devises"><div class="ratio-val" id="ratio-val-devises">53,3%</div><div class="ratio-label">Devise Étr.</div><div class="ratio-seuil">Seuil: &lt;60%</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="tc-header">COMMENTAIRES — Tableau de Bord des Risques 2025</div>
-      <div class="card-body" style="padding:0">
-        <table class="tbl tc-table" style="min-height:640px">
-          <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="width:110px">Auteur</th><th style="width:110px">Période</th><th style="text-align:left">Commentaire</th><th style="width:36px"></th></tr></thead>
-          <tbody id="commentaire-tbody">
-            <tr><td colspan="6" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>
-          </tbody>
-        </table>
-        <div class="tc-add-row">
-          <input type="text" id="commentaire-input" placeholder="Écrire un commentaire…" onkeydown="if(event.key==='Enter')addCommentaireEntry()">
-          <input type="text" id="commentaire-author" placeholder="Auteur (optionnel)" style="max-width:160px">
-          <button type="button" id="commentaire-submit-btn" onclick="addCommentaireEntry()">Ajouter</button>
-          <button type="button" id="commentaire-cancel-btn" onclick="cancelCommentaireEdit()" style="display:none;background:var(--gray)">Annuler</button>
+          <div class="ratio-item r-ok" id="ratio-item-pib">
+            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-pib" onclick="openObservationModal('ratio-pib','Dette AC / PIB','Indicateurs coûts et Risques')">💬</button>
+            <div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette/PIB</div><div class="ratio-seuil">Seuil: 70%</div>
+          </div>
+          <div class="ratio-item r-warn" id="ratio-item-intrec">
+            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-intrec" onclick="openObservationModal('ratio-intrec','Intérêts / Recettes','Indicateurs coûts et Risques')">💬</button>
+            <div class="ratio-val" id="ratio-val-intrec">16,5%</div><div class="ratio-label">Int./Recettes</div><div class="ratio-seuil">Seuil: 22%</div>
+          </div>
+          <div class="ratio-item r-ok" id="ratio-item-duree">
+            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-duree" onclick="openObservationModal('ratio-duree','Durée moyenne de vie','Indicateurs coûts et Risques')">💬</button>
+            <div class="ratio-val" id="ratio-val-duree">7,2 ans</div><div class="ratio-label">Durée Vie</div><div class="ratio-seuil">Cible: &gt;7 ans</div>
+          </div>
+          <div class="ratio-item r-warn" id="ratio-item-ct">
+            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-ct" onclick="openObservationModal('ratio-ct','Dette à court terme','Indicateurs coûts et Risques')">💬</button>
+            <div class="ratio-val" id="ratio-val-ct">14,8%</div><div class="ratio-label">CT / Total</div><div class="ratio-seuil">Seuil: 15%</div>
+          </div>
+          <div class="ratio-item r-ok" id="ratio-item-fixe">
+            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-fixe" onclick="openObservationModal('ratio-fixe','Dette à taux fixe','Indicateurs coûts et Risques')">💬</button>
+            <div class="ratio-val" id="ratio-val-fixe">89,4%</div><div class="ratio-label">Taux Fixe</div><div class="ratio-seuil">Cible: &gt;80%</div>
+          </div>
+          <div class="ratio-item r-ok" id="ratio-item-devises">
+            <button type="button" class="ratio-obs-btn obs-btn" data-slug="ratio-devises" onclick="openObservationModal('ratio-devises','Dette en devises','Indicateurs coûts et Risques')">💬</button>
+            <div class="ratio-val" id="ratio-val-devises">53,3%</div><div class="ratio-label">Devise Étr.</div><div class="ratio-seuil">Seuil: &lt;60%</div>
+          </div>
         </div>
       </div>
     </div>
@@ -2960,120 +2951,6 @@ async function loadObservations() {
     console.info('ℹ Aucune observation disponible (observations.json absent ou invalide).');
   }
   renderAllObservationBadges();
-  renderCommentaireTable();
-}
-
-/* ─── Commentaires sur le Tableau de Bord des Risques 2025 ───
-   Archive de commentaires numérotés/datés (DDMMYY) sur la carte juste
-   au-dessus. Chaque entrée capture aussi la période du MAD actif au
-   moment de l'écriture (MAD_META.periode), et reste modifiable ensuite
-   (bouton ✎ par ligne, ré-enregistre à la même place avec la date de
-   modification). Réutilise le même canal de sauvegarde partagé que les
-   observations par carte (OBSERVATIONS_ENDPOINT_URL → GitHub →
-   observations.json), mais stocke un tableau JSON d'entrées sous un
-   seul slug dédié, plutôt qu'une note unique remplacée à chaque
-   sauvegarde. */
-const TABLEAU_COMMENTAIRE_SLUG = 'tableau-commentaire-log';
-
-function getCommentaireEntries() {
-  const obs = OBSERVATIONS[TABLEAU_COMMENTAIRE_SLUG];
-  if (!obs || !obs.text) return [];
-  try {
-    const arr = JSON.parse(obs.text);
-    return Array.isArray(arr) ? arr : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function fmtDateDDMMYY(d) {
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const yy = String(d.getFullYear()).slice(-2);
-  return dd + mm + yy;
-}
-
-let _commentaireEditIndex = null;
-
-function renderCommentaireTable() {
-  const tbody = document.getElementById('commentaire-tbody');
-  if (!tbody) return;
-  const entries = getCommentaireEntries();
-  if (!entries.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>';
-    return;
-  }
-  // Le plus récent en tête du tableau (numérotation conservée dans l'ordre d'ajout).
-  const indexed = entries.map((e, i) => ({ e, i }));
-  tbody.innerHTML = indexed.slice().reverse().map(({ e, i }) => {
-    const auteur = e.author ? String(e.author).replace(/</g, '&lt;') : '—';
-    const periode = e.periode ? String(e.periode).replace(/</g, '&lt;') : '—';
-    const modifieTag = e.modifie ? ' <span style="color:var(--gray);font-size:9px">(modifié ' + e.modifie + ')</span>' : '';
-    return '<tr><td class="td-b">' + e.num + '</td><td>' + e.date + '</td><td>' + auteur + '</td><td>' + periode + '</td>' +
-      '<td style="text-align:left">' + String(e.text).replace(/</g, '&lt;') + modifieTag + '</td>' +
-      '<td style="text-align:center"><button type="button" class="tc-edit-btn" title="Modifier" onclick="editCommentaireEntry(' + i + ')">✎</button></td></tr>';
-  }).join('');
-}
-
-function editCommentaireEntry(idx) {
-  const entries = getCommentaireEntries();
-  const e = entries[idx];
-  if (!e) return;
-  _commentaireEditIndex = idx;
-  document.getElementById('commentaire-input').value = e.text || '';
-  document.getElementById('commentaire-author').value = e.author || '';
-  const btn = document.getElementById('commentaire-submit-btn');
-  if (btn) btn.textContent = 'Modifier';
-  const cancelBtn = document.getElementById('commentaire-cancel-btn');
-  if (cancelBtn) cancelBtn.style.display = '';
-  document.getElementById('commentaire-input').focus();
-}
-
-function cancelCommentaireEdit() {
-  _commentaireEditIndex = null;
-  document.getElementById('commentaire-input').value = '';
-  document.getElementById('commentaire-author').value = '';
-  const btn = document.getElementById('commentaire-submit-btn');
-  if (btn) btn.textContent = 'Ajouter';
-  const cancelBtn = document.getElementById('commentaire-cancel-btn');
-  if (cancelBtn) cancelBtn.style.display = 'none';
-}
-
-async function addCommentaireEntry() {
-  const input = document.getElementById('commentaire-input');
-  const authorInput = document.getElementById('commentaire-author');
-  const text = (input.value || '').trim();
-  if (!text) return;
-  const author = (authorInput.value || '').trim();
-  const periodeActuelle = MAD_META.periode || '';
-
-  const entries = getCommentaireEntries();
-  if (_commentaireEditIndex != null && entries[_commentaireEditIndex]) {
-    const orig = entries[_commentaireEditIndex];
-    entries[_commentaireEditIndex] = { num: orig.num, date: orig.date, periode: orig.periode || periodeActuelle, author, text, modifie: fmtDateDDMMYY(new Date()) };
-  } else {
-    entries.push({ num: entries.length + 1, date: fmtDateDDMMYY(new Date()), periode: periodeActuelle, author, text });
-  }
-  cancelCommentaireEdit();
-
-  const nowIso = new Date().toISOString();
-  const payload = { slug: TABLEAU_COMMENTAIRE_SLUG, text: JSON.stringify(entries), author, date: nowIso, page: 'Indicateurs coûts et Risques' };
-  OBSERVATIONS[TABLEAU_COMMENTAIRE_SLUG] = { text: payload.text, author, date: nowIso, page: payload.page };
-  renderCommentaireTable();
-
-  if (!OBSERVATIONS_ENDPOINT_URL) {
-    console.warn('⚠ OBSERVATIONS_ENDPOINT_URL non configuré — commentaire gardé localement seulement pour cette session.');
-    return;
-  }
-  try {
-    await fetch(OBSERVATIONS_ENDPOINT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-  } catch (e) {
-    console.warn("⚠ Échec de l'enregistrement distant du commentaire.", e);
-  }
 }
 
 function renderAllObservationBadges() {

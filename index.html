@@ -481,6 +481,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .tc-add-row button:hover{background:var(--green-light)}
 .tc-table td{padding:3px 9px;line-height:1.25}
 .tc-table th{padding:5px 9px}
+.tc-edit-btn{background:transparent;border:1px solid var(--border);border-radius:6px;width:22px;height:20px;font-size:10px;line-height:1;cursor:pointer;color:var(--gray);padding:0}
+.tc-edit-btn:hover{border-color:var(--orange);background:var(--orange-bg);color:var(--orange)}
 
 /* PROGRESS */
 .pb-wrap{flex:1;background:var(--border);border-radius:4px;height:5px;overflow:hidden}
@@ -1063,18 +1065,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
     </div>
     <div class="card">
-      <div class="tc-header">TABLEAU POUR COMMENTAIRES</div>
+      <div class="tc-header">COMMENTAIRES — Tableau de Bord des Risques 2025</div>
       <div class="card-body" style="padding:0">
-        <table class="tbl tc-table" style="min-height:420px">
-          <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="width:120px">Auteur</th><th style="text-align:left">Commentaire</th></tr></thead>
+        <table class="tbl tc-table" style="min-height:640px">
+          <thead><tr><th style="width:50px">N°</th><th style="width:80px">Date</th><th style="width:110px">Auteur</th><th style="width:110px">Période</th><th style="text-align:left">Commentaire</th><th style="width:36px"></th></tr></thead>
           <tbody id="commentaire-tbody">
-            <tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>
           </tbody>
         </table>
         <div class="tc-add-row">
           <input type="text" id="commentaire-input" placeholder="Écrire un commentaire…" onkeydown="if(event.key==='Enter')addCommentaireEntry()">
           <input type="text" id="commentaire-author" placeholder="Auteur (optionnel)" style="max-width:160px">
-          <button type="button" onclick="addCommentaireEntry()">Ajouter</button>
+          <button type="button" id="commentaire-submit-btn" onclick="addCommentaireEntry()">Ajouter</button>
+          <button type="button" id="commentaire-cancel-btn" onclick="cancelCommentaireEdit()" style="display:none;background:var(--gray)">Annuler</button>
         </div>
       </div>
     </div>
@@ -2960,12 +2963,16 @@ async function loadObservations() {
   renderCommentaireTable();
 }
 
-/* ─── Tableau pour Commentaire (Indicateurs coûts et Risques) ───
-   Archive de commentaires numérotés/datés (DDMMYY), indépendante des
-   observations par carte : réutilise le même canal de sauvegarde
-   partagé (OBSERVATIONS_ENDPOINT_URL → GitHub → observations.json),
-   mais stocke un tableau JSON d'entrées sous un seul slug dédié,
-   plutôt qu'une note unique remplacée à chaque sauvegarde. */
+/* ─── Commentaires sur le Tableau de Bord des Risques 2025 ───
+   Archive de commentaires numérotés/datés (DDMMYY) sur la carte juste
+   au-dessus. Chaque entrée capture aussi la période du MAD actif au
+   moment de l'écriture (MAD_META.periode), et reste modifiable ensuite
+   (bouton ✎ par ligne, ré-enregistre à la même place avec la date de
+   modification). Réutilise le même canal de sauvegarde partagé que les
+   observations par carte (OBSERVATIONS_ENDPOINT_URL → GitHub →
+   observations.json), mais stocke un tableau JSON d'entrées sous un
+   seul slug dédié, plutôt qu'une note unique remplacée à chaque
+   sauvegarde. */
 const TABLEAU_COMMENTAIRE_SLUG = 'tableau-commentaire-log';
 
 function getCommentaireEntries() {
@@ -2986,19 +2993,50 @@ function fmtDateDDMMYY(d) {
   return dd + mm + yy;
 }
 
+let _commentaireEditIndex = null;
+
 function renderCommentaireTable() {
   const tbody = document.getElementById('commentaire-tbody');
   if (!tbody) return;
   const entries = getCommentaireEntries();
   if (!entries.length) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:20px">Aucun commentaire pour le moment.</td></tr>';
     return;
   }
   // Le plus récent en tête du tableau (numérotation conservée dans l'ordre d'ajout).
-  tbody.innerHTML = entries.slice().reverse().map(e => {
+  const indexed = entries.map((e, i) => ({ e, i }));
+  tbody.innerHTML = indexed.slice().reverse().map(({ e, i }) => {
     const auteur = e.author ? String(e.author).replace(/</g, '&lt;') : '—';
-    return '<tr><td class="td-b">' + e.num + '</td><td>' + e.date + '</td><td>' + auteur + '</td><td style="text-align:left">' + String(e.text).replace(/</g, '&lt;') + '</td></tr>';
+    const periode = e.periode ? String(e.periode).replace(/</g, '&lt;') : '—';
+    const modifieTag = e.modifie ? ' <span style="color:var(--gray);font-size:9px">(modifié ' + e.modifie + ')</span>' : '';
+    return '<tr><td class="td-b">' + e.num + '</td><td>' + e.date + '</td><td>' + auteur + '</td><td>' + periode + '</td>' +
+      '<td style="text-align:left">' + String(e.text).replace(/</g, '&lt;') + modifieTag + '</td>' +
+      '<td style="text-align:center"><button type="button" class="tc-edit-btn" title="Modifier" onclick="editCommentaireEntry(' + i + ')">✎</button></td></tr>';
   }).join('');
+}
+
+function editCommentaireEntry(idx) {
+  const entries = getCommentaireEntries();
+  const e = entries[idx];
+  if (!e) return;
+  _commentaireEditIndex = idx;
+  document.getElementById('commentaire-input').value = e.text || '';
+  document.getElementById('commentaire-author').value = e.author || '';
+  const btn = document.getElementById('commentaire-submit-btn');
+  if (btn) btn.textContent = 'Modifier';
+  const cancelBtn = document.getElementById('commentaire-cancel-btn');
+  if (cancelBtn) cancelBtn.style.display = '';
+  document.getElementById('commentaire-input').focus();
+}
+
+function cancelCommentaireEdit() {
+  _commentaireEditIndex = null;
+  document.getElementById('commentaire-input').value = '';
+  document.getElementById('commentaire-author').value = '';
+  const btn = document.getElementById('commentaire-submit-btn');
+  if (btn) btn.textContent = 'Ajouter';
+  const cancelBtn = document.getElementById('commentaire-cancel-btn');
+  if (cancelBtn) cancelBtn.style.display = 'none';
 }
 
 async function addCommentaireEntry() {
@@ -3007,10 +3045,16 @@ async function addCommentaireEntry() {
   const text = (input.value || '').trim();
   if (!text) return;
   const author = (authorInput.value || '').trim();
+  const periodeActuelle = MAD_META.periode || '';
 
   const entries = getCommentaireEntries();
-  entries.push({ num: entries.length + 1, date: fmtDateDDMMYY(new Date()), author, text });
-  input.value = '';
+  if (_commentaireEditIndex != null && entries[_commentaireEditIndex]) {
+    const orig = entries[_commentaireEditIndex];
+    entries[_commentaireEditIndex] = { num: orig.num, date: orig.date, periode: orig.periode || periodeActuelle, author, text, modifie: fmtDateDDMMYY(new Date()) };
+  } else {
+    entries.push({ num: entries.length + 1, date: fmtDateDDMMYY(new Date()), periode: periodeActuelle, author, text });
+  }
+  cancelCommentaireEdit();
 
   const nowIso = new Date().toISOString();
   const payload = { slug: TABLEAU_COMMENTAIRE_SLUG, text: JSON.stringify(entries), author, date: nowIso, page: 'Indicateurs coûts et Risques' };

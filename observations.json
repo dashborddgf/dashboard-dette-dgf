@@ -14,7 +14,7 @@
   "tableau-de-bord-des-risques-2025": {
     "text": "Le tableau fonctionne Architecture et exploitation\nLe premier module a présenté la chaîne d’accès depuis le navigateur jusqu’aux données: frontend Angular, API Gateway, microservices backend, Oracle, Solr et fichiers. K3s héberge les services, tandis que Helm pilote l’installation et les mises à jour de la release applicative. Une distinction a été faite entre les contrôles techniques et la validation fonctionnelle.\n•\tLecture des objets essentiels : pods, services, ConfigMaps, Secrets et volumes persistants.\n•\tContrôle séquencé après démarrage : infrastructure, K3s, stockage, services, accès HTTPS et test fonctionnel.\n•\tUtilisation de commandes de lecture seule pour relever l’état de la plateforme.\n•\tUsage de Grafana, des événements Kubernetes et des journaux pour produire des preuves ciblées.\nectement",
     "author": "",
-    "date": "2026-09-29T09:24:21.443Z",
+    "date": "2026-09-29T09:25:39.225Z",
     "page": "Indicateurs coûts et Risques"
   }
 }

@@ -2554,7 +2554,12 @@ function evolPibForKey(key) {
   if (!ym) return null;
   const ratioPct = ratioPibPourAnnee(ym.year);
   if (!ratioPct) return null;
-  const total = compareAggregates(getComparePayload(key)).total;
+  // Encours TOTAL RÉEL (non filtré) : le PIB estimé ne doit pas varier selon
+  // le filtre Source/Créancier/Devise actif, sinon "% PIB" change de sens
+  // selon le filtre en cours, incohérent avec le Dette/PIB officiel affiché
+  // ailleurs (Encours de la dette publique, Tableau de Bord des Risques).
+  const e = getComparePayload(key).encours || {};
+  const total = Object.values(e).reduce((a, b) => a + (b || 0), 0);
   return total / (ratioPct / 100);
 }
 

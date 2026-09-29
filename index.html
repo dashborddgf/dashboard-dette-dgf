@@ -1124,6 +1124,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <select id="evolYearSelect" onchange="onEvolYearChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
         <select id="evolMonthSelect" onchange="onEvolMonthChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
         <div style="flex:1"></div>
+        <div id="evolValeurFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
         <div id="evolVarFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
       </div>
     </div>
@@ -1139,7 +1140,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
     <div id="compareContent" style="display:none">
       <div class="card" style="margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">Indicateurs clés par mois</div><div class="card-sub">en milliards de FCFA</div></div></div>
+        <div class="card-header"><div><div class="card-title">Indicateurs clés par mois</div><div class="card-sub" id="compareTableUnit">en milliards de FCFA</div></div></div>
         <div class="card-body" style="padding:0;overflow-x:auto">
           <table class="tbl" id="compareTable"></table>
         </div>
@@ -1148,7 +1149,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div id="evolSectionStock">
         <div class="g2">
           <div class="card">
-            <div class="card-header"><div><div class="card-title">Encours Total / Extérieure / Intérieure</div><div class="card-sub">Évolution par mois</div></div></div>
+            <div class="card-header"><div><div class="card-title">Stock de la Dette — Encours / Arriérés / Total</div><div class="card-sub">Évolution par mois</div></div></div>
             <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareEncours"></canvas></div></div>
           </div>
           <div class="card">
@@ -1159,12 +1160,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
 
       <div id="evolSectionService" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Capital + Intérêts — Évolution par mois</div></div></div>
+        <div class="card-header"><div><div class="card-title">Service de la Dette — Capital / Intérêts / Total</div><div class="card-sub">Évolution par mois</div></div></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareService"></canvas></div></div>
       </div>
 
       <div id="evolSectionTirages" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts — Cash / Traités / Total</div><div class="card-sub">Évolution par mois</div></div></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareTirages"></canvas></div></div>
       </div>
     </div>
@@ -1326,7 +1327,7 @@ function showScreen(id, el) {
     if (grp) grp.classList.add('open');
   }
   refreshAll();
-  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); }); }
+  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); }); }
   if (id === 'comparaison-bs') { renderComparisonPickerBS(); refreshComparisonBS(); renderEvolVarFilter('evolVarFilterBS', EVOL_VAR_BS, 'toggleEvolVarBS'); }
 }
 
@@ -2488,9 +2489,58 @@ async function toggleComparisonMonth(key) {
   refreshComparison();
 }
 
+/* ─── Filtre "VALEUR" (Nominale / % PIB) — Evolution MAD ───
+   %PIB dérivé du ratio officiel Dette/PIB de l'année de chaque période
+   comparée (ratioPibPourAnnee), appliqué à l'encours total réel de
+   cette période — même technique que Vue d'ensemble/Encours publique.
+   S'applique à tous les graphiques + au tableau des indicateurs clés. */
+let EVOL_VALEUR_MODE = 'nominale';
+
+function evolPibForKey(key) {
+  const ym = periodeToYearMonth(compareLabel(key));
+  if (!ym) return null;
+  const ratioPct = ratioPibPourAnnee(ym.year);
+  if (!ratioPct) return null;
+  const total = compareAggregates(getComparePayload(key)).total;
+  return total / (ratioPct / 100);
+}
+
+function evolConvert(value, key) {
+  if (EVOL_VALEUR_MODE !== 'pctpib') return value;
+  const pib = evolPibForKey(key);
+  return pib ? value / pib * 100 : null;
+}
+
+function evolValUnit() { return EVOL_VALEUR_MODE === 'pctpib' ? '% du PIB' : 'Mrds FCFA'; }
+
+function evolYAxisTicks() {
+  return EVOL_VALEUR_MODE === 'pctpib'
+    ? { callback: v => fmt(v) + '%', ...gO.ticks }
+    : { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks };
+}
+
+function renderEvolValeurFilter(hostId) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  const opts = [{ k: 'nominale', l: 'Nominale' }, { k: 'pctpib', l: '% PIB' }];
+  host.innerHTML = opts.map(o => {
+    const on = EVOL_VALEUR_MODE === o.k;
+    const bg = on ? 'var(--orange-bg)' : '#fff', bd = on ? 'var(--orange)' : 'var(--border)', fg = on ? 'var(--orange)' : 'var(--gray)';
+    return '<button type="button" onclick="toggleEvolValeurMode(\'' + o.k + '\')" style="border:1px solid ' + bd + ';background:' + bg + ';color:' + fg + ';border-radius:14px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">' + o.l + '</button>';
+  }).join('');
+}
+
+function toggleEvolValeurMode(mode) {
+  EVOL_VALEUR_MODE = mode;
+  renderEvolValeurFilter('evolValeurFilterMAD');
+  refreshComparison();
+}
+
 function renderComparisonTable() {
   const table = document.getElementById('compareTable');
   if (!table) return;
+  const unitEl = document.getElementById('compareTableUnit');
+  if (unitEl) unitEl.textContent = 'en ' + evolValUnit();
   const keys = COMPARE.selected;
   const rows = [
     { label: 'Encours Total',      get: p => compareAggregates(p).total },
@@ -2502,15 +2552,15 @@ function renderComparisonTable() {
   const hasVar = keys.length >= 2;
   const thead = '<thead><tr><th>Indicateur</th>' + labels.map(l => `<th>${l}</th>`).join('') + (hasVar ? '<th>Variation</th>' : '') + '</tr></thead>';
   const tbody = '<tbody>' + rows.map(r => {
-    const vals = keys.map(k => r.get(getComparePayload(k)));
+    const vals = keys.map(k => evolConvert(r.get(getComparePayload(k)), k));
     let varCell = '';
     if (hasVar) {
       const first = vals[0], last = vals[vals.length - 1];
-      const delta = last - first;
-      const pct = first ? (100 * delta / first) : 0;
-      const sign = delta >= 0 ? '+' : '';
-      const color = delta >= 0 ? 'var(--green)' : 'var(--red)';
-      varCell = `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
+      const delta = (first == null || last == null) ? null : last - first;
+      const pct = (delta != null && first) ? (100 * delta / first) : 0;
+      const sign = delta != null && delta >= 0 ? '+' : '';
+      const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
+      varCell = delta == null ? '<td>NULL</td>' : `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
     }
     return `<tr><td class="td-b">${r.label}</td>` + vals.map(v => `<td>${fmt(v)}</td>`).join('') + varCell + '</tr>';
   }).join('') + '</tbody>';
@@ -2521,9 +2571,10 @@ function buildComparisonEncours() {
   const keys = COMPARE.selected;
   const datasets = keys.map((k, i) => {
     const a = compareAggregates(getComparePayload(k));
-    return { label: compareLabel(k), data: [a.total, a.ext, a.int], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    const encours = evolConvert(a.total, k), arrieres = evolConvert(0, k), total = encours;
+    return { label: compareLabel(k), data: [encours, arrieres, total], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  mkChart('chartCompareEncours', { type: 'bar', data: { labels: ['Total', 'Extérieure', 'Intérieure'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+  mkChart('chartCompareEncours', { type: 'bar', data: { labels: ['Encours', 'Arriérés', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
 }
 
 function buildComparisonInstruments() {
@@ -2534,18 +2585,18 @@ function buildComparisonInstruments() {
   ];
   const datasets = keys.map((k, i) => {
     const a = compareAggregates(getComparePayload(k));
-    return { label: compareLabel(k), data: cats.map(c => a[c.k] || 0), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    return { label: compareLabel(k), data: cats.map(c => evolConvert(a[c.k] || 0, k)), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  mkChart('chartCompareInstruments', { type: 'bar', data: { labels: cats.map(c => c.l), datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+  mkChart('chartCompareInstruments', { type: 'bar', data: { labels: cats.map(c => c.l), datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
 }
 
 function buildComparisonService() {
   const keys = COMPARE.selected;
   const datasets = keys.map((k, i) => {
     const s = compareServiceBreakdown(getComparePayload(k));
-    return { label: compareLabel(k), data: [s.cap, s.intr, s.total], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    return { label: compareLabel(k), data: [evolConvert(s.cap, k), evolConvert(s.intr, k), evolConvert(s.total, k)], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  mkChart('chartCompareService', { type: 'bar', data: { labels: ['Capital', 'Intérêts', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+  mkChart('chartCompareService', { type: 'bar', data: { labels: ['Capital', 'Intérêts', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
 }
 
 function compareMobilisations(payload) {
@@ -2557,13 +2608,19 @@ function compareMobilisations(payload) {
   return { total: int + ext, ext, int };
 }
 
+/* Cash / Traités / Total — le pipeline MAD actuel ne distingue pas les
+   tirages "Cash" des tirages "Traités" (voir renderMADTable : la
+   colonne Traités y est déjà affichée en "—", faute de donnée source).
+   Tout le montant mobilisé est donc porté en Cash ; Traités reste à 0
+   jusqu'à ce qu'une extraction plus fine existe. */
 function buildComparisonTirages() {
   const keys = COMPARE.selected;
   const datasets = keys.map((k, i) => {
     const t = compareMobilisations(getComparePayload(k));
-    return { label: compareLabel(k), data: [t.total, t.ext, t.int], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    const cash = evolConvert(t.total, k), traites = evolConvert(0, k), total = cash;
+    return { label: compareLabel(k), data: [cash, traites, total], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  mkChart('chartCompareTirages', { type: 'bar', data: { labels: ['Total', 'Extérieure', 'Intérieure'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+  mkChart('chartCompareTirages', { type: 'bar', data: { labels: ['Cash', 'Traités', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
 }
 
 function refreshComparison() {
@@ -3356,7 +3413,7 @@ window.showScreen = function(id, el) {
     if (grp) grp.classList.add('open');
   }
   refreshAll();
-  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); }); }
+  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); }); }
   if (id === 'comparaison-bs') { renderComparisonPickerBS(); refreshComparisonBS(); renderEvolVarFilter('evolVarFilterBS', EVOL_VAR_BS, 'toggleEvolVarBS'); }
 };
 </script>

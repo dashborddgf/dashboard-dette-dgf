@@ -1441,12 +1441,16 @@ function msRenderState(key) {
 function applyFilters() {
   updateFilterSummary();
   refreshAll();
+  refreshComparison();
+  refreshComparisonBS();
 }
 
 function resetAllFilters() {
   FILTER_DEFS.forEach(def => { F[def.key] = []; msRenderState(def.key); });
   updateFilterSummary();
   refreshAll();
+  refreshComparison();
+  refreshComparisonBS();
 }
 
 /* ─── Résumé des filtres actifs ─── */
@@ -1534,8 +1538,12 @@ const DATA = {
 };
 
 /* ─── Filtrage des créanciers selon filtre Source / Créancier / Bailleur / Devise / Type ─── */
-function getFilteredEncours() {
-  let enc = {...DATA.encours};
+/* Filtrage générique par clé d'instrument (Source/Créancier/Devise) —
+   opère sur n'importe quel objet indexé par les mêmes clés MAD
+   (encours, mobilisations, service...), donc réutilisable telle
+   quelle pour rendre l'Evolution MAD dynamique selon ces filtres. */
+function getFilteredEncoursFrom(baseEnc) {
+  let enc = { ...(baseEnc || {}) };
 
   // Filtre Source (int/ext) — sélection multiple = union
   if (F.src.length) {
@@ -1569,6 +1577,8 @@ function getFilteredEncours() {
 
   return enc;
 }
+
+function getFilteredEncours() { return getFilteredEncoursFrom(DATA.encours); }
 
 /* ─── Totaux filtrés ─── */
 function calcTotals() {
@@ -2443,7 +2453,7 @@ async function loadComparePeriod(key) {
 /* Agrégats réutilisés pour le tableau et les 2 graphiques — même logique
    de regroupement que updateDynamicBadges() (multi/bilat/euro/comm). */
 function compareAggregates(payload) {
-  const e = payload.encours || {};
+  const e = getFilteredEncoursFrom(payload.encours || {});
   const g = k => e[k] || 0;
   const multi = g('FMI') + g('BM') + g('BAD') + g('BID') + g('AutresMulti');
   const bilat = g('AFD') + g('KFW') + g('EximbankChine') + g('JICA') + g('AutresBil');
@@ -2456,7 +2466,7 @@ function compareAggregates(payload) {
 }
 
 function compareServiceBreakdown(payload) {
-  const s = payload.service || {};
+  const s = getFilteredEncoursFrom(payload.service || {});
   let cap = 0, intr = 0;
   Object.values(s).forEach(v => { if (Array.isArray(v)) { cap += v[0] || 0; intr += v[1] || 0; } });
   return { cap, intr, total: cap + intr };
@@ -2658,7 +2668,7 @@ function buildComparisonService() {
 }
 
 function compareMobilisations(payload) {
-  const m = payload.mobilisations || {};
+  const m = getFilteredEncoursFrom(payload.mobilisations || {});
   const intKeys = ['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
   const extKeys = ['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
   const sum = keys => keys.reduce((a, k) => a + (m[k] || 0), 0);
@@ -2819,14 +2829,35 @@ function bsRowLatest(payload, idx) {
   return row.values[row.values.length - 1] || [0, 0];
 }
 
+/* Le BS n'a pas de détail par créancier/devise (contrairement au MAD) :
+   seul le filtre Source (Intérieure/Extérieure) peut s'appliquer, en
+   substituant le sous-total correspondant à la place du total global. */
+function applySrcFilterBS(total, ext, int) {
+  if (!F.src.length) return total;
+  const showExt = F.src.includes('ext'), showInt = F.src.includes('int');
+  if (showExt && showInt) return total;
+  if (showExt) return ext;
+  if (showInt) return int;
+  return total;
+}
+
 function compareAggregatesBS(payload) {
-  return { total: bsRowLatest(payload, 0)[1], ext: bsRowLatest(payload, 1)[1], int: bsRowLatest(payload, 2)[1] };
+  const total = bsRowLatest(payload, 0)[1], ext = bsRowLatest(payload, 1)[1], int = bsRowLatest(payload, 2)[1];
+  return { total: applySrcFilterBS(total, ext, int), ext, int };
 }
 function compareTiragesBS(payload) {
-  return { total: bsRowLatest(payload, 4)[1], ext: bsRowLatest(payload, 5)[1], int: bsRowLatest(payload, 6)[1] };
+  const total = bsRowLatest(payload, 4)[1], ext = bsRowLatest(payload, 5)[1], int = bsRowLatest(payload, 6)[1];
+  return { total: applySrcFilterBS(total, ext, int), ext, int };
 }
 function compareServiceBS(payload) {
-  return { cap: bsRowLatest(payload, 8)[1], intr: bsRowLatest(payload, 9)[1], total: bsRowLatest(payload, 7)[1] };
+  const capTotal = bsRowLatest(payload, 8)[1], intrTotal = bsRowLatest(payload, 9)[1], totTotal = bsRowLatest(payload, 7)[1];
+  const capExt = bsRowLatest(payload, 11)[1], intrExt = bsRowLatest(payload, 12)[1], totExt = bsRowLatest(payload, 10)[1];
+  const capInt = bsRowLatest(payload, 14)[1], intrInt = bsRowLatest(payload, 15)[1], totInt = bsRowLatest(payload, 13)[1];
+  return {
+    cap: applySrcFilterBS(capTotal, capExt, capInt),
+    intr: applySrcFilterBS(intrTotal, intrExt, intrInt),
+    total: applySrcFilterBS(totTotal, totExt, totInt)
+  };
 }
 
 function renderComparisonPickerBS() {

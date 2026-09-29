@@ -223,10 +223,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .page-sub{font-size:10px;color:rgba(255,255,255,.82)}
 .topbar-spacer{flex:1}
 .period-badge{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #fff;border-radius:20px;padding:3px 11px;font-size:11px;font-weight:600;color:var(--orange);transition:all .15s}
-.period-badge.hist{background:#F1F5F9;border-color:#9CA3AF;color:#374151}
 .dot{width:7px;height:7px;border-radius:50%}
 .dot.green{background:var(--green);animation:pulse 2s infinite}
-.period-badge.hist .dot{background:#9CA3AF;animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .btn-export{background:var(--green);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
 .btn-export:hover{background:#1E4A1A}
@@ -235,23 +233,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .btn-reset{background:#F1F5F9;color:var(--gray);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer}
 .btn-reset:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
 
-/* ── NAVIGATION HISTORIQUE MAD ── */
-.hist-picker{display:flex;align-items:center;gap:4px}
-.hist-picker select{background:#fff;color:var(--dark);border:1px solid #fff;border-radius:14px;padding:4px 8px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;max-width:120px}
-.hist-picker select:focus{outline:2px solid var(--green)}
-.mad-nav{display:none;align-items:center;gap:2px;background:#fff;border:1px solid #fff;border-radius:20px;padding:2px}
-.mad-nav.visible{display:flex}
-.mad-nav-btn{width:22px;height:22px;border:none;background:transparent;border-radius:50%;cursor:pointer;font-size:14px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;transition:background .15s;font-family:inherit;line-height:1}
-.mad-nav-btn:hover:not(:disabled){background:var(--orange-bg);color:var(--orange)}
-.mad-nav-btn:disabled{opacity:.3;cursor:not-allowed}
-.hist-banner{display:none;align-items:center;gap:8px;background:#F1F5F9;border-bottom:1px solid var(--border);padding:6px 20px;font-size:11px;color:#374151}
+/* ── NAVIGATION HISTORIQUE (Template BS, écran dédié) ── */
 .bs-hist-nav{display:flex;align-items:center;gap:2px}
 .bs-hist-btn{width:22px;height:22px;border:1px solid var(--border);background:#fff;border-radius:50%;cursor:pointer;font-size:13px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;font-family:inherit;line-height:1;transition:background .15s}
 .bs-hist-btn:hover:not(:disabled){background:var(--orange-bg);color:var(--orange)}
 .bs-hist-btn:disabled{opacity:.3;cursor:not-allowed}
-.hist-banner.visible{display:flex}
-.hist-banner a{color:var(--orange);font-weight:700;cursor:pointer;text-decoration:none}
-.hist-banner a:hover{text-decoration:underline}
 
 /* ── LOADING OVERLAY ── */
 .loading-overlay{position:fixed;inset:0;background:rgba(10,14,26,.55);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -525,8 +511,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   .page-sub { display: none; }
   .period-badge { font-size: 10px; padding: 2px 8px; }
   .btn-export, .btn-reset { font-size: 10px; padding: 4px 9px; }
-  .mad-nav-btn { width: 19px; height: 19px; font-size: 12px; }
-  .hist-banner { padding: 5px 12px; font-size: 10px; flex-wrap: wrap; }
 
   /* Barre de filtres scrollable horizontalement */
   .filter-bar {
@@ -795,9 +779,24 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="1.5"/></svg>
     Indicateurs coûts et Risques
   </div>
-  <div class="nav-item" data-nav-key="comparaison" onclick="showScreen('comparaison',this)">
-    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
-    Evolution
+  <div class="nav-group" id="navgroup-evolution" data-nav-key="evolution">
+    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('evolution',this)">
+      <span class="nav-item-main">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
+        Evolution
+      </span>
+      <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
+    </div>
+    <div class="nav-submenu" id="navsub-evolution">
+      <div class="nav-item nav-subitem" onclick="showScreen('comparaison',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" stroke-width="1.5"/></svg>
+        MAD
+      </div>
+      <div class="nav-item nav-subitem" onclick="showScreen('comparaison-bs',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="10" width="4" height="11"/><rect x="10" y="4" width="4" height="17"/><rect x="17" y="7" width="4" height="14"/></svg>
+        BS
+      </div>
+    </div>
   </div>
 
   <div class="nav-group" id="navgroup-nos-productions" data-nav-key="nos-productions">
@@ -897,25 +896,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="page-sub">Dette Publique · Administration Centrale · Côte d'Ivoire</div>
     </div>
     <div class="topbar-spacer"></div>
-    <div class="hist-picker" id="histPicker" title="Choisir directement un MAD par année et mois">
-      <select id="histYearSelect" onchange="onHistYearChange()"></select>
-      <select id="histMonthSelect" onchange="onHistMonthChange()"></select>
-    </div>
-    <div class="mad-nav" id="madNav" title="Naviguer entre les MAD archivés (MAD Historiques)">
-      <button type="button" class="mad-nav-btn" id="madNavPrev" onclick="madNavStep(-1)" title="MAD précédent" disabled>‹</button>
-      <button type="button" class="mad-nav-btn" id="madNavNext" onclick="madNavStep(1)" title="MAD suivant" disabled>›</button>
-    </div>
     <div class="period-badge" id="periodBadge"><div class="dot green"></div><span id="period-badge-label">MAD —</span></div>
     <div class="btn-stack">
       <button class="btn-export" onclick="exportXLSX()">⬇ Export XLSX</button>
       <button class="btn-export" onclick="downloadPDF()" title="Télécharger le tableau de bord (onglet actuel) en PDF">⬇ TB PDF</button>
     </div>
-  </div>
-
-  <!-- BANDEAU MAD HISTORIQUE (affiché uniquement lorsqu'on consulte un MAD archivé) -->
-  <div class="hist-banner" id="histBanner">
-    <span>🗂 <b id="histBannerLabel"></b> — vous consultez un MAD archivé (lecture seule, visible uniquement par vous)</span>
-    <a onclick="returnToActiveMAD();return false;" href="#">Revenir au MAD Actif</a>
   </div>
 
   <!-- ═══════════════════════════════════════════
@@ -1134,6 +1119,16 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ EVOLUTION (ex-Comparaison Mensuelle) ══════════════ -->
   <div class="screen" id="screen-comparaison">
     <div class="card" style="margin-bottom:12px;overflow:visible">
+      <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Année / Mois : ajoute rapidement une période à la sélection ci-dessous</div></div></div>
+      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;overflow:visible">
+        <select id="evolYearSelect" onchange="onEvolYearChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
+        <select id="evolMonthSelect" onchange="onEvolMonthChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
+        <div style="flex:1"></div>
+        <div id="evolVarFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Sélection des mois — Evolution</div><div class="card-sub">Coche 2 mois ou plus (MAD Actif + archives disponibles)</div></div></div>
       <div class="card-body" id="comparePicker" style="display:flex;flex-wrap:wrap;gap:8px;overflow:visible"></div>
     </div>
@@ -1150,23 +1145,71 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         </div>
       </div>
 
-      <div class="g2">
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Encours Total / Extérieure / Intérieure</div><div class="card-sub">Évolution par mois</div></div></div>
-          <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareEncours"></canvas></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Répartition par Instrument</div><div class="card-sub">Évolution par mois</div></div></div>
-          <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareInstruments"></canvas></div></div>
+      <div id="evolSectionStock">
+        <div class="g2">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Encours Total / Extérieure / Intérieure</div><div class="card-sub">Évolution par mois</div></div></div>
+            <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareEncours"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Répartition par Instrument</div><div class="card-sub">Évolution par mois</div></div></div>
+            <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareInstruments"></canvas></div></div>
+          </div>
         </div>
       </div>
 
-      <div class="card" style="margin-top:12px">
+      <div id="evolSectionService" class="card" style="margin-top:12px">
         <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Capital + Intérêts — Évolution par mois</div></div></div>
         <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareService"></canvas></div></div>
       </div>
+
+      <div id="evolSectionTirages" class="card" style="margin-top:12px">
+        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareTirages"></canvas></div></div>
+      </div>
     </div>
   </div><!-- /comparaison -->
+
+  <!-- ══════════════ EVOLUTION — BS ══════════════ -->
+  <div class="screen" id="screen-comparaison-bs">
+    <div class="card" style="margin-bottom:12px;overflow:visible">
+      <div class="card-header"><div><div class="card-title">Variables à afficher</div><div class="card-sub">Filtrer les sections ci-dessous</div></div></div>
+      <div class="card-body" id="evolVarFilterBS" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;overflow:visible">
+      <div class="card-header"><div><div class="card-title">Sélection des BS — Evolution</div><div class="card-sub">Coche 2 périodes ou plus (BS Actif + archives disponibles)</div></div></div>
+      <div class="card-body" id="comparePickerBS" style="display:flex;flex-wrap:wrap;gap:8px;overflow:visible"></div>
+    </div>
+
+    <div id="compareEmptyBS" class="card" style="text-align:center;padding:30px;color:var(--gray);font-size:12px">
+      Sélectionne au moins 2 périodes ci-dessus pour afficher l'évolution.
+    </div>
+
+    <div id="compareContentBS" style="display:none">
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-header"><div><div class="card-title">Indicateurs clés par période</div><div class="card-sub">en milliards de FCFA</div></div></div>
+        <div class="card-body" style="padding:0;overflow-x:auto">
+          <table class="tbl" id="compareTableBS"></table>
+        </div>
+      </div>
+
+      <div id="evolSectionStockBS" class="card">
+        <div class="card-header"><div><div class="card-title">Dette Totale / Extérieure / Intérieure</div><div class="card-sub">Évolution par période</div></div></div>
+        <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareBSDette"></canvas></div></div>
+      </div>
+
+      <div id="evolSectionTiragesBS" class="card" style="margin-top:12px">
+        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par période</div></div></div>
+        <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareBSTirages"></canvas></div></div>
+      </div>
+
+      <div id="evolSectionServiceBS" class="card" style="margin-top:12px">
+        <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Capital + Intérêts — Évolution par période</div></div></div>
+        <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareBSService"></canvas></div></div>
+      </div>
+    </div>
+  </div><!-- /comparaison-bs -->
 
   <!-- ══════════════ TEMPLATE BS (à venir) ══════════════ -->
   <div class="screen" id="screen-template-bs">
@@ -1263,7 +1306,8 @@ const PAGE_TITLES = {
   'vue-exec':'Encours de la dette',
   'portefeuille-dette':'Portefeuille de la Dette',
   'ratios':'Indicateurs coûts et Risques',
-  'comparaison':'Evolution'
+  'comparaison':'Evolution — MAD',
+  'comparaison-bs':'Evolution — BS'
 };
 
 function toggleNavGroup(id, el) {
@@ -1282,7 +1326,8 @@ function showScreen(id, el) {
     if (grp) grp.classList.add('open');
   }
   refreshAll();
-  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); }); }
+  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); }); }
+  if (id === 'comparaison-bs') { renderComparisonPickerBS(); refreshComparisonBS(); renderEvolVarFilter('evolVarFilterBS', EVOL_VAR_BS, 'toggleEvolVarBS'); }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1377,13 +1422,7 @@ function applyFilters() {
 function resetAllFilters() {
   FILTER_DEFS.forEach(def => { F[def.key] = []; msRenderState(def.key); });
   updateFilterSummary();
-  // "Réinitialiser" ramène toujours à l'affichage du MAD Actif, même si un MAD
-  // historique était consulté (uniquement pour l'utilisateur courant).
-  if (typeof HIST !== 'undefined' && HIST.idx !== -1) {
-    returnToActiveMAD();
-  } else {
-    refreshAll();
-  }
+  refreshAll();
 }
 
 /* ─── Résumé des filtres actifs ─── */
@@ -2337,7 +2376,6 @@ async function loadHistoryIndex() {
   } catch (e) {
     console.info('ℹ Aucun MAD historique disponible (history/index.json absent ou invalide).');
   }
-  updateMadNavUI();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2510,6 +2548,24 @@ function buildComparisonService() {
   mkChart('chartCompareService', { type: 'bar', data: { labels: ['Capital', 'Intérêts', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
 }
 
+function compareMobilisations(payload) {
+  const m = payload.mobilisations || {};
+  const intKeys = ['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
+  const extKeys = ['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
+  const sum = keys => keys.reduce((a, k) => a + (m[k] || 0), 0);
+  const int = sum(intKeys), ext = sum(extKeys);
+  return { total: int + ext, ext, int };
+}
+
+function buildComparisonTirages() {
+  const keys = COMPARE.selected;
+  const datasets = keys.map((k, i) => {
+    const t = compareMobilisations(getComparePayload(k));
+    return { label: compareLabel(k), data: [t.total, t.ext, t.int], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+  });
+  mkChart('chartCompareTirages', { type: 'bar', data: { labels: ['Total', 'Extérieure', 'Intérieure'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+}
+
 function refreshComparison() {
   const empty = document.getElementById('compareEmpty');
   const content = document.getElementById('compareContent');
@@ -2525,41 +2581,260 @@ function refreshComparison() {
   buildComparisonEncours();
   buildComparisonInstruments();
   buildComparisonService();
+  buildComparisonTirages();
 }
 
-function updateMadNavUI() {
-  const nav = document.getElementById('madNav');
-  const prevBtn = document.getElementById('madNavPrev');
-  const nextBtn = document.getElementById('madNavNext');
-  const badge   = document.getElementById('periodBadge');
-  const banner  = document.getElementById('histBanner');
-  if (!nav || !prevBtn || !nextBtn) return;
+/* ─── Filtre "Variables à afficher" (Stock Dette / Service courant payé /
+   Tirages et mobilisations d'emprunts) — commun aux écrans Evolution MAD
+   et Evolution BS, montre/cache les sections correspondantes. ─── */
+const EVOL_VAR = { stock: true, service: true, tirages: true };
+const EVOL_VAR_BS = { stock: true, service: true, tirages: true };
+const EVOL_VAR_LABELS = [
+  { k: 'stock', l: 'Stock Dette' },
+  { k: 'service', l: 'Service courant payé' },
+  { k: 'tirages', l: "Tirages et mobilisations d'emprunts" }
+];
 
-  const onActive = HIST.idx === -1;
-  if (!HIST.list.length) {
-    nav.classList.remove('visible');
-  } else {
-    nav.classList.add('visible');
-    prevBtn.disabled = HIST.idx === 0;              // déjà sur le MAD archivé le plus ancien
-    nextBtn.disabled = onActive;                     // impossible d'aller au-delà du MAD Actif
-  }
+function renderEvolVarFilter(hostId, state, onToggleFnName) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.innerHTML = EVOL_VAR_LABELS.map(v => {
+    const on = state[v.k];
+    const bg = on ? 'var(--green-bg)' : '#fff', bd = on ? 'var(--green)' : 'var(--border)', fg = on ? 'var(--green)' : 'var(--gray)';
+    return '<button type="button" onclick="' + onToggleFnName + "('" + v.k + "')" + '" style="border:1px solid ' + bd + ';background:' + bg + ';color:' + fg + ';border-radius:14px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">' + v.l + '</button>';
+  }).join('');
+}
 
-  if (badge) badge.classList.toggle('hist', !onActive);
-  if (banner) {
-    banner.classList.toggle('visible', !onActive);
-    if (!onActive) {
-      const lbl = document.getElementById('histBannerLabel');
-      if (lbl) lbl.textContent = 'MAD ' + madCoreLabel();
-    }
-  }
-  renderHistPicker();
+function applyEvolVarFilter(sectionMap, state) {
+  Object.keys(sectionMap).forEach(k => {
+    const el = document.getElementById(sectionMap[k]);
+    if (el) el.style.display = state[k] ? '' : 'none';
+  });
+}
+
+function toggleEvolVarMAD(key) {
+  EVOL_VAR[key] = !EVOL_VAR[key];
+  renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD');
+  applyEvolVarFilter({ stock: 'evolSectionStock', service: 'evolSectionService', tirages: 'evolSectionTirages' }, EVOL_VAR);
+}
+
+function toggleEvolVarBS(key) {
+  EVOL_VAR_BS[key] = !EVOL_VAR_BS[key];
+  renderEvolVarFilter('evolVarFilterBS', EVOL_VAR_BS, 'toggleEvolVarBS');
+  applyEvolVarFilter({ stock: 'evolSectionStockBS', service: 'evolSectionServiceBS', tirages: 'evolSectionTiragesBS' }, EVOL_VAR_BS);
+}
+
+/* ─── Sélecteur Année / Mois relocalisé depuis la barre du haut : ajoute
+   directement une période à la sélection de comparaison MAD ci-dessous,
+   au lieu de changer le MAD affiché globalement (voir note plus bas). ─── */
+function renderEvolYearMonthPicker() {
+  const yearSel = document.getElementById('evolYearSelect');
+  const monthSel = document.getElementById('evolMonthSelect');
+  if (!yearSel || !monthSel) return;
+  const periods = compareAvailablePeriods().map(p => ({ ...p, ...(periodeToYearMonth(p.label) || { year: '?', month: '00' }) }));
+  if (!periods.length) { yearSel.innerHTML = ''; monthSel.innerHTML = ''; return; }
+  const years = [...new Set(periods.map(p => p.year))].sort();
+  const curYear = (yearSel.value && years.includes(yearSel.value)) ? yearSel.value : years[years.length - 1];
+  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y === curYear ? 'selected' : ''}>${y}</option>`).join('');
+  renderEvolMonthOptions(curYear);
+}
+
+function renderEvolMonthOptions(year) {
+  const monthSel = document.getElementById('evolMonthSelect');
+  if (!monthSel) return;
+  const periods = compareAvailablePeriods()
+    .map(p => ({ ...p, ...(periodeToYearMonth(p.label) || { year: '?', month: '00' }) }))
+    .filter(p => p.year === year).sort((a, b) => a.month.localeCompare(b.month));
+  monthSel.innerHTML = periods.map(p => `<option value="${p.key}">${p.label}</option>`).join('');
+}
+
+function onEvolYearChange() {
+  const yearSel = document.getElementById('evolYearSelect');
+  if (!yearSel) return;
+  renderEvolMonthOptions(yearSel.value);
+}
+
+async function onEvolMonthChange() {
+  const monthSel = document.getElementById('evolMonthSelect');
+  if (!monthSel || !monthSel.value) return;
+  const key = monthSel.value;
+  if (!COMPARE.selected.includes(key)) await toggleComparisonMonth(key);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SÉLECTEUR ANNÉE → MOIS (navigation historique directe)
-   Réutilisé aussi pour regrouper par année la liste de l'onglet
-   Comparaison Mensuelle (voir periodeToYearMonth ci-dessous).
+   EVOLUTION — BS (comparaison de périodes BS, miroir de l'Evolution MAD)
 ════════════════════════════════════════════════════════════════ */
+const COMPARE_BS = { selected: [], loaded: {} };
+
+function compareAvailablePeriodsBS() {
+  const list = BS_HIST.list.map(e => ({ key: e.id, label: e.periode || e.bsName || e.id }));
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const activeLabel = (bs.meta && bs.meta.periode) || 'BS Actif';
+  list.push({ key: 'active', label: activeLabel + ' (Actif)' });
+  return list;
+}
+
+function compareLabelBS(key) {
+  const p = compareAvailablePeriodsBS().find(p => p.key === key);
+  return p ? p.label : key;
+}
+
+function getComparePayloadBS(key) { return COMPARE_BS.loaded[key] || {}; }
+
+async function loadComparePeriodBS(key) {
+  if (key === 'active') { COMPARE_BS.loaded.active = BS_DATA || BS_DATA_FALLBACK; return; }
+  const entry = BS_HIST.list.find(e => e.id === key);
+  if (!entry) return;
+  try {
+    COMPARE_BS.loaded[key] = await fetchJsonWithProgress(entry.file + '?v=' + Date.now(), () => {});
+  } catch (e) {
+    console.warn('⚠ Impossible de charger la période BS demandée.', entry, e);
+  }
+}
+
+/* Dernière paire [USD, FCFA] de la ligne d'index idx (ordre fixe du BS —
+   voir renderBSTable) : la période "courante" de CE fichier BS précis. */
+function bsRowLatest(payload, idx) {
+  const row = payload.rows && payload.rows[idx];
+  if (!row || !Array.isArray(row.values) || !row.values.length) return [0, 0];
+  return row.values[row.values.length - 1] || [0, 0];
+}
+
+function compareAggregatesBS(payload) {
+  return { total: bsRowLatest(payload, 0)[1], ext: bsRowLatest(payload, 1)[1], int: bsRowLatest(payload, 2)[1] };
+}
+function compareTiragesBS(payload) {
+  return { total: bsRowLatest(payload, 4)[1], ext: bsRowLatest(payload, 5)[1], int: bsRowLatest(payload, 6)[1] };
+}
+function compareServiceBS(payload) {
+  return { cap: bsRowLatest(payload, 8)[1], intr: bsRowLatest(payload, 9)[1], total: bsRowLatest(payload, 7)[1] };
+}
+
+function renderComparisonPickerBS() {
+  const host = document.getElementById('comparePickerBS');
+  if (!host) return;
+  const openDd = host.querySelector('.ms-dd.open');
+  const openYear = openDd ? openDd.id.replace('ms-dd-cmpYearBS-', '') : null;
+  const periods = compareAvailablePeriodsBS();
+  if (!periods.length) { host.innerHTML = '<span style="color:var(--gray);font-size:11px">Aucune période disponible.</span>'; return; }
+  const withYear = periods.map(p => ({ ...p, year: (periodeToYearMonth(p.label) || { year: '?' }).year }));
+  const years = [...new Set(withYear.map(p => p.year))].sort();
+  host.innerHTML = years.map(y => {
+    const periodsOfYear = withYear.filter(p => p.year === y);
+    const nbSelected = periodsOfYear.filter(p => COMPARE_BS.selected.includes(p.key)).length;
+    const opts = periodsOfYear.map(p => {
+      const checked = COMPARE_BS.selected.includes(p.key) ? 'checked' : '';
+      return `<label class="ms-opt"><input type="checkbox" ${checked} onchange="toggleComparisonPeriodBS('${p.key}')"><span>${p.label}</span></label>`;
+    }).join('');
+    return `<div class="ms-dd" id="ms-dd-cmpYearBS-${y}">
+      <button type="button" class="ms-btn${nbSelected ? ' has-selection' : ''}" onclick="toggleMsPanel('cmpYearBS-${y}')">
+        <span class="ms-btn-text">Année ${y} (${periodsOfYear.length}${nbSelected ? ' · ' + nbSelected + ' coché' + (nbSelected > 1 ? 's' : '') : ''})</span>
+        <svg class="ms-caret" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg>
+      </button>
+      <div class="ms-panel" id="ms-panel-cmpYearBS-${y}">${opts}</div>
+    </div>`;
+  }).join('');
+  if (openYear) {
+    const dd = document.getElementById('ms-dd-cmpYearBS-' + openYear);
+    if (dd) dd.classList.add('open');
+  }
+}
+
+async function toggleComparisonPeriodBS(key) {
+  const idx = COMPARE_BS.selected.indexOf(key);
+  if (idx >= 0) {
+    COMPARE_BS.selected.splice(idx, 1);
+  } else {
+    COMPARE_BS.selected.push(key);
+    const order = compareAvailablePeriodsBS().map(p => p.key);
+    COMPARE_BS.selected.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    if (!COMPARE_BS.loaded[key]) {
+      showLoading('Chargement de la période ' + compareLabelBS(key) + '…');
+      await loadComparePeriodBS(key);
+      hideLoading();
+    }
+  }
+  renderComparisonPickerBS();
+  refreshComparisonBS();
+}
+
+function renderComparisonTableBS() {
+  const table = document.getElementById('compareTableBS');
+  if (!table) return;
+  const keys = COMPARE_BS.selected;
+  const rows = [
+    { label: 'Dette Totale',      get: p => compareAggregatesBS(p).total },
+    { label: 'Dette Extérieure',  get: p => compareAggregatesBS(p).ext },
+    { label: 'Dette Intérieure',  get: p => compareAggregatesBS(p).int },
+    { label: "Tirages / Mobilisations", get: p => compareTiragesBS(p).total },
+    { label: 'Service (Capital+Intérêts)', get: p => compareServiceBS(p).total }
+  ];
+  const labels = keys.map(compareLabelBS);
+  const hasVar = keys.length >= 2;
+  const thead = '<thead><tr><th>Indicateur</th>' + labels.map(l => `<th>${l}</th>`).join('') + (hasVar ? '<th>Variation</th>' : '') + '</tr></thead>';
+  const tbody = '<tbody>' + rows.map(r => {
+    const vals = keys.map(k => r.get(getComparePayloadBS(k)));
+    let varCell = '';
+    if (hasVar) {
+      const first = vals[0], last = vals[vals.length - 1];
+      const delta = last - first;
+      const pct = first ? (100 * delta / first) : 0;
+      const sign = delta >= 0 ? '+' : '';
+      const color = delta >= 0 ? 'var(--green)' : 'var(--red)';
+      varCell = `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
+    }
+    return `<tr><td class="td-b">${r.label}</td>` + vals.map(v => `<td>${fmt(v)}</td>`).join('') + varCell + '</tr>';
+  }).join('') + '</tbody>';
+  table.innerHTML = thead + tbody;
+}
+
+function buildComparisonBSDette() {
+  const keys = COMPARE_BS.selected;
+  const datasets = keys.map((k, i) => {
+    const a = compareAggregatesBS(getComparePayloadBS(k));
+    return { label: compareLabelBS(k), data: [a.total, a.ext, a.int], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+  });
+  mkChart('chartCompareBSDette', { type: 'bar', data: { labels: ['Total', 'Extérieure', 'Intérieure'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+}
+
+function buildComparisonBSTirages() {
+  const keys = COMPARE_BS.selected;
+  const datasets = keys.map((k, i) => {
+    const t = compareTiragesBS(getComparePayloadBS(k));
+    return { label: compareLabelBS(k), data: [t.total, t.ext, t.int], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+  });
+  mkChart('chartCompareBSTirages', { type: 'bar', data: { labels: ['Total', 'Extérieure', 'Intérieure'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+}
+
+function buildComparisonBSService() {
+  const keys = COMPARE_BS.selected;
+  const datasets = keys.map((k, i) => {
+    const s = compareServiceBS(getComparePayloadBS(k));
+    return { label: compareLabelBS(k), data: [s.cap, s.intr, s.total], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+  });
+  mkChart('chartCompareBSService', { type: 'bar', data: { labels: ['Capital', 'Intérêts', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
+}
+
+function refreshComparisonBS() {
+  const empty = document.getElementById('compareEmptyBS');
+  const content = document.getElementById('compareContentBS');
+  if (!empty || !content) return;
+  if (COMPARE_BS.selected.length < 2) {
+    empty.style.display = '';
+    content.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  content.style.display = '';
+  renderComparisonTableBS();
+  buildComparisonBSDette();
+  buildComparisonBSTirages();
+  buildComparisonBSService();
+}
+
+/* Vue d'ensemble et les autres écrans restent figés sur le MAD Actif :
+   plus de navigation vers un MAD archivé depuis la barre du haut. Seul
+   l'écran Evolution permet de consulter/comparer des MAD antérieurs. */
 const MOIS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
 function periodeToYearMonth(periode) {
@@ -2567,113 +2842,6 @@ function periodeToYearMonth(periode) {
   if (!m) return null;
   const idx = MOIS_FR.findIndex(x => x.toLowerCase() === m[1].toLowerCase());
   return { year: m[2], month: idx >= 0 ? String(idx + 1).padStart(2, '0') : '00' };
-}
-
-/* key : index dans HIST.list pour un MAD archivé, ou 'active' pour le MAD Actif */
-function histAllPeriods() {
-  const arr = HIST.list.map((e, i) => {
-    const ym = periodeToYearMonth(e.periode) || { year: '?', month: '00' };
-    return { key: i, year: ym.year, month: ym.month, label: e.periode || e.madName };
-  });
-  const activePeriode = (ACTIVE_SNAPSHOT && ACTIVE_SNAPSHOT.meta.periode) || MAD_META.periode;
-  const ym = periodeToYearMonth(activePeriode) || { year: '?', month: '00' };
-  arr.push({ key: 'active', year: ym.year, month: ym.month, label: activePeriode || 'MAD Actif' });
-  return arr;
-}
-
-function renderHistPicker() {
-  const yearSel = document.getElementById('histYearSelect');
-  const monthSel = document.getElementById('histMonthSelect');
-  if (!yearSel || !monthSel) return;
-  const periods = histAllPeriods();
-  if (!periods.length) { yearSel.innerHTML = ''; monthSel.innerHTML = ''; return; }
-  const years = [...new Set(periods.map(p => p.year))].sort();
-  const curKey = HIST.idx === -1 ? 'active' : HIST.idx;
-  const curPeriod = periods.find(p => p.key === curKey) || periods[periods.length - 1];
-  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y === curPeriod.year ? 'selected' : ''}>${y}</option>`).join('');
-  renderHistMonthOptions(curPeriod.year, curPeriod.key);
-}
-
-function renderHistMonthOptions(year, selectedKey) {
-  const monthSel = document.getElementById('histMonthSelect');
-  if (!monthSel) return;
-  const periods = histAllPeriods().filter(p => p.year === year).sort((a, b) => a.month.localeCompare(b.month));
-  monthSel.innerHTML = periods.map(p => `<option value="${p.key}" ${p.key === selectedKey ? 'selected' : ''}>${p.label}</option>`).join('');
-}
-
-function onHistYearChange() {
-  const yearSel = document.getElementById('histYearSelect');
-  if (!yearSel) return;
-  const year = yearSel.value;
-  const periods = histAllPeriods().filter(p => p.year === year).sort((a, b) => a.month.localeCompare(b.month));
-  const target = periods[periods.length - 1]; // le plus récent de l'année sélectionnée, par défaut
-  renderHistMonthOptions(year, target ? target.key : null);
-  if (target) onHistMonthChange();
-}
-
-async function onHistMonthChange() {
-  const monthSel = document.getElementById('histMonthSelect');
-  if (!monthSel || !monthSel.value) return;
-  const val = monthSel.value;
-  if (val === 'active') {
-    if (HIST.idx !== -1) await returnToActiveMAD();
-  } else {
-    const idx = Number(val);
-    if (idx !== HIST.idx) await loadHistoricalMAD(idx);
-  }
-}
-
-async function madNavStep(dir) {
-  if (!HIST.list.length) return;
-  if (dir < 0) {
-    // Précédent = MAD plus ancien
-    const target = HIST.idx === -1 ? HIST.list.length - 1 : HIST.idx - 1;
-    if (target < 0) return;
-    await loadHistoricalMAD(target);
-  } else {
-    // Suivant = MAD plus récent, jamais au-delà du MAD Actif
-    if (HIST.idx === -1) return;
-    const target = HIST.idx + 1;
-    if (target >= HIST.list.length) { await returnToActiveMAD(); return; }
-    await loadHistoricalMAD(target);
-  }
-}
-
-async function loadHistoricalMAD(idx) {
-  const entry = HIST.list[idx];
-  if (!entry || !entry.file) return;
-  showLoading('Chargement du MAD ' + (entry.periode || entry.madName || '') + '…');
-  try {
-    const j = await fetchJsonWithProgress(entry.file + '?v=' + Date.now(), setLoadingProgress);
-    applyDataJson(j);
-    HIST.idx = idx;
-    updateMadLabels();
-    refreshAll();
-    updateMadNavUI();
-  } catch (e) {
-    console.warn('⚠ Impossible de charger le MAD historique demandé.', entry, e);
-    alert("Ce MAD archivé n'a pas pu être chargé.");
-  } finally {
-    hideLoading();
-  }
-}
-
-async function returnToActiveMAD() {
-  if (HIST.idx === -1) return;
-  showLoading('Retour au MAD Actif…');
-  try {
-    if (ACTIVE_SNAPSHOT) {
-      applyDataJson({ ...ACTIVE_SNAPSHOT.data, meta: ACTIVE_SNAPSHOT.meta });
-    }
-    // Progression visuelle même si la restauration est instantanée (données déjà en mémoire)
-    for (let p = 20; p <= 100; p += 20) { setLoadingProgress(p); await new Promise(r => setTimeout(r, 30)); }
-    HIST.idx = -1;
-    updateMadLabels();
-    refreshAll();
-    updateMadNavUI();
-  } finally {
-    hideLoading();
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3188,7 +3356,8 @@ window.showScreen = function(id, el) {
     if (grp) grp.classList.add('open');
   }
   refreshAll();
-  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); }); }
+  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); }); }
+  if (id === 'comparaison-bs') { renderComparisonPickerBS(); refreshComparisonBS(); renderEvolVarFilter('evolVarFilterBS', EVOL_VAR_BS, 'toggleEvolVarBS'); }
 };
 </script>
 

@@ -1118,6 +1118,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ EVOLUTION (ex-Comparaison Mensuelle) ══════════════ -->
   <div class="screen" id="screen-comparaison">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
+        <button type="button" class="btn-export" onclick="downloadPDF()">⬇ Télécharger PDF</button>
+        <button type="button" class="btn-export" onclick="exportXLSX()">⬇ Télécharger Excel</button>
+      </div>
+    </div>
+
     <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Année / Mois : ajoute rapidement une période à la sélection ci-dessous</div></div></div>
       <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;overflow:visible">
@@ -1149,8 +1156,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div id="evolSectionStock">
         <div class="g2">
           <div class="card">
-            <div class="card-header"><div><div class="card-title">Stock de la Dette — Encours / Arriérés / Total</div><div class="card-sub">Évolution par mois</div></div></div>
-            <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareEncours"></canvas></div></div>
+            <div class="card-header"><div><div class="card-title">Stock de la Dette</div><div class="card-sub">Évolution par mois</div></div></div>
+            <div class="card-body">
+              <div id="metricFilterStock" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+              <div class="cw cw-lg"><canvas id="chartCompareEncours"></canvas></div>
+            </div>
           </div>
           <div class="card">
             <div class="card-header"><div><div class="card-title">Répartition par Instrument</div><div class="card-sub">Évolution par mois</div></div></div>
@@ -1160,19 +1170,32 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
 
       <div id="evolSectionService" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Service de la Dette — Capital / Intérêts / Total</div><div class="card-sub">Évolution par mois</div></div></div>
-        <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareService"></canvas></div></div>
+        <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-body">
+          <div id="metricFilterService" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+          <div class="cw cw-lg"><canvas id="chartCompareService"></canvas></div>
+        </div>
       </div>
 
       <div id="evolSectionTirages" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts — Cash / Traités / Total</div><div class="card-sub">Évolution par mois</div></div></div>
-        <div class="card-body"><div class="cw cw-lg"><canvas id="chartCompareTirages"></canvas></div></div>
+        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-body">
+          <div id="metricFilterTirages" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+          <div class="cw cw-lg"><canvas id="chartCompareTirages"></canvas></div>
+        </div>
       </div>
     </div>
   </div><!-- /comparaison -->
 
   <!-- ══════════════ EVOLUTION — BS ══════════════ -->
   <div class="screen" id="screen-comparaison-bs">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
+        <button type="button" class="btn-export" onclick="downloadPDF()">⬇ Télécharger PDF</button>
+        <button type="button" class="btn-export" onclick="exportXLSX()">⬇ Télécharger Excel</button>
+      </div>
+    </div>
+
     <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Variables à afficher</div><div class="card-sub">Filtrer les sections ci-dessous</div></div></div>
       <div class="card-body" id="evolVarFilterBS" style="display:flex;flex-wrap:wrap;gap:6px"></div>
@@ -2567,14 +2590,45 @@ function renderComparisonTable() {
   table.innerHTML = thead + tbody;
 }
 
+/* ─── Filtres "par graphe" (au niveau de chaque section Evolution MAD) :
+   choisit quelles séries (Encours/Arriérés/Total, Capital/Intérêts/Total,
+   Cash/Traités/Total) restent affichées dans CE graphique précis, en plus
+   du filtre global "Variables à afficher" qui montre/cache la section
+   entière. Trois états indépendants, un par graphique. ─── */
+const EVOL_METRIC_STOCK = { encours: true, arrieres: true, total: true };
+const EVOL_METRIC_SERVICE = { capital: true, interets: true, total: true };
+const EVOL_METRIC_TIRAGES = { cash: true, traites: true, total: true };
+
+function renderMetricPills(hostId, state, labelsMap, onToggleFnName) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  host.innerHTML = Object.keys(labelsMap).map(k => {
+    const on = state[k];
+    const bg = on ? 'var(--orange-bg)' : '#fff', bd = on ? 'var(--orange)' : 'var(--border)', fg = on ? 'var(--orange)' : 'var(--gray)';
+    return '<button type="button" onclick="' + onToggleFnName + "('" + k + "')" + '" style="border:1px solid ' + bd + ';background:' + bg + ';color:' + fg + ';border-radius:14px;padding:4px 11px;font-size:10.5px;font-weight:600;cursor:pointer;font-family:inherit">' + labelsMap[k] + '</button>';
+  }).join('');
+}
+
+const METRIC_LABELS_STOCK = { encours: 'Encours', arrieres: 'Arriérés', total: 'Total' };
+const METRIC_LABELS_SERVICE = { capital: 'Capital', interets: 'Intérêts', total: 'Total' };
+const METRIC_LABELS_TIRAGES = { cash: 'Cash', traites: 'Traités', total: 'Total' };
+
+function toggleMetricStock(key) { EVOL_METRIC_STOCK[key] = !EVOL_METRIC_STOCK[key]; renderMetricPills('metricFilterStock', EVOL_METRIC_STOCK, METRIC_LABELS_STOCK, 'toggleMetricStock'); buildComparisonEncours(); }
+function toggleMetricService(key) { EVOL_METRIC_SERVICE[key] = !EVOL_METRIC_SERVICE[key]; renderMetricPills('metricFilterService', EVOL_METRIC_SERVICE, METRIC_LABELS_SERVICE, 'toggleMetricService'); buildComparisonService(); }
+function toggleMetricTirages(key) { EVOL_METRIC_TIRAGES[key] = !EVOL_METRIC_TIRAGES[key]; renderMetricPills('metricFilterTirages', EVOL_METRIC_TIRAGES, METRIC_LABELS_TIRAGES, 'toggleMetricTirages'); buildComparisonTirages(); }
+
 function buildComparisonEncours() {
+  renderMetricPills('metricFilterStock', EVOL_METRIC_STOCK, METRIC_LABELS_STOCK, 'toggleMetricStock');
   const keys = COMPARE.selected;
+  const allKeys = ['encours', 'arrieres', 'total'], allLabels = ['Encours', 'Arriérés', 'Total'];
+  const activeIdx = allKeys.map((k, i) => EVOL_METRIC_STOCK[k] ? i : -1).filter(i => i >= 0);
   const datasets = keys.map((k, i) => {
     const a = compareAggregates(getComparePayload(k));
     const encours = evolConvert(a.total, k), arrieres = evolConvert(0, k), total = encours;
-    return { label: compareLabel(k), data: [encours, arrieres, total], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    const full = [encours, arrieres, total];
+    return { label: compareLabel(k), data: activeIdx.map(idx => full[idx]), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  mkChart('chartCompareEncours', { type: 'bar', data: { labels: ['Encours', 'Arriérés', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
+  mkChart('chartCompareEncours', { type: 'bar', data: { labels: activeIdx.map(idx => allLabels[idx]), datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
 }
 
 function buildComparisonInstruments() {
@@ -2591,12 +2645,16 @@ function buildComparisonInstruments() {
 }
 
 function buildComparisonService() {
+  renderMetricPills('metricFilterService', EVOL_METRIC_SERVICE, METRIC_LABELS_SERVICE, 'toggleMetricService');
   const keys = COMPARE.selected;
+  const allKeys = ['capital', 'interets', 'total'], allLabels = ['Capital', 'Intérêts', 'Total'];
+  const activeIdx = allKeys.map((k, i) => EVOL_METRIC_SERVICE[k] ? i : -1).filter(i => i >= 0);
   const datasets = keys.map((k, i) => {
     const s = compareServiceBreakdown(getComparePayload(k));
-    return { label: compareLabel(k), data: [evolConvert(s.cap, k), evolConvert(s.intr, k), evolConvert(s.total, k)], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    const full = [evolConvert(s.cap, k), evolConvert(s.intr, k), evolConvert(s.total, k)];
+    return { label: compareLabel(k), data: activeIdx.map(idx => full[idx]), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  mkChart('chartCompareService', { type: 'bar', data: { labels: ['Capital', 'Intérêts', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
+  mkChart('chartCompareService', { type: 'bar', data: { labels: activeIdx.map(idx => allLabels[idx]), datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
 }
 
 function compareMobilisations(payload) {
@@ -2614,13 +2672,17 @@ function compareMobilisations(payload) {
    Tout le montant mobilisé est donc porté en Cash ; Traités reste à 0
    jusqu'à ce qu'une extraction plus fine existe. */
 function buildComparisonTirages() {
+  renderMetricPills('metricFilterTirages', EVOL_METRIC_TIRAGES, METRIC_LABELS_TIRAGES, 'toggleMetricTirages');
   const keys = COMPARE.selected;
+  const allKeys = ['cash', 'traites', 'total'], allLabels = ['Cash', 'Traités', 'Total'];
+  const activeIdx = allKeys.map((k, i) => EVOL_METRIC_TIRAGES[k] ? i : -1).filter(i => i >= 0);
   const datasets = keys.map((k, i) => {
     const t = compareMobilisations(getComparePayload(k));
     const cash = evolConvert(t.total, k), traites = evolConvert(0, k), total = cash;
-    return { label: compareLabel(k), data: [cash, traites, total], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    const full = [cash, traites, total];
+    return { label: compareLabel(k), data: activeIdx.map(idx => full[idx]), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  mkChart('chartCompareTirages', { type: 'bar', data: { labels: ['Cash', 'Traités', 'Total'], datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
+  mkChart('chartCompareTirages', { type: 'bar', data: { labels: activeIdx.map(idx => allLabels[idx]), datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
 }
 
 function refreshComparison() {

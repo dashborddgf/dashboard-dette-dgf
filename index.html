@@ -1139,19 +1139,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
 
     <div id="compareContent" style="display:none">
-      <div class="card" style="margin-bottom:12px" id="cardIndicateursMAD">
-        <div class="card-header">
-          <div><div class="card-title">Indicateurs clés par mois</div><div class="card-sub" id="compareTableUnit">en milliards de FCFA</div></div>
-          <div style="display:flex;gap:6px">
-            <button type="button" class="chart-dl-btn" onclick="printOneCard('cardIndicateursMAD')">PDF</button>
-            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('compareTable','indicateurs_cles_mad')">Excel</button>
-          </div>
-        </div>
-        <div class="card-body" style="padding:0;overflow-x:auto">
-          <table class="tbl" id="compareTable"></table>
-        </div>
-      </div>
-
       <div id="evolSectionStock" class="card">
         <div class="card-header">
           <div><div class="card-title">Stock de la Dette</div><div class="card-sub">Évolution par mois</div></div>
@@ -2565,8 +2552,6 @@ function compareServiceBreakdown(payload) {
   return { cap, intr, total: cap + intr };
 }
 
-function compareServiceTotal(payload) { return compareServiceBreakdown(payload).total; }
-
 function renderComparisonPicker() {
   const host = document.getElementById('comparePicker');
   if (!host) return;
@@ -2694,37 +2679,6 @@ function srcAllowed(label) {
   if (label === 'Extérieure' || label === 'Dette Extérieure') return hasExt;
   if (label === 'Intérieure' || label === 'Dette Intérieure') return hasInt;
   return true;
-}
-
-function renderComparisonTable() {
-  const table = document.getElementById('compareTable');
-  if (!table) return;
-  const unitEl = document.getElementById('compareTableUnit');
-  if (unitEl) unitEl.textContent = 'en ' + evolValUnit();
-  const keys = COMPARE.selected;
-  const rows = [
-    { label: 'Encours Total',      get: p => compareAggregates(p).total },
-    { label: 'Dette Extérieure',   get: p => compareAggregates(p).ext },
-    { label: 'Dette Intérieure',   get: p => compareAggregates(p).int },
-    { label: 'Service (Capital+Intérêts)', get: p => compareServiceTotal(p) }
-  ].filter(r => srcAllowed(r.label));
-  const labels = keys.map(compareLabel);
-  const hasVar = keys.length >= 2;
-  const thead = '<thead><tr><th>Indicateur</th>' + labels.map(l => `<th>${l}</th>`).join('') + (hasVar ? '<th>Variation</th>' : '') + '</tr></thead>';
-  const tbody = '<tbody>' + rows.map(r => {
-    const vals = keys.map(k => evolConvert(r.get(getComparePayload(k)), k));
-    let varCell = '';
-    if (hasVar) {
-      const first = vals[0], last = vals[vals.length - 1];
-      const delta = (first == null || last == null) ? null : last - first;
-      const pct = (delta != null && first) ? (100 * delta / first) : 0;
-      const sign = delta != null && delta >= 0 ? '+' : '';
-      const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
-      varCell = delta == null ? '<td>NULL</td>' : `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
-    }
-    return `<tr><td class="td-b">${r.label}</td>` + vals.map(v => `<td>${fmt(v)}</td>`).join('') + varCell + '</tr>';
-  }).join('') + '</tbody>';
-  table.innerHTML = thead + tbody;
 }
 
 /* ─── Filtres "par graphe" (au niveau de chaque section Evolution MAD) :
@@ -2879,7 +2833,6 @@ function refreshComparison() {
   }
   empty.style.display = 'none';
   content.style.display = '';
-  renderComparisonTable();
   buildComparisonEncours();
   buildComparisonService();
   buildComparisonTirages();

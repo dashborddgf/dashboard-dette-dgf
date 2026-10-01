@@ -365,6 +365,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .obs-btn.has-obs{border-color:var(--orange);background:var(--orange-bg);color:var(--orange)}
 .card-obs{margin:10px 14px 0;padding:8px 10px;background:#FFFBEA;border-left:3px solid var(--orange);border-radius:4px;font-size:11px;color:var(--dark);line-height:1.5;display:none;white-space:pre-wrap}
 .card-obs b{color:var(--orange)}
+.chart-dl-btn{background:transparent;border:1px solid var(--border);border-radius:6px;height:22px;padding:0 8px;font-size:10px;font-weight:700;line-height:1;cursor:pointer;color:var(--gray);flex-shrink:0;font-family:inherit}
+.chart-dl-btn:hover{border-color:var(--green);background:var(--green-bg);color:var(--green)}
 .modal-overlay{position:fixed;inset:0;background:rgba(10,14,26,.5);display:flex;align-items:center;justify-content:center;z-index:9998;opacity:0;pointer-events:none;transition:opacity .15s}
 .modal-overlay.open{opacity:1;pointer-events:auto}
 .modal-box{background:#fff;border-radius:10px;width:min(480px,90vw);padding:16px;box-shadow:0 12px 32px rgba(0,0,0,.25)}
@@ -1118,12 +1120,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ EVOLUTION (ex-Comparaison Mensuelle) ══════════════ -->
   <div class="screen" id="screen-comparaison">
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
-        <button type="button" class="btn-export" onclick="downloadPDF()">⬇ Télécharger PDF</button>
-        <button type="button" class="btn-export" onclick="exportXLSX()">⬇ Télécharger Excel</button>
-      </div>
-    </div>
 
     <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Année / Mois : ajoute rapidement une période à la sélection ci-dessous</div></div></div>
@@ -1147,15 +1143,27 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
 
     <div id="compareContent" style="display:none">
-      <div class="card" style="margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">Indicateurs clés par mois</div><div class="card-sub" id="compareTableUnit">en milliards de FCFA</div></div></div>
+      <div class="card" style="margin-bottom:12px" id="cardIndicateursMAD">
+        <div class="card-header">
+          <div><div class="card-title">Indicateurs clés par mois</div><div class="card-sub" id="compareTableUnit">en milliards de FCFA</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('cardIndicateursMAD')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('compareTable','indicateurs_cles_mad')">Excel</button>
+          </div>
+        </div>
         <div class="card-body" style="padding:0;overflow-x:auto">
           <table class="tbl" id="compareTable"></table>
         </div>
       </div>
 
       <div id="evolSectionStock" class="card">
-        <div class="card-header"><div><div class="card-title">Stock de la Dette</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-header">
+          <div><div class="card-title">Stock de la Dette</div><div class="card-sub">Évolution par mois</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionStock')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableChartCompareEncours','stock_dette_evolution')">Excel</button>
+          </div>
+        </div>
         <div class="card-body">
           <div id="metricFilterStock" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
           <div class="cw cw-lg" id="wrapChartCompareEncours"><canvas id="chartCompareEncours"></canvas></div>
@@ -1164,7 +1172,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
 
       <div id="evolSectionService" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-header">
+          <div><div class="card-title">Service de la Dette</div><div class="card-sub">Évolution par mois</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionService')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableChartCompareService','service_dette_evolution')">Excel</button>
+          </div>
+        </div>
         <div class="card-body">
           <div id="metricFilterService" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
           <div class="cw cw-lg" id="wrapChartCompareService"><canvas id="chartCompareService"></canvas></div>
@@ -1173,7 +1187,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
 
       <div id="evolSectionTirages" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-header">
+          <div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par mois</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionTirages')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableChartCompareTirages','tirages_mobilisations_evolution')">Excel</button>
+          </div>
+        </div>
         <div class="card-body">
           <div id="metricFilterTirages" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
           <div class="cw cw-lg" id="wrapChartCompareTirages"><canvas id="chartCompareTirages"></canvas></div>
@@ -1185,12 +1205,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ EVOLUTION — BS ══════════════ -->
   <div class="screen" id="screen-comparaison-bs">
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
-        <button type="button" class="btn-export" onclick="downloadPDF()">⬇ Télécharger PDF</button>
-        <button type="button" class="btn-export" onclick="exportXLSX()">⬇ Télécharger Excel</button>
-      </div>
-    </div>
 
     <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Variables à afficher</div><div class="card-sub">Filtrer les sections ci-dessous</div></div></div>
@@ -1211,15 +1225,27 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
 
     <div id="compareContentBS" style="display:none">
-      <div class="card" style="margin-bottom:12px">
-        <div class="card-header"><div><div class="card-title">Indicateurs clés par période</div><div class="card-sub">en milliards de FCFA</div></div></div>
+      <div class="card" style="margin-bottom:12px" id="cardIndicateursBS">
+        <div class="card-header">
+          <div><div class="card-title">Indicateurs clés par période</div><div class="card-sub">en milliards de FCFA</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('cardIndicateursBS')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('compareTableBS','indicateurs_cles_bs')">Excel</button>
+          </div>
+        </div>
         <div class="card-body" style="padding:0;overflow-x:auto">
           <table class="tbl" id="compareTableBS"></table>
         </div>
       </div>
 
       <div id="evolSectionStockBS" class="card">
-        <div class="card-header"><div><div class="card-title">Dette Totale / Extérieure / Intérieure</div><div class="card-sub">Évolution par période</div></div></div>
+        <div class="card-header">
+          <div><div class="card-title">Dette Totale / Extérieure / Intérieure</div><div class="card-sub">Évolution par période</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionStockBS')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableChartCompareBSDette','dette_totale_evolution_bs')">Excel</button>
+          </div>
+        </div>
         <div class="card-body">
           <div class="cw cw-lg" id="wrapChartCompareBSDette"><canvas id="chartCompareBSDette"></canvas></div>
           <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareBSDette" style="display:none"></table></div>
@@ -1227,7 +1253,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
 
       <div id="evolSectionTiragesBS" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par période</div></div></div>
+        <div class="card-header">
+          <div><div class="card-title">Tirages et Mobilisations d'Emprunts</div><div class="card-sub">Évolution par période</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionTiragesBS')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableChartCompareBSTirages','tirages_mobilisations_evolution_bs')">Excel</button>
+          </div>
+        </div>
         <div class="card-body">
           <div class="cw cw-lg" id="wrapChartCompareBSTirages"><canvas id="chartCompareBSTirages"></canvas></div>
           <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareBSTirages" style="display:none"></table></div>
@@ -1235,7 +1267,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
 
       <div id="evolSectionServiceBS" class="card" style="margin-top:12px">
-        <div class="card-header"><div><div class="card-title">Service de la Dette</div><div class="card-sub">Capital + Intérêts — Évolution par période</div></div></div>
+        <div class="card-header">
+          <div><div class="card-title">Service de la Dette</div><div class="card-sub">Capital + Intérêts — Évolution par période</div></div>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionServiceBS')">PDF</button>
+            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableChartCompareBSService','service_dette_evolution_bs')">Excel</button>
+          </div>
+        </div>
         <div class="card-body">
           <div class="cw cw-lg" id="wrapChartCompareBSService"><canvas id="chartCompareBSService"></canvas></div>
           <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareBSService" style="display:none"></table></div>
@@ -2134,6 +2172,56 @@ function downloadPDF() {
   window.addEventListener('afterprint', restore);
 
   window.print();
+}
+
+/* ─── Téléchargement autonome par carte (Evolution MAD/BS) ───
+   Imprime UNE SEULE carte (graphique ou tableau) au lieu de l'écran
+   entier : masque temporairement les autres cartes de l'écran actif
+   (et les autres cartes à l'intérieur du conteneur de résultats
+   compareContent/compareContentBS), lance l'impression existante
+   (downloadPDF), puis restaure l'affichage après coup. */
+function printOneCard(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const screen = card.closest('.screen');
+  if (!screen) { downloadPDF(); return; }
+  const hidden = [];
+  const hideIfNotTarget = (el) => {
+    if (!el || el.nodeType !== 1) return;
+    if (el === card || el.contains(card) || card.contains(el)) return;
+    if (el.style.display !== 'none') { hidden.push(el); el.style.display = 'none'; }
+  };
+  Array.from(screen.children).forEach(hideIfNotTarget);
+  const content = screen.querySelector('#compareContent, #compareContentBS');
+  if (content) Array.from(content.children).forEach(hideIfNotTarget);
+  const restore = () => {
+    hidden.forEach(el => { el.style.display = ''; });
+    window.removeEventListener('afterprint', restore);
+  };
+  window.addEventListener('afterprint', restore);
+  downloadPDF();
+}
+
+/* Exporte en CSV (ouvrable dans Excel) le contenu d'un <table> déjà
+   rempli — réutilise les tableaux jumeaux générés pour le filtre
+   AFFICHAGE (Graphiques/Tableau), qui contiennent toujours les
+   données même quand ils sont masqués en mode Graphiques. */
+function exportChartCSV(tableId, filenameBase) {
+  const table = document.getElementById(tableId);
+  if (!table || !table.rows.length) { alert("Aucune donnée à exporter pour l'instant — sélectionnez au moins 2 périodes."); return; }
+  const rows = Array.from(table.rows).map(tr =>
+    Array.from(tr.cells).map(td => csvEscape(td.textContent.trim())).join(';')
+  );
+  const csv = '﻿' + rows.join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filenameBase + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 /* ═══════════════════════════════════════════════════════════════

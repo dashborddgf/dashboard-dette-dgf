@@ -1154,23 +1154,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         </div>
       </div>
 
-      <div id="evolSectionStock">
-        <div class="g2">
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Stock de la Dette</div><div class="card-sub">Évolution par mois</div></div></div>
-            <div class="card-body">
-              <div id="metricFilterStock" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
-              <div class="cw cw-lg" id="wrapChartCompareEncours"><canvas id="chartCompareEncours"></canvas></div>
-              <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareEncours" style="display:none"></table></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Répartition par Instrument</div><div class="card-sub">Évolution par mois</div></div></div>
-            <div class="card-body">
-              <div class="cw cw-lg" id="wrapChartCompareInstruments"><canvas id="chartCompareInstruments"></canvas></div>
-              <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareInstruments" style="display:none"></table></div>
-            </div>
-          </div>
+      <div id="evolSectionStock" class="card">
+        <div class="card-header"><div><div class="card-title">Stock de la Dette</div><div class="card-sub">Évolution par mois</div></div></div>
+        <div class="card-body">
+          <div id="metricFilterStock" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+          <div class="cw cw-lg" id="wrapChartCompareEncours"><canvas id="chartCompareEncours"></canvas></div>
+          <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareEncours" style="display:none"></table></div>
         </div>
       </div>
 
@@ -2668,21 +2657,6 @@ function buildComparisonEncours() {
   renderCompareTable('tableChartCompareEncours', chartLabels, datasets);
 }
 
-function buildComparisonInstruments() {
-  const keys = COMPARE.selected;
-  const cats = [
-    { k: 'bt', l: 'Bons du Trésor' }, { k: 'tpci', l: 'TPCI' }, { k: 'oat', l: 'OAT' }, { k: 'bceao', l: 'BCEAO' },
-    { k: 'multi', l: 'Multilatéraux' }, { k: 'bilat', l: 'Bilatéraux' }, { k: 'euro', l: 'Eurobonds' }, { k: 'comm', l: 'Commerciaux' }
-  ];
-  const datasets = keys.map((k, i) => {
-    const a = compareAggregates(getComparePayload(k));
-    return { label: compareLabel(k), data: cats.map(c => evolConvert(a[c.k] || 0, k)), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
-  });
-  const chartLabels = cats.map(c => c.l);
-  mkChart('chartCompareInstruments', { type: 'bar', data: { labels: chartLabels, datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: evolYAxisTicks() } } } });
-  renderCompareTable('tableChartCompareInstruments', chartLabels, datasets);
-}
-
 function buildComparisonService() {
   renderMetricPills('metricFilterService', EVOL_METRIC_SERVICE, METRIC_LABELS_SERVICE, 'toggleMetricService');
   const keys = COMPARE.selected;
@@ -2732,7 +2706,7 @@ function buildComparisonTirages() {
    Evolution : bascule chaque graphique vers sa table de données jumelle
    (mêmes libellés/valeurs), sans dupliquer la logique de calcul. ─── */
 let EVOL_DISPLAY_MODE = 'graph';
-const EVOL_CHART_IDS = ['ChartCompareEncours', 'ChartCompareInstruments', 'ChartCompareService', 'ChartCompareTirages', 'ChartCompareBSDette', 'ChartCompareBSTirages', 'ChartCompareBSService'];
+const EVOL_CHART_IDS = ['ChartCompareEncours', 'ChartCompareService', 'ChartCompareTirages', 'ChartCompareBSDette', 'ChartCompareBSTirages', 'ChartCompareBSService'];
 
 function renderCompareTable(tableId, labels, datasets) {
   const table = document.getElementById(tableId);
@@ -2784,7 +2758,6 @@ function refreshComparison() {
   content.style.display = '';
   renderComparisonTable();
   buildComparisonEncours();
-  buildComparisonInstruments();
   buildComparisonService();
   buildComparisonTirages();
   applyEvolDisplayMode();

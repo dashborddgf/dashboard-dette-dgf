@@ -2583,14 +2583,32 @@ function toggleEvolValeurMode(mode) {
   refreshComparison();
 }
 
-/* Masque les lignes/catégories "Extérieure"/"Intérieure" quand le filtre
-   Source n'en retient qu'une seule — le total et les autres lignes
-   (Service, Capital/Intérêts...) restent toujours visibles. Commun aux
-   tableaux et graphiques de l'Evolution MAD et BS. */
+/* Masque les lignes/catégories "Extérieure"/"Intérieure" quand plus aucun
+   instrument de ce groupe ne survit aux filtres actifs (Source, mais aussi
+   Créancier et Devise, qui peuvent chacun vider un groupe entier — ex:
+   Créancier = "Titres Intl" seul élimine tout l'Intérieur). Réutilise
+   getFilteredEncoursFrom sur un jeu-témoin pour rester toujours cohérent
+   avec le calcul réel, plutôt que de redupliquer la logique des filtres.
+   Le total et les autres lignes (Service, Capital/Intérêts...) restent
+   toujours visibles. Commun aux tableaux et graphiques de l'Evolution
+   MAD et BS. */
+function srcIntExtAvailability() {
+  const intKeysAll = ['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
+  const extKeysAll = ['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
+  const probe = {};
+  intKeysAll.concat(extKeysAll).forEach(k => { probe[k] = 1; });
+  const filtered = getFilteredEncoursFrom(probe);
+  return {
+    hasExt: extKeysAll.some(k => filtered[k] !== undefined),
+    hasInt: intKeysAll.some(k => filtered[k] !== undefined)
+  };
+}
+
 function srcAllowed(label) {
-  if (!F.src.length) return true;
-  if (label === 'Extérieure' || label === 'Dette Extérieure') return F.src.includes('ext');
-  if (label === 'Intérieure' || label === 'Dette Intérieure') return F.src.includes('int');
+  if (!F.src.length && !F.creancier.length && !F.devise.length) return true;
+  const { hasExt, hasInt } = srcIntExtAvailability();
+  if (label === 'Extérieure' || label === 'Dette Extérieure') return hasExt;
+  if (label === 'Intérieure' || label === 'Dette Intérieure') return hasInt;
   return true;
 }
 

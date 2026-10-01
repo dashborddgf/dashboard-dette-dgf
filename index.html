@@ -2824,9 +2824,19 @@ const EVOL_CHART_IDS = ['ChartCompareEncours', 'ChartCompareService', 'ChartComp
 function renderCompareTable(tableId, labels, datasets) {
   const table = document.getElementById(tableId);
   if (!table) return;
-  const thead = '<thead><tr><th style="text-align:left">Indicateur</th>' + datasets.map(d => '<th>' + d.label + '</th>').join('') + '</tr></thead>';
+  const hasVar = datasets.length >= 2;
+  const thead = '<thead><tr><th style="text-align:left">Indicateur</th>' + datasets.map(d => '<th>' + d.label + '</th>').join('') + (hasVar ? '<th>Variation</th>' : '') + '</tr></thead>';
   const tbody = '<tbody>' + labels.map((lab, i) => {
-    return '<tr><td class="td-b">' + lab + '</td>' + datasets.map(d => '<td>' + fmt(d.data[i]) + '</td>').join('') + '</tr>';
+    let varCell = '';
+    if (hasVar) {
+      const first = datasets[0].data[i], last = datasets[datasets.length - 1].data[i];
+      const delta = (first == null || last == null) ? null : last - first;
+      const pct = (delta != null && first) ? (100 * delta / first) : 0;
+      const sign = delta != null && delta >= 0 ? '+' : '';
+      const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
+      varCell = delta == null ? '<td>—</td>' : `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
+    }
+    return '<tr><td class="td-b">' + lab + '</td>' + datasets.map(d => '<td>' + fmt(d.data[i]) + '</td>').join('') + varCell + '</tr>';
   }).join('') + '</tbody>';
   table.innerHTML = thead + tbody;
 }

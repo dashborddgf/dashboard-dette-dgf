@@ -2583,6 +2583,17 @@ function toggleEvolValeurMode(mode) {
   refreshComparison();
 }
 
+/* Masque les lignes/catégories "Extérieure"/"Intérieure" quand le filtre
+   Source n'en retient qu'une seule — le total et les autres lignes
+   (Service, Capital/Intérêts...) restent toujours visibles. Commun aux
+   tableaux et graphiques de l'Evolution MAD et BS. */
+function srcAllowed(label) {
+  if (!F.src.length) return true;
+  if (label === 'Extérieure' || label === 'Dette Extérieure') return F.src.includes('ext');
+  if (label === 'Intérieure' || label === 'Dette Intérieure') return F.src.includes('int');
+  return true;
+}
+
 function renderComparisonTable() {
   const table = document.getElementById('compareTable');
   if (!table) return;
@@ -2594,7 +2605,7 @@ function renderComparisonTable() {
     { label: 'Dette Extérieure',   get: p => compareAggregates(p).ext },
     { label: 'Dette Intérieure',   get: p => compareAggregates(p).int },
     { label: 'Service (Capital+Intérêts)', get: p => compareServiceTotal(p) }
-  ];
+  ].filter(r => srcAllowed(r.label));
   const labels = keys.map(compareLabel);
   const hasVar = keys.length >= 2;
   const thead = '<thead><tr><th>Indicateur</th>' + labels.map(l => `<th>${l}</th>`).join('') + (hasVar ? '<th>Variation</th>' : '') + '</tr></thead>';
@@ -2968,7 +2979,7 @@ function renderComparisonTableBS() {
     { label: 'Dette Intérieure',  get: p => compareAggregatesBS(p).int },
     { label: "Tirages / Mobilisations", get: p => compareTiragesBS(p).total },
     { label: 'Service (Capital+Intérêts)', get: p => compareServiceBS(p).total }
-  ];
+  ].filter(r => srcAllowed(r.label));
   const labels = keys.map(compareLabelBS);
   const hasVar = keys.length >= 2;
   const thead = '<thead><tr><th>Indicateur</th>' + labels.map(l => `<th>${l}</th>`).join('') + (hasVar ? '<th>Variation</th>' : '') + '</tr></thead>';
@@ -2990,22 +3001,28 @@ function renderComparisonTableBS() {
 
 function buildComparisonBSDette() {
   const keys = COMPARE_BS.selected;
+  const allLabels = ['Total', 'Extérieure', 'Intérieure'];
+  const activeIdx = allLabels.map((l, i) => srcAllowed(l) ? i : -1).filter(i => i >= 0);
   const datasets = keys.map((k, i) => {
     const a = compareAggregatesBS(getComparePayloadBS(k));
-    return { label: compareLabelBS(k), data: [a.total, a.ext, a.int], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    const full = [a.total, a.ext, a.int];
+    return { label: compareLabelBS(k), data: activeIdx.map(idx => full[idx]), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  const chartLabels = ['Total', 'Extérieure', 'Intérieure'];
+  const chartLabels = activeIdx.map(idx => allLabels[idx]);
   mkChart('chartCompareBSDette', { type: 'bar', data: { labels: chartLabels, datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
   renderCompareTable('tableChartCompareBSDette', chartLabels, datasets);
 }
 
 function buildComparisonBSTirages() {
   const keys = COMPARE_BS.selected;
+  const allLabels = ['Total', 'Extérieure', 'Intérieure'];
+  const activeIdx = allLabels.map((l, i) => srcAllowed(l) ? i : -1).filter(i => i >= 0);
   const datasets = keys.map((k, i) => {
     const t = compareTiragesBS(getComparePayloadBS(k));
-    return { label: compareLabelBS(k), data: [t.total, t.ext, t.int], backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
+    const full = [t.total, t.ext, t.int];
+    return { label: compareLabelBS(k), data: activeIdx.map(idx => full[idx]), backgroundColor: COMPARE_PALETTE[i % COMPARE_PALETTE.length], borderRadius: 3 };
   });
-  const chartLabels = ['Total', 'Extérieure', 'Intérieure'];
+  const chartLabels = activeIdx.map(idx => allLabels[idx]);
   mkChart('chartCompareBSTirages', { type: 'bar', data: { labels: chartLabels, datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { ...gO }, y: { ...gO, ticks: { callback: v => v.toLocaleString('fr-FR'), ...gO.ticks } } } } });
   renderCompareTable('tableChartCompareBSTirages', chartLabels, datasets);
 }

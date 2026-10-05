@@ -527,18 +527,16 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   .period-badge { font-size: 10px; padding: 2px 8px; }
   .btn-export, .btn-reset { font-size: 10px; padding: 4px 9px; }
 
-  /* Barre de filtres scrollable horizontalement */
+  /* Barre de filtres : repasse en multi-lignes sur mobile plutôt qu'en
+     scroll horizontal — l'overflow-x/y précédent masquait le panneau
+     déroulant (.ms-panel, position:absolute) des filtres Source /
+     Créancier / Devise, qui dépasse la hauteur de la barre. */
   .filter-bar {
     top: 48px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
+    flex-wrap: wrap;
     padding: 8px 12px;
     gap: 8px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
-  .filter-bar::-webkit-scrollbar { display: none; }
   .filter-sep { display: none; }
   .filter-label { display: none; }
   .filter-group { flex-direction: column; gap: 3px; min-width: max-content; }

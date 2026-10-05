@@ -2814,9 +2814,9 @@ function renderCompareTable(tableId, labels, datasets) {
   const tbody = '<tbody>' + labels.map((lab, i) => {
     let varCell = '';
     if (hasVar) {
-      const first = datasets[0].data[i], last = datasets[datasets.length - 1].data[i];
-      const delta = (first == null || last == null) ? null : last - first;
-      const pct = (delta != null && first) ? (100 * delta / first) : 0;
+      const prev = datasets[datasets.length - 2].data[i], last = datasets[datasets.length - 1].data[i];
+      const delta = (prev == null || last == null) ? null : last - prev;
+      const pct = (delta != null && prev) ? (100 * delta / prev) : 0;
       const sign = delta != null && delta >= 0 ? '+' : '';
       const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
       varCell = delta == null ? '<td>—</td>' : `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
@@ -3083,9 +3083,9 @@ function renderComparisonTableBS() {
     const vals = keys.map(k => r.get(getComparePayloadBS(k)));
     let varCell = '';
     if (hasVar) {
-      const first = vals[0], last = vals[vals.length - 1];
-      const delta = last - first;
-      const pct = first ? (100 * delta / first) : 0;
+      const prev = vals[vals.length - 2], last = vals[vals.length - 1];
+      const delta = last - prev;
+      const pct = prev ? (100 * delta / prev) : 0;
       const sign = delta >= 0 ? '+' : '';
       const color = delta >= 0 ? 'var(--green)' : 'var(--red)';
       varCell = `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;

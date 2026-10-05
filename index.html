@@ -1120,20 +1120,18 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
 
     <div class="card" style="margin-bottom:12px;overflow:visible">
-      <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Année / Mois : ajoute rapidement une période à la sélection ci-dessous</div></div></div>
-      <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;overflow:visible">
-        <select id="evolYearSelect" onchange="onEvolYearChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
-        <select id="evolMonthSelect" onchange="onEvolMonthChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
-        <div style="flex:1"></div>
-        <div id="evolDisplayFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-        <div id="evolValeurFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-        <div id="evolVarFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Année / Mois : ajoute une période (coche 2 mois ou plus) ; ✕ pour en retirer un</div></div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px;overflow:visible">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <select id="evolYearSelect" onchange="onEvolYearChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
+          <select id="evolMonthSelect" onchange="onEvolMonthChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
+          <div style="flex:1"></div>
+          <div id="evolDisplayFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          <div id="evolValeurFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          <div id="evolVarFilterMAD" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+        <div id="compareSelectedChipsMAD" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"></div>
       </div>
-    </div>
-
-    <div class="card" style="margin-bottom:12px;overflow:visible">
-      <div class="card-header"><div><div class="card-title">Sélection des mois — Evolution</div><div class="card-sub">Coche 2 mois ou plus (MAD Actif + archives disponibles)</div></div></div>
-      <div class="card-body" id="comparePicker" style="display:flex;flex-wrap:wrap;gap:8px;overflow:visible"></div>
     </div>
 
     <div id="compareEmpty" class="card" style="text-align:center;padding:30px;color:var(--gray);font-size:12px">
@@ -2600,34 +2598,19 @@ function compareServiceBreakdown(payload) {
   return { cap, intr, total: cap + intr };
 }
 
+/* Remplace l'ancien sélecteur groupé "Année 2025 (12) ▼" par de simples
+   puces retirables : Année/Mois ci-dessus ajoute un mois, la puce ✕
+   correspondante permet de le retirer de la comparaison. */
 function renderComparisonPicker() {
-  const host = document.getElementById('comparePicker');
+  const host = document.getElementById('compareSelectedChipsMAD');
   if (!host) return;
-  const openDd = host.querySelector('.ms-dd.open');
-  const openYear = openDd ? openDd.id.replace('ms-dd-cmpYear-', '') : null;
-  const periods = compareAvailablePeriods();
-  if (!periods.length) { host.innerHTML = '<span style="color:var(--gray);font-size:11px">Aucun mois disponible.</span>'; return; }
-  const withYear = periods.map(p => ({ ...p, year: (periodeToYearMonth(p.label) || { year: '?' }).year }));
-  const years = [...new Set(withYear.map(p => p.year))].sort();
-  host.innerHTML = years.map(y => {
-    const monthsOfYear = withYear.filter(p => p.year === y);
-    const nbSelected = monthsOfYear.filter(p => COMPARE.selected.includes(p.key)).length;
-    const opts = monthsOfYear.map(p => {
-      const checked = COMPARE.selected.includes(p.key) ? 'checked' : '';
-      return `<label class="ms-opt"><input type="checkbox" ${checked} onchange="toggleComparisonMonth('${p.key}')"><span>${p.label}</span></label>`;
-    }).join('');
-    return `<div class="ms-dd" id="ms-dd-cmpYear-${y}">
-      <button type="button" class="ms-btn${nbSelected ? ' has-selection' : ''}" onclick="toggleMsPanel('cmpYear-${y}')">
-        <span class="ms-btn-text">Année ${y} (${monthsOfYear.length}${nbSelected ? ' · ' + nbSelected + ' coché' + (nbSelected>1?'s':'') : ''})</span>
-        <svg class="ms-caret" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg>
-      </button>
-      <div class="ms-panel" id="ms-panel-cmpYear-${y}">${opts}</div>
-    </div>`;
-  }).join('');
-  if (openYear) {
-    const dd = document.getElementById('ms-dd-cmpYear-' + openYear);
-    if (dd) dd.classList.add('open');
+  if (!COMPARE.selected.length) {
+    host.innerHTML = '<span style="color:var(--gray);font-size:11px">Aucun mois sélectionné — utilise Année / Mois ci-dessus pour en ajouter.</span>';
+    return;
   }
+  host.innerHTML = COMPARE.selected.map(key =>
+    `<span class="filter-tag">${compareLabel(key)}<span class="filter-tag-x" onclick="toggleComparisonMonth('${key}')">✕</span></span>`
+  ).join('');
 }
 
 async function toggleComparisonMonth(key) {

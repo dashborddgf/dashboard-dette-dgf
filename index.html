@@ -464,6 +464,17 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .enc-box-tag.orange{background:var(--orange-bg);color:var(--orange)}
 @media (max-width:900px){.enc-grid-3{grid-template-columns:repeat(2,1fr)}}
 
+/* Écran "Encours de la dette publique" (Vue d'Ensemble) — occupe tout
+   l'espace vertical disponible plutôt que de laisser le bas de page vide ;
+   cases agrandies en conséquence. */
+.enc-wrap{min-height:calc(100vh - 260px);display:flex;flex-direction:column;justify-content:center;gap:14px;max-width:1100px;margin:0 auto;width:100%}
+.enc-wrap .enc-header{font-size:16px;padding:14px 20px}
+.enc-wrap .enc-grid{padding:22px;gap:16px}
+.enc-wrap .enc-box{padding:22px 14px;gap:10px}
+.enc-wrap .enc-box-label{font-size:13px}
+.enc-wrap .enc-box-value{font-size:32px}
+.enc-wrap .enc-box-tag{font-size:12px;padding:4px 10px}
+
 /* PORTEFEUILLE DE LA DETTE — répartition par type de créanciers */
 .cred-header{background:var(--green);color:#fff;font-size:14px;font-weight:800;padding:11px 16px;border-radius:8px 8px 0 0}
 .cred-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;background:var(--white)}
@@ -914,35 +925,36 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ VUE EXECUTIVE ══════════════ -->
   <div class="screen active" id="screen-vue-exec">
 
-
-    <div class="enc-header">Encours de la dette publique</div>
-    <div class="enc-grid enc-grid-2">
-      <div class="enc-box">
-        <div class="enc-box-label">Encours total de la dette</div>
-        <div class="enc-box-value green" id="enc-total-value">—</div>
-        <div class="enc-box-tag green" id="enc-total-usd">—</div>
+    <div class="enc-wrap">
+      <div class="enc-header">Encours de la dette publique</div>
+      <div class="enc-grid enc-grid-2">
+        <div class="enc-box">
+          <div class="enc-box-label">Encours total de la dette</div>
+          <div class="enc-box-value green" id="enc-total-value">—</div>
+          <div class="enc-box-tag green" id="enc-total-usd">—</div>
+        </div>
+        <div class="enc-box">
+          <div class="enc-box-label">Dette / PIB</div>
+          <div class="enc-box-value green" id="enc-pib-value">—</div>
+          <div class="enc-box-tag green">Norme UEMOA : 70%</div>
+        </div>
       </div>
-      <div class="enc-box">
-        <div class="enc-box-label">Dette / PIB</div>
-        <div class="enc-box-value green" id="enc-pib-value">—</div>
-        <div class="enc-box-tag green">Norme UEMOA : 70%</div>
-      </div>
-    </div>
-    <div class="enc-grid enc-grid-3">
-      <div class="enc-box">
-        <div class="enc-box-label">Dette extérieure</div>
-        <div class="enc-box-value green" id="enc-ext-value">—</div>
-        <div class="enc-box-tag green" id="enc-ext-tag">—</div>
-      </div>
-      <div class="enc-box">
-        <div class="enc-box-label">Dette intérieure</div>
-        <div class="enc-box-value green" id="enc-int-value">—</div>
-        <div class="enc-box-tag green" id="enc-int-tag">—</div>
-      </div>
-      <div class="enc-box">
-        <div class="enc-box-label">Dette garantie par l'Etat</div>
-        <div class="enc-box-value orange" id="enc-garantie-value">—</div>
-        <div class="enc-box-tag orange" id="enc-garantie-tag">—</div>
+      <div class="enc-grid enc-grid-3">
+        <div class="enc-box">
+          <div class="enc-box-label">Dette extérieure</div>
+          <div class="enc-box-value green" id="enc-ext-value">—</div>
+          <div class="enc-box-tag green" id="enc-ext-tag">—</div>
+        </div>
+        <div class="enc-box">
+          <div class="enc-box-label">Dette intérieure</div>
+          <div class="enc-box-value green" id="enc-int-value">—</div>
+          <div class="enc-box-tag green" id="enc-int-tag">—</div>
+        </div>
+        <div class="enc-box">
+          <div class="enc-box-label">Dette garantie par l'Etat</div>
+          <div class="enc-box-value orange" id="enc-garantie-value">—</div>
+          <div class="enc-box-tag orange" id="enc-garantie-tag">—</div>
+        </div>
       </div>
     </div>
 

@@ -1189,6 +1189,17 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ EVOLUTION — BS ══════════════ -->
   <div class="screen" id="screen-comparaison-bs">
 
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header"><div><div class="card-title">Dette garantie par l'État</div><div class="card-sub">Dernière situation BS — Tableau 11</div></div></div>
+      <div class="card-body">
+        <div class="enc-box" style="border:1px solid var(--gold);max-width:260px">
+          <div class="enc-box-label">Dette garantie par l'Etat</div>
+          <div class="enc-box-value orange" id="evol-garantie-value">—</div>
+          <div class="enc-box-tag orange" id="evol-garantie-tag">—</div>
+        </div>
+      </div>
+    </div>
+
     <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Variables à afficher</div><div class="card-sub">Filtrer les sections ci-dessous</div></div></div>
       <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
@@ -1921,8 +1932,9 @@ function refreshVueEnsembleColonnes(enc) {
 /* Écran "Encours de la dette publique" (1er écran de Vue d'ensemble).
    Total/Intérieur/Extérieur viennent du MAD Actif ; PIB et l'équivalent
    USD viennent du BS (Tableau 3 + "Dette Totale"), seule source qui les
-   porte actuellement. "Dette garantie par l'Etat" n'a pour l'instant
-   aucune source de donnée (ni MAD ni BS) → affichée en NULL. */
+   porte actuellement. "Dette garantie par l'Etat" vient de bs.detteGarantie
+   (Tableau 11 "Situation de la dette garantie" du BS), saisi manuellement
+   faute d'extraction automatisée depuis le BS.pdf publié sur SharePoint. */
 function refreshEncoursPublique() {
   const intKeys=['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
   const extKeys=['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
@@ -1957,9 +1969,9 @@ function refreshEncoursPublique() {
   setTxt('enc-int-value', fmt(encInt) + ' Md FCFA');
   setTxt('enc-int-tag', (encTotal ? fmt(encInt/encTotal*100) : 'NULL') + '% de l\'encours' + (pibValue ? ' ; ' + fmt(encInt/pibValue*100) + '% du PIB' : ''));
 
-  // Aucune source de donnée pour l'instant (ni MAD ni BS)
-  setTxt('enc-garantie-value', 'NULL');
-  setTxt('enc-garantie-tag', 'NULL');
+  const dg = bs.detteGarantie;
+  setTxt('enc-garantie-value', dg ? fmt(dg.valeur) + ' Md FCFA' : 'NULL');
+  setTxt('enc-garantie-tag', dg ? fmt(dg.ratioPib) + '% du PIB' : 'NULL');
 
   refreshRisqueDepuisMAD(encInt, encExt, encTotal);
 }
@@ -3103,7 +3115,21 @@ function buildComparisonBSService() {
   renderCompareTable('tableChartCompareBSService', chartLabels, datasets);
 }
 
+/* Situation de la dette garantie par l'État (Tableau 11 du BS) — donnée
+   ponctuelle du dernier BS importé, indépendante de la sélection de
+   périodes ; affichée en haut de l'écran Evolution BS. */
+function refreshEvolGarantie() {
+  const valEl = document.getElementById('evol-garantie-value');
+  const tagEl = document.getElementById('evol-garantie-tag');
+  if (!valEl || !tagEl) return;
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const dg = bs.detteGarantie;
+  valEl.textContent = dg ? fmt(dg.valeur) + ' Md FCFA' : 'NULL';
+  tagEl.textContent = dg ? fmt(dg.ratioPib) + '% du PIB' : 'NULL';
+}
+
 function refreshComparisonBS() {
+  refreshEvolGarantie();
   const empty = document.getElementById('compareEmptyBS');
   const content = document.getElementById('compareContentBS');
   if (!empty || !content) return;
@@ -3197,7 +3223,9 @@ const BS_DATA_FALLBACK = {
       EUR: { value: 14840.1, pct: 68.3 }, XOF: { value: 3365.7, pct: 15.5 },
       USD: { value: 2408.2, pct: 11.1 }, CNY: { value: 415.4, pct: 1.9 }, Autres: { value: 707.3, pct: 3.3 }
     }
-  }
+  },
+  // Source : Tableau 11 "Situation de la dette garantie" du BS.pdf (SharePoint).
+  detteGarantie: { valeur: 234.0, ratioPib: 0.4 }
 };
 let BS_DATA = null;
 

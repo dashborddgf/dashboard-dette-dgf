@@ -901,27 +901,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <div class="period-badge" id="periodBadge"><div class="dot green"></div><span id="period-badge-label">MAD —</span></div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       BARRE DE FILTRES DYNAMIQUES
-  ═══════════════════════════════════════════ -->
-  <div class="filter-bar" id="filterBar">
-
-    <span class="filter-label">🔍 Filtres</span>
-    <div class="filter-sep"></div>
-
-    <!-- Groupes de filtres générés dynamiquement (multi-sélection) -->
-    <div id="filterGroups" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
-
-    <!-- Compteur de filtres actifs -->
-    <div style="margin-left:auto">
-      <span class="filter-count" id="filterCount">0 filtre(s)</span>
+  <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
+    <div class="ticker-track">
+      <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong class="pib-ac-ticker">57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
+      <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong class="pib-ac-ticker">57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
     </div>
-  </div>
-
-  <!-- RÉSUMÉ DES FILTRES ACTIFS -->
-  <div class="filter-summary" id="filterSummary">
-    <span class="filter-summary-label">Filtres actifs :</span>
-    <div id="filterTags" style="display:flex;gap:5px;flex-wrap:wrap"></div>
   </div>
 
   <!-- CONTENT -->
@@ -929,13 +913,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ VUE EXECUTIVE ══════════════ -->
   <div class="screen active" id="screen-vue-exec">
-
-    <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
-      <div class="ticker-track">
-        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong class="pib-ac-ticker">57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
-        <span class="ticker-item">✅&nbsp; Ratio Dette/PIB : <strong class="pib-ac-ticker">57,1%</strong> — En dessous du seuil UEMOA 70% — Ba2 (Moody's) | BB (S&amp;P &amp; Fitch) — Perspective : Stable</span>
-      </div>
-    </div>
 
 
     <div class="enc-header">Encours de la dette publique</div>
@@ -1117,6 +1094,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <!-- ══════════════ EVOLUTION (ex-Comparaison Mensuelle) ══════════════ -->
   <div class="screen" id="screen-comparaison">
 
+    <div class="filter-bar" id="filterBar-mad" style="margin-bottom:12px;border-radius:8px;position:static">
+      <span class="filter-label">🔍 Filtres</span>
+      <div class="filter-sep"></div>
+      <div id="filterGroups-mad" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
+      <div style="margin-left:auto">
+        <span class="filter-count" id="filterCount-mad">0 filtre(s)</span>
+      </div>
+    </div>
+    <div class="filter-summary" id="filterSummary-mad">
+      <span class="filter-summary-label">Filtres actifs :</span>
+      <div id="filterTags-mad" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+    </div>
+
     <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Année / Mois : ajoute rapidement une période à la sélection ci-dessous</div></div></div>
       <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;overflow:visible">
@@ -1188,6 +1178,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   <!-- ══════════════ EVOLUTION — BS ══════════════ -->
   <div class="screen" id="screen-comparaison-bs">
+
+    <div class="filter-bar" id="filterBar-bs" style="margin-bottom:12px;border-radius:8px;position:static">
+      <span class="filter-label">🔍 Filtres</span>
+      <div class="filter-sep"></div>
+      <div id="filterGroups-bs" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
+      <div style="margin-left:auto">
+        <span class="filter-count" id="filterCount-bs">0 filtre(s)</span>
+      </div>
+    </div>
+    <div class="filter-summary" id="filterSummary-bs">
+      <span class="filter-summary-label">Filtres actifs :</span>
+      <div id="filterTags-bs" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+    </div>
 
     <div class="card" style="margin-bottom:12px">
       <div class="card-header"><div><div class="card-title">Dette garantie par l'État</div><div class="card-sub">Dernière situation BS — Tableau 11</div></div></div>
@@ -1398,13 +1401,20 @@ function showScreen(id, el) {
 /* ═══════════════════════════════════════════════════════════════
    BARRE DE FILTRES — MENUS DÉROULANTS À SÉLECTION MULTIPLE
 ════════════════════════════════════════════════════════════════ */
+/* La barre de filtres (Source/Créancier/Devise) est dupliquée sur chaque
+   écran Evolution (MAD et BS) — un seul état partagé (F), deux jeux
+   d'éléments DOM (préfixés "mad"/"bs") maintenus en synchro. */
+const FILTER_SCOPES = ['mad', 'bs'];
+
 function renderFilterBar() {
-  const host = document.getElementById('filterGroups');
-  if (!host) return;
-  host.innerHTML = FILTER_DEFS.map(renderFilterGroup).join('<div class="filter-sep"></div>');
+  FILTER_SCOPES.forEach(scope => {
+    const host = document.getElementById('filterGroups-' + scope);
+    if (!host) return;
+    host.innerHTML = FILTER_DEFS.map(def => renderFilterGroup(def, scope)).join('<div class="filter-sep"></div>');
+  });
 }
 
-function renderFilterGroup(def) {
+function renderFilterGroup(def, scope) {
   const optsHtml = def.groups
     ? def.groups.map(g => `<div class="ms-group-label">${g.label}</div>` + g.options.map(o => renderMsOpt(def.key, o)).join(''))
         .join('')
@@ -1412,12 +1422,12 @@ function renderFilterGroup(def) {
 
   return `<div class="filter-group ms-filter" data-filter="${def.key}">
       <span class="ms-label">${def.label}</span>
-      <div class="ms-dd" id="ms-dd-${def.key}">
-        <button type="button" class="ms-btn" id="ms-btn-${def.key}" onclick="toggleMsPanel('${def.key}')">
+      <div class="ms-dd" id="ms-dd-${scope}-${def.key}">
+        <button type="button" class="ms-btn" id="ms-btn-${scope}-${def.key}" onclick="toggleMsPanel('${scope}','${def.key}')">
           <span class="ms-btn-text">${def.allLabel}</span>
           <svg class="ms-caret" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg>
         </button>
-        <div class="ms-panel" id="ms-panel-${def.key}">
+        <div class="ms-panel" id="ms-panel-${scope}-${def.key}">
           <button type="button" class="ms-clear-all" onclick="msClearAll('${def.key}')">${def.allLabel}</button>
           <div class="ms-sep"></div>
           ${optsHtml}
@@ -1430,8 +1440,14 @@ function renderMsOpt(key, o) {
   return `<label class="ms-opt"><input type="checkbox" value="${o.v}" onchange="msToggleOption('${key}','${o.v}',this.checked)"><span>${o.l}</span></label>`;
 }
 
-function toggleMsPanel(key) {
-  const dd = document.getElementById('ms-dd-' + key);
+/* Appelée soit avec un seul id combiné (ex: 'cmpYear-2026', utilisé par
+   les sélecteurs année/mois de l'Evolution), soit avec (scope, key) pour
+   les barres de filtres Source/Créancier/Devise — les deux reconstruisent
+   le même id "ms-dd-<suffixe>". */
+function toggleMsPanel(a, b) {
+  const suffix = b === undefined ? a : (a + '-' + b);
+  const dd = document.getElementById('ms-dd-' + suffix);
+  if (!dd) return;
   const wasOpen = dd.classList.contains('open');
   document.querySelectorAll('.ms-dd.open').forEach(el => el.classList.remove('open'));
   if (!wasOpen) dd.classList.add('open');
@@ -1458,22 +1474,25 @@ function msClearAll(key) {
   applyFilters();
 }
 
-/* Synchronise les cases à cocher et le libellé du bouton avec F[key] */
+/* Synchronise les cases à cocher et le libellé du bouton avec F[key],
+   sur les deux instances (MAD et BS) de la barre de filtres. */
 function msRenderState(key) {
   const def = FILTER_DEFS.find(d => d.key === key);
   if (!def) return;
-  const panel = document.getElementById('ms-panel-' + key);
-  if (panel) panel.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = F[key].includes(cb.value); });
-  const btn = document.getElementById('ms-btn-' + key);
-  if (btn) {
-    const textEl = btn.querySelector('.ms-btn-text');
-    let text;
-    if (F[key].length === 0) text = def.allLabel;
-    else if (F[key].length === 1) text = optionLabel(key, F[key][0]);
-    else text = F[key].length + ' sélectionnés';
-    textEl.textContent = text;
-    btn.classList.toggle('has-selection', F[key].length > 0);
-  }
+  FILTER_SCOPES.forEach(scope => {
+    const panel = document.getElementById('ms-panel-' + scope + '-' + key);
+    if (panel) panel.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = F[key].includes(cb.value); });
+    const btn = document.getElementById('ms-btn-' + scope + '-' + key);
+    if (btn) {
+      const textEl = btn.querySelector('.ms-btn-text');
+      let text;
+      if (F[key].length === 0) text = def.allLabel;
+      else if (F[key].length === 1) text = optionLabel(key, F[key][0]);
+      else text = F[key].length + ' sélectionnés';
+      textEl.textContent = text;
+      btn.classList.toggle('has-selection', F[key].length > 0);
+    }
+  });
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1494,28 +1513,31 @@ function resetAllFilters() {
   refreshComparisonBS();
 }
 
-/* ─── Résumé des filtres actifs ─── */
+/* ─── Résumé des filtres actifs (sur les deux instances MAD/BS) ─── */
 function updateFilterSummary() {
   const tags = FILTER_DEFS
     .filter(def => F[def.key].length > 0)
     .map(def => ({ label: def.label + ' : ' + F[def.key].map(v => optionLabel(def.key, v)).join(', '), key: def.key }));
 
-  const summary = document.getElementById('filterSummary');
-  const tagsEl  = document.getElementById('filterTags');
-  const counter = document.getElementById('filterCount');
+  FILTER_SCOPES.forEach(scope => {
+    const summary = document.getElementById('filterSummary-' + scope);
+    const tagsEl  = document.getElementById('filterTags-' + scope);
+    const counter = document.getElementById('filterCount-' + scope);
+    if (!summary || !tagsEl || !counter) return;
 
-  tagsEl.innerHTML = tags.map(t =>
-    `<span class="filter-tag">${t.label}<span class="filter-tag-x" onclick="clearFilter('${t.key}')">✕</span></span>`
-  ).join('');
+    tagsEl.innerHTML = tags.map(t =>
+      `<span class="filter-tag">${t.label}<span class="filter-tag-x" onclick="clearFilter('${t.key}')">✕</span></span>`
+    ).join('');
 
-  if (tags.length > 0) {
-    summary.classList.add('visible');
-    counter.textContent = tags.length + ' filtre(s) actif(s)';
-    counter.classList.add('visible');
-  } else {
-    summary.classList.remove('visible');
-    counter.classList.remove('visible');
-  }
+    if (tags.length > 0) {
+      summary.classList.add('visible');
+      counter.textContent = tags.length + ' filtre(s) actif(s)';
+      counter.classList.add('visible');
+    } else {
+      summary.classList.remove('visible');
+      counter.classList.remove('visible');
+    }
+  });
 }
 
 function clearFilter(key) {
@@ -1523,6 +1545,8 @@ function clearFilter(key) {
   msRenderState(key);
   updateFilterSummary();
   refreshAll();
+  refreshComparison();
+  refreshComparisonBS();
 }
 
 /* ─── Libellé compact des filtres actifs ─── */

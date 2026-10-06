@@ -501,7 +501,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 /* FOOTER */
 .footer{background:#fff;border-top:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;justify-content:space-between;font-size:9px;color:var(--gray)}
-.print-header,.print-footer,.print-filters{display:none}
+.print-header,.print-footer,.card-print-meta{display:none}
 
 /* NO-DATA */
 .no-data{text-align:center;padding:40px 20px;color:var(--gray)}
@@ -635,9 +635,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 @media print {
   .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .ticker-wrap,
   #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn { display: none !important; }
-  .print-filters { display: block !important; background: #FFFBE6; border: 1px solid #D9D5C7; border-radius: 6px;
-    padding: 8px 12px; margin: 0 0 12px; font-size: 11px; color: #1F2A24; }
-  .print-filters b { color: #037B3D; }
+  /* Légende par fiche : titre + période + filtres actifs, insérée sous
+     l'en-tête de chaque carte (voir populatePrintMetaBlocks ci-dessous)
+     pour que chaque tableau imprimé indique son propre état d'extraction. */
+  .card-print-meta { display: block !important; font-size: 10.5px; color: #1F2A24; font-weight: 600;
+    margin: 2px 14px 10px; padding-bottom: 8px; border-bottom: 1px dashed #D9D5C7; }
+  .card-print-meta b { color: #037B3D; text-transform: uppercase; }
   /* Le contenu prend toute la largeur de la page (paysage) : les graphiques sont
      redessinés à la bonne taille via l'écouteur 'beforeprint' (voir mkChart plus bas),
      donc plus de risque d'étirement/débordement malgré ce changement de largeur. */
@@ -905,11 +908,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <img src="Capture d'écran 2026-07-22 133239.png" alt="République de Côte d'Ivoire — Ministère de l'Économie, des Finances et du Budget — Direction Générale des Financements">
     <div class="print-header-title">Tableau de Bord Digital de Suivi Mensuel des Statistiques de la Dette et d'Historisation</div>
   </div>
-
-  <!-- LÉGENDE DES FILTRES ACTIFS (masquée à l'écran, générée juste avant
-       impression — voir buildPrintFiltersLegend() — pour que l'extrait
-       imprimé indique toujours avec quels filtres/périodes il a été tiré) -->
-  <div class="print-filters" id="printFilters"></div>
 
   <!-- TOPBAR -->
   <div class="topbar">
@@ -2188,32 +2186,64 @@ function openHistoriqueFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.his
 /* Télécharge l'onglet actuellement affiché en PDF via l'impression native du navigateur
    (aucune dépendance externe requise — cohérent avec la CSP qui bloque les scripts tiers).
    Le titre de la page est ajusté temporairement pour suggérer un nom de fichier pertinent. */
-/* Légende imprimée des filtres/périodes actifs, pour que l'extrait PDF
-   indique toujours dans quel état (Source/Créancier/Devise, périodes
-   comparées, Nominale/%PIB) il a été tiré — invisible à l'écran, générée
-   juste avant chaque impression (voir downloadPDF ci-dessous). */
-function buildPrintFiltersLegend() {
-  const el = document.getElementById('printFilters');
-  if (!el) return;
+/* Légende imprimée par fiche : titre + période (début→fin) + filtres actifs
+   en un libellé, insérée sous l'en-tête de CHAQUE carte (voir
+   injectPrintMetaBlocks, appelée une fois à l'init) et remplie juste avant
+   chaque impression — ainsi l'extrait papier de n'importe quel tableau du
+   dashboard indique toujours dans quel état il a été tiré. */
+function injectPrintMetaBlocks() {
+  document.querySelectorAll('.card-header').forEach(header => {
+    if (header.dataset.printMetaInjected) return;
+    header.dataset.printMetaInjected = '1';
+    const el = document.createElement('div');
+    el.className = 'card-print-meta';
+    header.insertAdjacentElement('afterend', el);
+  });
+}
+
+/* Cartes Evolution MAD dont un filtre "par graphe" (pastilles
+   Encours/Arriérés/Total, etc.) réduit encore les indicateurs affichés. */
+const PRINT_CARD_METRIC_EXTRA = {
+  'evolSectionStock':   () => metricPillsLabel(EVOL_METRIC_STOCK, METRIC_LABELS_STOCK),
+  'evolSectionService': () => metricPillsLabel(EVOL_METRIC_SERVICE, METRIC_LABELS_SERVICE),
+  'evolSectionTirages': () => metricPillsLabel(EVOL_METRIC_TIRAGES, METRIC_LABELS_TIRAGES)
+};
+function metricPillsLabel(state, labels) {
+  const on = Object.keys(labels).filter(k => state[k]).map(k => labels[k]);
+  return on.length ? on.join(', ') : 'Aucun';
+}
+
+function populatePrintMetaBlocks() {
   const screenEl = document.querySelector('.screen.active');
   const screenId = screenEl ? screenEl.id.replace(/^screen-/, '') : '';
-  const parts = ['<b>Filtres :</b> ' + filterLabel()];
+
+  let periodeTxt = (MAD_META && MAD_META.periode) ? MAD_META.periode : '—';
   if (screenId === 'comparaison') {
     const periods = COMPARE.selected.map(compareLabel);
-    parts.push('<b>Périodes (MAD) :</b> ' + (periods.length ? periods.join(', ') : '—'));
-    parts.push('<b>Valeur :</b> ' + (EVOL_VALEUR_MODE === 'pib' ? '% PIB' : 'Nominale'));
+    periodeTxt = periods.length >= 2 ? periods[0] + ' à ' + periods[periods.length - 1]
+      : (periods[0] || '—');
   } else if (screenId === 'comparaison-bs') {
     const periods = COMPARE_BS.selected.map(compareLabelBS);
-    parts.push('<b>Périodes (BS) :</b> ' + (periods.length ? periods.join(', ') : '—'));
-  } else {
-    const periode = (MAD_META && MAD_META.periode) ? MAD_META.periode : '';
-    if (periode) parts.push('<b>Période (MAD) :</b> ' + periode);
+    periodeTxt = periods.length >= 2 ? periods[0] + ' à ' + periods[periods.length - 1]
+      : (periods[0] || '—');
   }
-  el.innerHTML = parts.join(' &nbsp;·&nbsp; ');
+
+  const baseFiltre = filterLabel() + (screenId === 'comparaison'
+    ? ' ; Valeur : ' + (EVOL_VALEUR_MODE === 'pib' ? '% PIB' : 'Nominale') : '');
+
+  document.querySelectorAll('.card-print-meta').forEach(el => {
+    const card = el.closest('.card');
+    const titleEl = card ? card.querySelector('.card-title') : null;
+    const title = titleEl ? titleEl.textContent.trim() : '';
+    const extraFn = card ? PRINT_CARD_METRIC_EXTRA[card.id] : null;
+    const filtreTxt = extraFn ? baseFiltre + ' ; Indicateurs : ' + extraFn() : baseFiltre;
+    el.innerHTML = '<b>' + title + '</b> &nbsp;·&nbsp; Période : ' + periodeTxt +
+      ' &nbsp;·&nbsp; Filtre : ' + filtreTxt;
+  });
 }
 
 function downloadPDF() {
-  buildPrintFiltersLegend();
+  populatePrintMetaBlocks();
   const titleEl = document.getElementById('page-title');
   const pageName = (titleEl ? titleEl.textContent : 'Dashboard').trim();
   const periode = (MAD_META && MAD_META.periode) ? MAD_META.periode : '';
@@ -3681,6 +3711,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFilters();
   initNavSortable();
   injectObservationButtons();
+  injectPrintMetaBlocks();
   loadObservations();
   loadBSData();
   loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META, l'historique et les libellés)

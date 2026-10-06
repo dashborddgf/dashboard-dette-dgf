@@ -932,7 +932,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
           <div class="enc-box-label">Encours total de la dette</div>
           <div class="enc-box-value green" id="enc-total-value">—</div>
           <div class="enc-box-tag green" id="enc-total-usd">—</div>
-          <div class="enc-box-tag green" id="enc-total-pib-tag">—</div>
         </div>
         <div class="enc-box">
           <div class="enc-box-label">Dette / PIB</div>
@@ -1995,8 +1994,7 @@ function refreshEncoursPublique() {
   const pctTxt = v => v == null ? 'NULL' : fmt(v) + '%';
 
   setTxt('enc-total-value', fmt(encTotal) + ' Md FCFA');
-  setTxt('enc-total-usd', encTotalUSD != null ? '(' + fmt(encTotalUSD) + ' M USD)' : 'NULL');
-  setTxt('enc-total-pib-tag', pibPct != null ? fmt(pibPct) + '% du PIB' : 'NULL');
+  setTxt('enc-total-usd', (encTotalUSD != null ? '(' + fmt(encTotalUSD) + ' M USD)' : 'NULL') + (pibPct != null ? ' ; ' + fmt(pibPct) + '% du PIB' : ''));
   setTxt('enc-pib-value', pctTxt(pibPct));
 
   setTxt('enc-ext-value', fmt(encExt) + ' Md FCFA');

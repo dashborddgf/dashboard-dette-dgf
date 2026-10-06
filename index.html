@@ -643,7 +643,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
    les filtres et la nav mobile sont masqués ; le contenu prend toute la largeur. */
 @media print {
   .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .ticker-wrap,
-  #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn { display: none !important; }
+  #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn,
+  #metricFilterStock, #metricFilterService, #metricFilterTirages { display: none !important; }
   /* Légende par fiche : titre + période + filtres actifs, insérée sous
      l'en-tête de chaque carte (voir populatePrintMetaBlocks ci-dessous)
      pour que chaque tableau imprimé indique son propre état d'extraction. */
@@ -1164,6 +1165,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
           </div>
         </div>
         <div class="card-body">
+          <div id="metricFilterStock" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
           <div class="cw cw-lg" id="wrapChartCompareEncours"><canvas id="chartCompareEncours"></canvas></div>
           <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareEncours" style="display:none"></table></div>
         </div>
@@ -2807,13 +2809,12 @@ const METRIC_LABELS_STOCK = { encours: 'Encours', arrieres: 'Arriérés', total:
 const METRIC_LABELS_SERVICE = { capital: 'Capital', interets: 'Intérêts', total: 'Total' };
 const METRIC_LABELS_TIRAGES = { cash: 'Cash', traites: 'Traités', total: 'Total' };
 
+function toggleMetricStock(key) { EVOL_METRIC_STOCK[key] = !EVOL_METRIC_STOCK[key]; renderMetricPills('metricFilterStock', EVOL_METRIC_STOCK, METRIC_LABELS_STOCK, 'toggleMetricStock'); buildComparisonEncours(); }
 function toggleMetricService(key) { EVOL_METRIC_SERVICE[key] = !EVOL_METRIC_SERVICE[key]; renderMetricPills('metricFilterService', EVOL_METRIC_SERVICE, METRIC_LABELS_SERVICE, 'toggleMetricService'); buildComparisonService(); }
 function toggleMetricTirages(key) { EVOL_METRIC_TIRAGES[key] = !EVOL_METRIC_TIRAGES[key]; renderMetricPills('metricFilterTirages', EVOL_METRIC_TIRAGES, METRIC_LABELS_TIRAGES, 'toggleMetricTirages'); buildComparisonTirages(); }
 
-/* Encours/Arriérés/Total sont toujours tous affichés (plus de pastilles
-   de filtre par graphe ici) — EVOL_METRIC_STOCK reste à {true,true,true}
-   en permanence, mais sert encore à la légende d'impression. */
 function buildComparisonEncours() {
+  renderMetricPills('metricFilterStock', EVOL_METRIC_STOCK, METRIC_LABELS_STOCK, 'toggleMetricStock');
   const keys = COMPARE.selected;
   const allKeys = ['encours', 'arrieres', 'total'], allLabels = ['Encours', 'Arriérés', 'Total'];
   const activeIdx = allKeys.map((k, i) => EVOL_METRIC_STOCK[k] ? i : -1).filter(i => i >= 0);

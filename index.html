@@ -635,16 +635,16 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 @media print {
   .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .ticker-wrap,
   #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn,
-  #metricFilterStock, #metricFilterService, #metricFilterTirages { display: none !important; }
+  #metricFilterStock, #metricFilterService, #metricFilterTirages, .card-header { display: none !important; }
   /* Légende par fiche : titre + période + filtres actifs, insérée sous
      l'en-tête de chaque carte (voir populatePrintMetaBlocks ci-dessous)
      pour que chaque tableau imprimé indique son propre état d'extraction.
-     Titre large et centré pour occuper l'espace laissé par le retrait des
-     boutons/pastilles interactives, plutôt qu'une simple ligne discrète. */
+     Le .card-header d'origine (petit titre noir) est masqué ci-dessus :
+     cette légende, plus grande et centrée, le remplace entièrement. */
   .card-print-meta { display: block !important; text-align: center;
-    margin: 6px 14px 16px; padding: 10px 0 14px; border-bottom: 1px dashed #D9D5C7; }
+    margin: 14px 14px 28px; padding: 16px 0 20px; border-bottom: 1px dashed #D9D5C7; }
   .card-print-meta .ppm-title { font-size: 24px; font-weight: 800; color: #037B3D;
-    letter-spacing: .03em; text-transform: uppercase; margin-bottom: 8px; }
+    letter-spacing: .03em; text-transform: uppercase; margin-bottom: 16px; }
   .card-print-meta .ppm-detail { font-size: 12.5px; color: #374151; font-weight: 600; }
   /* Le contenu prend toute la largeur de la page (paysage) : les graphiques sont
      redessinés à la bonne taille via l'écouteur 'beforeprint' (voir mkChart plus bas),

@@ -646,6 +646,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   .card-print-meta .ppm-title { font-size: 24px; font-weight: 800; color: #037B3D;
     letter-spacing: .03em; text-transform: uppercase; margin-bottom: 16px; }
   .card-print-meta .ppm-detail { font-size: 12.5px; color: #374151; font-weight: 600; }
+  /* Tableaux de données : caractères agrandis pour rester lisibles une fois
+     imprimés (la taille écran, pensée pour une carte compacte, est trop
+     petite sur une page A4/A3). */
+  .tbl { font-size: 15px !important; }
+  .tbl th { font-size: 13px !important; padding: 11px 15px !important; }
+  .tbl td { font-size: 15px !important; padding: 11px 15px !important; }
   /* Le contenu prend toute la largeur de la page (paysage) : les graphiques sont
      redessinés à la bonne taille via l'écouteur 'beforeprint' (voir mkChart plus bas),
      donc plus de risque d'étirement/débordement malgré ce changement de largeur. */

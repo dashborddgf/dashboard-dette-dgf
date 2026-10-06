@@ -501,7 +501,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 /* FOOTER */
 .footer{background:#fff;border-top:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;justify-content:space-between;font-size:9px;color:var(--gray)}
-.print-header,.print-footer{display:none}
+.print-header,.print-footer,.print-filters{display:none}
 
 /* NO-DATA */
 .no-data{text-align:center;padding:40px 20px;color:var(--gray)}
@@ -633,7 +633,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
    N'imprime que l'onglet actuellement affiché : la sidebar, la barre du haut,
    les filtres et la nav mobile sont masqués ; le contenu prend toute la largeur. */
 @media print {
-  .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, #filterBar, .obs-btn, .modal-overlay { display: none !important; }
+  .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .ticker-wrap,
+  #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn { display: none !important; }
+  .print-filters { display: block !important; background: #FFFBE6; border: 1px solid #D9D5C7; border-radius: 6px;
+    padding: 8px 12px; margin: 0 0 12px; font-size: 11px; color: #1F2A24; }
+  .print-filters b { color: #037B3D; }
   /* Le contenu prend toute la largeur de la page (paysage) : les graphiques sont
      redessinés à la bonne taille via l'écouteur 'beforeprint' (voir mkChart plus bas),
      donc plus de risque d'étirement/débordement malgré ce changement de largeur. */
@@ -901,6 +905,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <img src="Capture d'écran 2026-07-22 133239.png" alt="République de Côte d'Ivoire — Ministère de l'Économie, des Finances et du Budget — Direction Générale des Financements">
     <div class="print-header-title">Tableau de Bord Digital de Suivi Mensuel des Statistiques de la Dette et d'Historisation</div>
   </div>
+
+  <!-- LÉGENDE DES FILTRES ACTIFS (masquée à l'écran, générée juste avant
+       impression — voir buildPrintFiltersLegend() — pour que l'extrait
+       imprimé indique toujours avec quels filtres/périodes il a été tiré) -->
+  <div class="print-filters" id="printFilters"></div>
 
   <!-- TOPBAR -->
   <div class="topbar">
@@ -2179,7 +2188,32 @@ function openHistoriqueFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.his
 /* Télécharge l'onglet actuellement affiché en PDF via l'impression native du navigateur
    (aucune dépendance externe requise — cohérent avec la CSP qui bloque les scripts tiers).
    Le titre de la page est ajusté temporairement pour suggérer un nom de fichier pertinent. */
+/* Légende imprimée des filtres/périodes actifs, pour que l'extrait PDF
+   indique toujours dans quel état (Source/Créancier/Devise, périodes
+   comparées, Nominale/%PIB) il a été tiré — invisible à l'écran, générée
+   juste avant chaque impression (voir downloadPDF ci-dessous). */
+function buildPrintFiltersLegend() {
+  const el = document.getElementById('printFilters');
+  if (!el) return;
+  const screenEl = document.querySelector('.screen.active');
+  const screenId = screenEl ? screenEl.id.replace(/^screen-/, '') : '';
+  const parts = ['<b>Filtres :</b> ' + filterLabel()];
+  if (screenId === 'comparaison') {
+    const periods = COMPARE.selected.map(compareLabel);
+    parts.push('<b>Périodes (MAD) :</b> ' + (periods.length ? periods.join(', ') : '—'));
+    parts.push('<b>Valeur :</b> ' + (EVOL_VALEUR_MODE === 'pib' ? '% PIB' : 'Nominale'));
+  } else if (screenId === 'comparaison-bs') {
+    const periods = COMPARE_BS.selected.map(compareLabelBS);
+    parts.push('<b>Périodes (BS) :</b> ' + (periods.length ? periods.join(', ') : '—'));
+  } else {
+    const periode = (MAD_META && MAD_META.periode) ? MAD_META.periode : '';
+    if (periode) parts.push('<b>Période (MAD) :</b> ' + periode);
+  }
+  el.innerHTML = parts.join(' &nbsp;·&nbsp; ');
+}
+
 function downloadPDF() {
+  buildPrintFiltersLegend();
   const titleEl = document.getElementById('page-title');
   const pageName = (titleEl ? titleEl.textContent : 'Dashboard').trim();
   const periode = (MAD_META && MAD_META.periode) ? MAD_META.periode : '';

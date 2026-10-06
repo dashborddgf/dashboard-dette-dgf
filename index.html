@@ -638,10 +638,14 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   #metricFilterStock, #metricFilterService, #metricFilterTirages { display: none !important; }
   /* Légende par fiche : titre + période + filtres actifs, insérée sous
      l'en-tête de chaque carte (voir populatePrintMetaBlocks ci-dessous)
-     pour que chaque tableau imprimé indique son propre état d'extraction. */
-  .card-print-meta { display: block !important; font-size: 10.5px; color: #1F2A24; font-weight: 600;
-    margin: 2px 14px 10px; padding-bottom: 8px; border-bottom: 1px dashed #D9D5C7; }
-  .card-print-meta b { color: #037B3D; text-transform: uppercase; }
+     pour que chaque tableau imprimé indique son propre état d'extraction.
+     Titre large et centré pour occuper l'espace laissé par le retrait des
+     boutons/pastilles interactives, plutôt qu'une simple ligne discrète. */
+  .card-print-meta { display: block !important; text-align: center;
+    margin: 6px 14px 16px; padding: 10px 0 14px; border-bottom: 1px dashed #D9D5C7; }
+  .card-print-meta .ppm-title { font-size: 24px; font-weight: 800; color: #037B3D;
+    letter-spacing: .03em; text-transform: uppercase; margin-bottom: 8px; }
+  .card-print-meta .ppm-detail { font-size: 12.5px; color: #374151; font-weight: 600; }
   /* Le contenu prend toute la largeur de la page (paysage) : les graphiques sont
      redessinés à la bonne taille via l'écouteur 'beforeprint' (voir mkChart plus bas),
      donc plus de risque d'étirement/débordement malgré ce changement de largeur. */
@@ -2238,8 +2242,8 @@ function populatePrintMetaBlocks() {
     const title = titleEl ? titleEl.textContent.trim() : '';
     const extraFn = card ? PRINT_CARD_METRIC_EXTRA[card.id] : null;
     const filtreTxt = extraFn ? baseFiltre + ' ; Indicateurs : ' + extraFn() : baseFiltre;
-    el.innerHTML = '<b>' + title + '</b> &nbsp;·&nbsp; Période : ' + periodeTxt +
-      ' &nbsp;·&nbsp; Filtre : ' + filtreTxt;
+    el.innerHTML = '<div class="ppm-title">' + title + '</div>' +
+      '<div class="ppm-detail">Période : ' + periodeTxt + ' &nbsp;·&nbsp; Filtre : ' + filtreTxt + '</div>';
   });
 }
 
@@ -2293,7 +2297,14 @@ function printOneCard(cardId) {
     window.removeEventListener('afterprint', restore);
   };
   window.addEventListener('afterprint', restore);
-  downloadPDF();
+  // Laisse le navigateur reformer la mise en page (carte isolée = nouvelle
+  // largeur) avant de redessiner les graphiques et de lancer l'impression :
+  // sans ce délai, le canvas capture parfois sa taille d'avant le masquage
+  // des autres cartes, d'où une zone de graphique vide sur l'extrait imprimé.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    Object.values(charts).forEach(c => { if (c && typeof c.draw === 'function') c.draw(); });
+    downloadPDF();
+  }));
 }
 
 /* Exporte en CSV (ouvrable dans Excel) le contenu d'un <table> déjà

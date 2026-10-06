@@ -384,6 +384,15 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .cw-lg{height:230px}
 .cw-pie{height:185px}
 
+/* Carte "Stock de la Dette" (Evolution MAD) — après retrait des pastilles
+   Encours/Arriérés/Total, occupe tout l'espace disponible et agrandit
+   le graphique/tableau au lieu de laisser un bloc étriqué en haut. */
+#evolSectionStock .card-body{min-height:calc(100vh - 260px);display:flex;flex-direction:column;justify-content:center}
+#evolSectionStock .cw-lg{height:min(55vh, 480px)}
+#evolSectionStock table.tbl{max-width:1000px;width:100%;margin:0 auto;font-size:14px}
+#evolSectionStock .tbl th{font-size:12.5px;padding:11px 16px}
+#evolSectionStock .tbl td{font-size:14px;padding:11px 16px}
+
 /* ── TABLES ── */
 .tbl{width:100%;border-collapse:collapse;font-size:11px}
 .tbl th{background:var(--navy);color:#fff;padding:7px 9px;text-align:left;font-weight:600;font-size:10px;text-transform:uppercase;border:1px solid rgba(255,255,255,.12)}
@@ -1155,7 +1164,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
           </div>
         </div>
         <div class="card-body">
-          <div id="metricFilterStock" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
           <div class="cw cw-lg" id="wrapChartCompareEncours"><canvas id="chartCompareEncours"></canvas></div>
           <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareEncours" style="display:none"></table></div>
         </div>
@@ -2799,12 +2807,13 @@ const METRIC_LABELS_STOCK = { encours: 'Encours', arrieres: 'Arriérés', total:
 const METRIC_LABELS_SERVICE = { capital: 'Capital', interets: 'Intérêts', total: 'Total' };
 const METRIC_LABELS_TIRAGES = { cash: 'Cash', traites: 'Traités', total: 'Total' };
 
-function toggleMetricStock(key) { EVOL_METRIC_STOCK[key] = !EVOL_METRIC_STOCK[key]; renderMetricPills('metricFilterStock', EVOL_METRIC_STOCK, METRIC_LABELS_STOCK, 'toggleMetricStock'); buildComparisonEncours(); }
 function toggleMetricService(key) { EVOL_METRIC_SERVICE[key] = !EVOL_METRIC_SERVICE[key]; renderMetricPills('metricFilterService', EVOL_METRIC_SERVICE, METRIC_LABELS_SERVICE, 'toggleMetricService'); buildComparisonService(); }
 function toggleMetricTirages(key) { EVOL_METRIC_TIRAGES[key] = !EVOL_METRIC_TIRAGES[key]; renderMetricPills('metricFilterTirages', EVOL_METRIC_TIRAGES, METRIC_LABELS_TIRAGES, 'toggleMetricTirages'); buildComparisonTirages(); }
 
+/* Encours/Arriérés/Total sont toujours tous affichés (plus de pastilles
+   de filtre par graphe ici) — EVOL_METRIC_STOCK reste à {true,true,true}
+   en permanence, mais sert encore à la légende d'impression. */
 function buildComparisonEncours() {
-  renderMetricPills('metricFilterStock', EVOL_METRIC_STOCK, METRIC_LABELS_STOCK, 'toggleMetricStock');
   const keys = COMPARE.selected;
   const allKeys = ['encours', 'arrieres', 'total'], allLabels = ['Encours', 'Arriérés', 'Total'];
   const activeIdx = allKeys.map((k, i) => EVOL_METRIC_STOCK[k] ? i : -1).filter(i => i >= 0);

@@ -1231,6 +1231,19 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       </div>
     </div>
 
+    <div id="evolSectionIndicateursBS" class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div><div class="card-title">Indicateurs Coûts et Risques</div><div class="card-sub">Ratios de la dette — Tableau 3 du BS</div></div>
+        <div style="display:flex;gap:6px">
+          <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionIndicateursBS')">PDF</button>
+          <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableCompareIndicateursBS','indicateurs_couts_risques_bs')">Excel</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table class="tbl" id="tableCompareIndicateursBS"></table>
+      </div>
+    </div>
+
     <div class="card" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Variables à afficher</div><div class="card-sub">Filtrer les sections ci-dessous</div></div></div>
       <div class="card-body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
@@ -1302,19 +1315,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         <div class="card-body">
           <div class="cw cw-lg" id="wrapChartCompareBSService"><canvas id="chartCompareBSService"></canvas></div>
           <div style="overflow-x:auto"><table class="tbl" id="tableChartCompareBSService" style="display:none"></table></div>
-        </div>
-      </div>
-
-      <div id="evolSectionIndicateursBS" class="card" style="margin-top:12px">
-        <div class="card-header">
-          <div><div class="card-title">Indicateurs Coûts et Risques</div><div class="card-sub">Évolution par période</div></div>
-          <div style="display:flex;gap:6px">
-            <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionIndicateursBS')">PDF</button>
-            <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableCompareIndicateursBS','indicateurs_couts_risques_evolution_bs')">Excel</button>
-          </div>
-        </div>
-        <div class="card-body" style="padding:0;overflow-x:auto">
-          <table class="tbl" id="tableCompareIndicateursBS"></table>
         </div>
       </div>
     </div>
@@ -3233,65 +3233,76 @@ function buildComparisonBSService() {
   renderCompareTable('tableChartCompareBSService', chartLabels, datasets);
 }
 
-/* Évolution des Indicateurs Coûts et Risques (Tableau de Bord des Risques)
-   d'un BS à l'autre — lit les mêmes champs que applyRatiosData()/le
-   Tableau de Bord des Risques (ratios + pibAC du BS), mais sur CHAQUE
-   période BS sélectionnée plutôt que sur le seul BS Actif. "Latest" = la
-   5e valeur (BS en cours) si présente, sinon la dernière année close —
-   même règle que applyRatiosData(). Pas de graphique ici : les unités
-   mélangées (%, ans) ne se prêtent pas à un même axe, un tableau suffit
-   pour montrer l'évolution et la variation période à période. */
-function pickLatestRatio(arr) {
-  if (!Array.isArray(arr)) return null;
-  if (arr.length > 4 && arr[4] != null) return arr[4];
-  return arr[3] != null ? arr[3] : null;
-}
-function compareIndicateursBS(payload) {
-  const ratios = payload.ratios || {};
-  let pib = payload.pibACCurrent;
-  if (pib == null && payload.pibAC) {
-    const years = Object.keys(payload.pibAC).sort();
-    pib = years.length ? payload.pibAC[years[years.length - 1]] : null;
+/* "Ratios de la dette" / "Indicateurs de Risque" — reproduit le Tableau 3
+   du BS tel quel (mêmes libellés/lignes, colonnes 2022→2025 + BS en cours),
+   avec une colonne Évolution = BS en cours moins 2025. "BS en cours" =
+   BS_DATA (le dernier BS importé), indépendant de la sélection de périodes
+   de comparaison ci-dessous — au même titre que "Dette garantie par l'État". */
+const BS_RATIO_TABLE_ROWS = [
+  { section: 'Ratios de la dette' },
+  { key: 'pibac',       label: "Dette de l'Administration Centrale en % du PIB", unit: '%' },
+  { key: 'intrec',      label: 'Intérêts de la dette en % des Recettes budgétaires', unit: '%' },
+  { key: 'intpib',      label: 'Intérêts de la dette en % du PIB', unit: '%' },
+  { section: 'Indicateurs de Risque' },
+  { key: 'tauxmoy',     label: "Taux d'intérêt moyen pondéré de la dette", unit: '%' },
+  { key: 'tauxmoyext',  label: 'Dette Extérieure', unit: '%', sub: true },
+  { key: 'tauxmoyint',  label: 'Dette Intérieure', unit: '%', sub: true },
+  { key: 'duree',       label: "Durée moyenne de vie jusqu'à échéance (année)", unit: '' },
+  { key: 'dureeext',    label: 'Dette Extérieure', unit: '', sub: true },
+  { key: 'dureeint',    label: 'Dette Intérieure', unit: '', sub: true },
+  { key: 'ct',          label: 'Dette à court terme (% total)', unit: '%' },
+  { key: 'revision',    label: 'Durée moyenne révision des taux (année)', unit: '' },
+  { key: 'revisionext', label: 'Dette Extérieure', unit: '', sub: true },
+  { key: 'revisionint', label: 'Dette Intérieure', unit: '', sub: true },
+  { key: 'fixe',        label: 'Dette à taux fixe (%)', unit: '%' },
+  { key: 'devises',     label: 'Dette en devises étrangères (%)', unit: '%' }
+];
+const BS_RATIO_YEARS = ['2022', '2023', '2024', '2025'];
+
+/* [2022,2023,2024,2025,BSEnCours] pour une ligne donnée — "pibac" vient de
+   pibAC/pibACCurrent (déjà distincts dans le BS) ; les autres lisent le
+   tableau ratios[key] (4 années) + un éventuel 5e élément déjà présent
+   (BS en cours), sinon — (pas encore extrait par l'Office Script). */
+function bsRatioRowValues(payload, key) {
+  if (key === 'pibac') {
+    const pibAC = payload.pibAC || {};
+    const years = BS_RATIO_YEARS.map(y => pibAC[y] != null ? pibAC[y] : null);
+    const current = payload.pibACCurrent != null ? payload.pibACCurrent : null;
+    return years.concat([current]);
   }
-  return {
-    pib: pib != null ? pib : null,
-    intrec: pickLatestRatio(ratios.intrec),
-    duree: pickLatestRatio(ratios.duree),
-    ct: pickLatestRatio(ratios.ct),
-    fixe: pickLatestRatio(ratios.fixe),
-    devises: pickLatestRatio(ratios.devises)
-  };
+  const arr = (payload.ratios || {})[key];
+  if (!Array.isArray(arr)) return [null, null, null, null, null];
+  const years = [0, 1, 2, 3].map(i => arr[i] != null ? arr[i] : null);
+  const current = (arr.length > 4 && arr[4] != null) ? arr[4] : null;
+  return years.concat([current]);
 }
 
 function buildComparisonIndicateursBS() {
   const table = document.getElementById('tableCompareIndicateursBS');
   if (!table) return;
-  const keys = COMPARE_BS.selected;
-  const rows = [
-    { label: 'Dette / PIB',        unit: '%',    get: p => compareIndicateursBS(p).pib },
-    { label: 'Int. / Recettes',    unit: '%',    get: p => compareIndicateursBS(p).intrec },
-    { label: 'Durée de Vie',       unit: ' ans', get: p => compareIndicateursBS(p).duree },
-    { label: 'CT / Total',         unit: '%',    get: p => compareIndicateursBS(p).ct },
-    { label: 'Taux Fixe',          unit: '%',    get: p => compareIndicateursBS(p).fixe },
-    { label: 'Devise Étrangère',   unit: '%',    get: p => compareIndicateursBS(p).devises }
-  ];
-  const labels = keys.map(compareLabelBS);
-  const hasVar = keys.length >= 2;
-  const thead = '<thead><tr><th style="text-align:left">Indicateur</th>' + labels.map(l => `<th>${l}</th>`).join('') + (hasVar ? '<th>Variation</th>' : '') + '</tr></thead>';
-  const tbody = '<tbody>' + rows.map(r => {
-    const vals = keys.map(k => r.get(getComparePayloadBS(k)));
-    let varCell = '';
-    if (hasVar) {
-      const prev = vals[vals.length - 2], last = vals[vals.length - 1];
-      const delta = (prev == null || last == null) ? null : last - prev;
-      const pct = (delta != null && prev) ? (100 * delta / prev) : 0;
-      const sign = delta != null && delta >= 0 ? '+' : '';
-      const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
-      varCell = delta == null ? '<td>—</td>' : `<td class="td-b" style="color:${color}">${sign}${fmt(delta)}${r.unit} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
-    }
-    return `<tr><td class="td-b">${r.label}</td>` + vals.map(v => `<td>${v == null ? '—' : fmt(v) + r.unit}</td>`).join('') + varCell + '</tr>';
-  }).join('') + '</tbody>';
-  table.innerHTML = thead + tbody;
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const curLabel = (bs.meta && bs.meta.periode) || 'BS Actif';
+
+  const thead = '<thead><tr><th style="text-align:left">Indicateur</th>' +
+    BS_RATIO_YEARS.map(y => `<th>${y}</th>`).join('') +
+    `<th>${curLabel}</th><th>Évolution</th></tr></thead>`;
+
+  const fmtVal = (v, unit) => v == null ? '—' : fmt(v) + unit;
+  const bodyRows = BS_RATIO_TABLE_ROWS.map(r => {
+    if (r.section) return `<tr><td colspan="7" class="td-b" style="background:var(--green);color:#fff">${r.section}</td></tr>`;
+    const [y22, y23, y24, y25, cur] = bsRatioRowValues(bs, r.key);
+    const delta = (cur != null && y25 != null) ? cur - y25 : null;
+    const pct = (delta != null && y25) ? (100 * delta / y25) : 0;
+    const sign = delta != null && delta >= 0 ? '+' : '';
+    const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
+    const evoCell = delta == null ? '—' : `<span style="color:${color};font-weight:700">${sign}${fmt(delta)}${r.unit} (${sign}${pct.toFixed(1).replace('.', ',')}%)</span>`;
+    const labelCell = r.sub
+      ? `<td style="padding-left:28px;font-style:italic;color:#374151">${r.label}</td>`
+      : `<td class="td-b">${r.label}</td>`;
+    return `<tr>${labelCell}<td>${fmtVal(y22, r.unit)}</td><td>${fmtVal(y23, r.unit)}</td><td>${fmtVal(y24, r.unit)}</td><td>${fmtVal(y25, r.unit)}</td><td>${fmtVal(cur, r.unit)}</td><td>${evoCell}</td></tr>`;
+  }).join('');
+
+  table.innerHTML = thead + '<tbody>' + bodyRows + '</tbody>';
 }
 
 /* Situation de la dette garantie par l'État (Tableau 11 du BS) — donnée
@@ -3309,6 +3320,7 @@ function refreshEvolGarantie() {
 
 function refreshComparisonBS() {
   refreshEvolGarantie();
+  buildComparisonIndicateursBS();
   const empty = document.getElementById('compareEmptyBS');
   const content = document.getElementById('compareContentBS');
   if (!empty || !content) return;
@@ -3323,7 +3335,6 @@ function refreshComparisonBS() {
   buildComparisonBSDette();
   buildComparisonBSTirages();
   buildComparisonBSService();
-  buildComparisonIndicateursBS();
   applyEvolDisplayMode();
 }
 

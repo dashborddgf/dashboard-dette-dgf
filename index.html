@@ -1203,17 +1203,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div id="filterTags-bs" style="display:flex;gap:5px;flex-wrap:wrap"></div>
     </div>
 
-    <div class="card" style="margin-bottom:12px">
-      <div class="card-header"><div><div class="card-title">Dette garantie par l'État</div><div class="card-sub">Dernière situation BS — Tableau 11</div></div></div>
-      <div class="card-body">
-        <div class="enc-box" style="border:1px solid var(--gold);max-width:260px">
-          <div class="enc-box-label">Dette garantie par l'Etat</div>
-          <div class="enc-box-value green" id="evol-garantie-value">—</div>
-          <div class="enc-box-tag green" id="evol-garantie-tag">—</div>
-        </div>
-      </div>
-    </div>
-
     <div id="evolSectionIndicateursBS" class="card" style="margin-bottom:12px">
       <div class="card-header">
         <div><div class="card-title">Indicateurs Coûts et Risques</div><div class="card-sub">Ratios de la dette — Tableau 3 du BS</div></div>
@@ -3256,21 +3245,7 @@ function buildComparisonIndicateursBS() {
   table.innerHTML = thead + '<tbody>' + bodyRows + '</tbody>';
 }
 
-/* Situation de la dette garantie par l'État (Tableau 11 du BS) — donnée
-   ponctuelle du dernier BS importé, indépendante de la sélection de
-   périodes ; affichée en haut de l'écran Evolution BS. */
-function refreshEvolGarantie() {
-  const valEl = document.getElementById('evol-garantie-value');
-  const tagEl = document.getElementById('evol-garantie-tag');
-  if (!valEl || !tagEl) return;
-  const bs = BS_DATA || BS_DATA_FALLBACK;
-  const dg = bs.detteGarantie;
-  valEl.textContent = dg ? fmt(dg.valeur) + ' Md FCFA' : 'NULL';
-  tagEl.textContent = dg ? fmt(dg.ratioPib) + '% du PIB' : 'NULL';
-}
-
 function refreshComparisonBS() {
-  refreshEvolGarantie();
   buildComparisonIndicateursBS();
   const empty = document.getElementById('compareEmptyBS');
   const content = document.getElementById('compareContentBS');

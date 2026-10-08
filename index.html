@@ -1050,26 +1050,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <div class="card ratios-card">
       <div class="card-header"><div><div class="card-title">Tableau de Bord des Risques 2025</div><div class="card-sub">Synthèse indicateurs</div></div></div>
       <div class="card-body">
-        <div class="ratio-grid ratio-grid-lg">
-          <div class="ratio-item r-ok" id="ratio-item-pib">
-            <div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette de l'Administration Centrale en % du PIB</div>
-          </div>
-          <div class="ratio-item r-warn" id="ratio-item-intrec">
-            <div class="ratio-val" id="ratio-val-intrec">16,5%</div><div class="ratio-label">Intérêts de la dette en % des Recettes budgétaires</div>
-          </div>
-          <div class="ratio-item r-ok" id="ratio-item-duree">
-            <div class="ratio-val" id="ratio-val-duree">7,2 ans</div><div class="ratio-label">Durée moyenne de vie jusqu'à échéance (année)</div>
-          </div>
-          <div class="ratio-item r-warn" id="ratio-item-ct">
-            <div class="ratio-val" id="ratio-val-ct">14,8%</div><div class="ratio-label">Dette à court terme (% total)</div>
-          </div>
-          <div class="ratio-item r-ok" id="ratio-item-fixe">
-            <div class="ratio-val" id="ratio-val-fixe">89,4%</div><div class="ratio-label">Dette à taux fixe (% total)</div>
-          </div>
-          <div class="ratio-item r-ok" id="ratio-item-devises">
-            <div class="ratio-val" id="ratio-val-devises">53,3%</div><div class="ratio-label">Dette en devises (en % total)</div>
-          </div>
-        </div>
+        <div class="ratio-grid ratio-grid-lg" id="ratiosBoxGrid"></div>
       </div>
     </div>
   </div><!-- /ratios -->
@@ -3402,61 +3383,45 @@ async function loadBSData() {
   BS_VIEW = BS_DATA;
   renderBSTable();
   applyPibACData();
-  applyRatiosData();
+  refreshRatiosBoxes();
   buildDeviseBars();
   loadBSHistoryIndex();
 }
 
-/* Répercute les indicateurs de Tableau 3 (hors Dette/PIB, déjà géré par
-   applyPibACData) sur le Tableau de Bord des Risques et le tableau
-   "Tableau pour Commentaire" : Intérêts/Recettes,
-   Intérêts/PIB, Taux moyen pondéré (+Ext/Int), Durée de vie, Dette CT,
-   Dette en devises, Dette à taux fixe. 2021 reste une constante
-   historique fixe ; 2022-2025 et le statut/seuil deviennent dynamiques.
-   "CT / Total" et "Devise Étr." lisent désormais ratios.ct/ratios.devises
-   du BS (même règle useCurrent que duree/fixe) pour correspondre
-   exactement à la dernière colonne du Tableau 3, au lieu d'une
-   approximation recalculée depuis le MAD. */
-function applyRatiosData() {
-  const bs = BS_DATA || BS_DATA_FALLBACK;
-  const ratios = bs.ratios;
-  if (!ratios) return;
-  const configs = [
-    { key:'intrec', box:true, boxUnit:'%', threshold:22, dir:'below' },
-    { key:'intpib', box:false, threshold:3, dir:'below' },
-    { key:'tauxmoy', box:false },
-    { key:'tauxmoyext', box:false },
-    { key:'tauxmoyint', box:false },
-    { key:'duree', box:true, boxUnit:' ans', tableUnit:'', threshold:7, dir:'above', useCurrent:true },
-    { key:'ct', box:true, boxUnit:'%', threshold:15, dir:'below', useCurrent:true },
-    { key:'devises', box:true, boxUnit:'%', threshold:60, dir:'below', useCurrent:true },
-    { key:'fixe', box:true, boxUnit:'%', threshold:80, dir:'above', useCurrent:true }
-  ];
-  configs.forEach(cfg => {
-    const arr = ratios[cfg.key];
-    if (!Array.isArray(arr) || arr.length < 4) return;
-    const tableUnit = cfg.tableUnit != null ? cfg.tableUnit : '%';
-    ['2022','2023','2024','2025'].forEach((y, i) => {
-      const el = document.getElementById('td-' + cfg.key + '-' + y);
-      if (el && arr[i] != null) el.textContent = fmt(arr[i]) + tableUnit;
-    });
-    if (cfg.threshold == null) return;
-    const latest = (cfg.useCurrent && arr.length > 4 && arr[4] != null) ? arr[4] : arr[3];
-    const ok = cfg.dir === 'below' ? latest < cfg.threshold : latest > cfg.threshold;
-    const tag = document.getElementById('tag-' + cfg.key + '-status');
-    if (tag) {
-      tag.textContent = ok ? '✓ OK' : '⚠ Vigilance';
-      tag.style.background = ok ? 'var(--green-bg)' : 'var(--gold-bg)';
-      tag.style.color = ok ? 'var(--green)' : '#92720A';
-    }
-    if (cfg.box) {
-      const boxVal = document.getElementById('ratio-val-' + cfg.key);
-      const box = document.getElementById('ratio-item-' + cfg.key);
-      if (boxVal) boxVal.textContent = fmt(latest) + cfg.boxUnit;
-      if (box) { box.classList.remove('r-ok','r-warn'); box.classList.add(ok ? 'r-ok' : 'r-warn'); }
-    }
-  });
+/* Seuils de vigilance appliqués à certaines lignes du Tableau 3 (les
+   mêmes seuils qu'avant ce passage en grille dynamique) ; les lignes
+   sans entrée ici (intpib, tauxmoy*, duree/revision Ext/Int) s'affichent
+   en style neutre, faute de seuil officiel documenté. */
+const RATIO_BOX_THRESHOLDS = {
+  pibac:   { threshold: 70, dir: 'below' },
+  intrec:  { threshold: 22, dir: 'below' },
+  duree:   { threshold: 7,  dir: 'above' },
+  ct:      { threshold: 15, dir: 'below' },
+  devises: { threshold: 60, dir: 'below' },
+  fixe:    { threshold: 80, dir: 'above' }
+};
 
+/* Grille "Tableau de Bord des Risques" — une case par ligne du Tableau 3
+   du BS (hors lignes de section), valeur = dernière colonne du BS en
+   cours (voir bsRatioRowValues/BS_RATIO_TABLE_ROWS, partagés avec le
+   tableau d'Evolution BS) ; se reconstruit à chaque chargement de
+   bs_data.json, donc dynamique à chaque nouveau BS. */
+function refreshRatiosBoxes() {
+  const host = document.getElementById('ratiosBoxGrid');
+  if (!host) return;
+  const bs = BS_DATA || BS_DATA_FALLBACK;
+  host.innerHTML = BS_RATIO_TABLE_ROWS.filter(r => !r.section).map(r => {
+    const cur = bsRatioRowValues(bs, r.key)[4];
+    const th = RATIO_BOX_THRESHOLDS[r.key];
+    let cls = '';
+    if (th && cur != null) {
+      const ok = th.dir === 'below' ? cur < th.threshold : cur > th.threshold;
+      cls = ok ? 'r-ok' : 'r-warn';
+    }
+    const valTxt = cur == null ? '—' : fmt(cur) + r.unit;
+    return `<div class="ratio-item ${cls}" id="ratio-item-${r.key}">` +
+      `<div class="ratio-val" id="ratio-val-${r.key}">${valTxt}</div><div class="ratio-label">${r.label}</div></div>`;
+  }).join('');
 }
 
 /* ─── Navigation historique — BS archivés (bs_history/) ───
@@ -3518,11 +3483,10 @@ function returnToActiveBS() {
   updateBSHistNav();
 }
 
-/* Répercute le ratio Dette AC/PIB (Tableau 3 du BS) sur tous les affichages
-   qui en dépendaient jusqu'ici d'une constante figée : bandeau défilant,
-   case "Dette/PIB" du Tableau de Bord des Risques, ligne "Dette AC / PIB (%)"
-   du tableau des ratios, graphique "Évolution Ratio Dette/PIB", et le %PIB
-   dérivé par composante dans Vue d'ensemble (via RATIO_PIB_PAR_ANNEE). */
+/* Répercute le ratio Dette AC/PIB (Tableau 3 du BS) sur le bandeau défilant
+   et le %PIB dérivé par composante dans Vue d'ensemble (via
+   RATIO_PIB_PAR_ANNEE) ; la case "Dette/PIB" du Tableau de Bord des
+   Risques est gérée par refreshRatiosBoxes (clé 'pibac'). */
 function applyPibACData() {
   const bs = BS_DATA || BS_DATA_FALLBACK;
   const pibAC = bs.pibAC;
@@ -3530,28 +3494,9 @@ function applyPibACData() {
   Object.assign(RATIO_PIB_PAR_ANNEE, pibAC);
 
   // pibACCurrent = ratio du trimestre en cours (Tableau 3), utilisé en priorité pour
-  // le bandeau/la case Risques ; à défaut, on retombe sur la dernière année close.
+  // le bandeau ; à défaut, on retombe sur la dernière année close.
   const latestVal = (bs.pibACCurrent != null) ? bs.pibACCurrent : pibAC[Object.keys(pibAC).sort().pop()];
-  const latestTxt = fmt(latestVal) + '%';
-  const ok = latestVal < 70;
-
-  document.querySelectorAll('.pib-ac-ticker').forEach(el => { el.textContent = latestTxt; });
-
-  const boxVal = document.getElementById('ratio-val-pib');
-  if (boxVal) boxVal.textContent = latestTxt;
-  const box = document.getElementById('ratio-item-pib');
-  if (box) { box.classList.remove('r-ok','r-warn'); box.classList.add(ok ? 'r-ok' : 'r-warn'); }
-
-  ['2022','2023','2024','2025'].forEach(y => {
-    const el = document.getElementById('td-pib-' + y);
-    if (el && pibAC[y] != null) el.textContent = fmt(pibAC[y]) + '%';
-  });
-  const tag = document.getElementById('tag-pib-status');
-  if (tag) {
-    tag.textContent = ok ? '✓ OK' : '⚠ Vigilance';
-    tag.style.background = ok ? 'var(--green-bg)' : 'var(--gold-bg)';
-    tag.style.color = ok ? 'var(--green)' : '#92720A';
-  }
+  document.querySelectorAll('.pib-ac-ticker').forEach(el => { el.textContent = fmt(latestVal) + '%'; });
 
   refreshAll();
 }

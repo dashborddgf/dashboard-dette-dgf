@@ -1052,22 +1052,22 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="card-body">
         <div class="ratio-grid ratio-grid-lg">
           <div class="ratio-item r-ok" id="ratio-item-pib">
-            <div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette/PIB</div>
+            <div class="ratio-val" id="ratio-val-pib">57,1%</div><div class="ratio-label">Dette de l'Administration Centrale en % du PIB</div>
           </div>
           <div class="ratio-item r-warn" id="ratio-item-intrec">
-            <div class="ratio-val" id="ratio-val-intrec">16,5%</div><div class="ratio-label">Int./Recettes</div>
+            <div class="ratio-val" id="ratio-val-intrec">16,5%</div><div class="ratio-label">Intérêts de la dette en % des Recettes budgétaires</div>
           </div>
           <div class="ratio-item r-ok" id="ratio-item-duree">
-            <div class="ratio-val" id="ratio-val-duree">7,2 ans</div><div class="ratio-label">Durée Vie</div>
+            <div class="ratio-val" id="ratio-val-duree">7,2 ans</div><div class="ratio-label">Durée moyenne de vie jusqu'à échéance (année)</div>
           </div>
           <div class="ratio-item r-warn" id="ratio-item-ct">
-            <div class="ratio-val" id="ratio-val-ct">14,8%</div><div class="ratio-label">CT / Total</div>
+            <div class="ratio-val" id="ratio-val-ct">14,8%</div><div class="ratio-label">Dette à court terme (% total)</div>
           </div>
           <div class="ratio-item r-ok" id="ratio-item-fixe">
-            <div class="ratio-val" id="ratio-val-fixe">89,4%</div><div class="ratio-label">Taux Fixe</div>
+            <div class="ratio-val" id="ratio-val-fixe">89,4%</div><div class="ratio-label">Dette à taux fixe (% total)</div>
           </div>
           <div class="ratio-item r-ok" id="ratio-item-devises">
-            <div class="ratio-val" id="ratio-val-devises">53,3%</div><div class="ratio-label">Devise Étr.</div>
+            <div class="ratio-val" id="ratio-val-devises">53,3%</div><div class="ratio-label">Dette en devises (en % total)</div>
           </div>
         </div>
       </div>
@@ -2041,38 +2041,6 @@ function refreshEncoursPublique() {
   const dg = bs.detteGarantie;
   setTxt('enc-garantie-value', dg ? fmt(dg.valeur) + ' Md FCFA' : 'NULL');
   setTxt('enc-garantie-tag', dg ? fmt(dg.ratioPib) + '% du PIB' : 'NULL');
-
-  refreshRisqueDepuisMAD(encInt, encExt, encTotal);
-}
-
-/* Cases "CT / Total" et "Devise Étr." du Tableau de Bord des Risques :
-   calculées depuis le MAD actuellement consulté (Actif ou historique),
-   pas depuis le BS, pour suivre le MAD affiché quand on navigue dans
-   l'historique. Approximations faute de détail plus fin dans le MAD :
-   - CT / Total  ≈ Bons du Trésor (BT) / Encours total (BT = seul
-     instrument à échéance courte identifiable dans le MAD).
-   - Devise Étr. ≈ Dette Extérieure / Encours total (la dette
-     extérieure est presque intégralement en devises, la dette
-     intérieure presque intégralement en FCFA).
-   "Durée Vie" reste sur le BS : la durée de vie moyenne pondérée ne
-   peut pas être recalculée depuis le MAD (pas d'échéance par
-   instrument dans les données actuelles). */
-function refreshRisqueDepuisMAD(encInt, encExt, encTotal) {
-  const setBox = (key, pct, threshold, dir) => {
-    if (!encTotal) return;
-    const boxVal = document.getElementById('ratio-val-' + key);
-    const box = document.getElementById('ratio-item-' + key);
-    if (boxVal) boxVal.textContent = fmt(pct) + '%';
-    if (box) {
-      const ok = dir === 'below' ? pct < threshold : pct > threshold;
-      box.classList.remove('r-ok', 'r-warn');
-      box.classList.add(ok ? 'r-ok' : 'r-warn');
-    }
-  };
-  const ctPct = encTotal ? (DATA.encours.BT || 0) / encTotal * 100 : 0;
-  const devisesPct = encTotal ? encExt / encTotal * 100 : 0;
-  setBox('ct', ctPct, 15, 'below');
-  setBox('devises', devisesPct, 60, 'below');
 }
 
 function buildChartMADEncours(enc) {
@@ -3444,7 +3412,11 @@ async function loadBSData() {
    "Tableau pour Commentaire" : Intérêts/Recettes,
    Intérêts/PIB, Taux moyen pondéré (+Ext/Int), Durée de vie, Dette CT,
    Dette en devises, Dette à taux fixe. 2021 reste une constante
-   historique fixe ; 2022-2025 et le statut/seuil deviennent dynamiques. */
+   historique fixe ; 2022-2025 et le statut/seuil deviennent dynamiques.
+   "CT / Total" et "Devise Étr." lisent désormais ratios.ct/ratios.devises
+   du BS (même règle useCurrent que duree/fixe) pour correspondre
+   exactement à la dernière colonne du Tableau 3, au lieu d'une
+   approximation recalculée depuis le MAD. */
 function applyRatiosData() {
   const bs = BS_DATA || BS_DATA_FALLBACK;
   const ratios = bs.ratios;
@@ -3456,10 +3428,9 @@ function applyRatiosData() {
     { key:'tauxmoyext', box:false },
     { key:'tauxmoyint', box:false },
     { key:'duree', box:true, boxUnit:' ans', tableUnit:'', threshold:7, dir:'above', useCurrent:true },
+    { key:'ct', box:true, boxUnit:'%', threshold:15, dir:'below', useCurrent:true },
+    { key:'devises', box:true, boxUnit:'%', threshold:60, dir:'below', useCurrent:true },
     { key:'fixe', box:true, boxUnit:'%', threshold:80, dir:'above', useCurrent:true }
-    // 'ct' et 'devises' retirés d'ici : calculés depuis le MAD en cours
-    // (voir refreshRisqueDepuisMAD), pas depuis le BS, pour suivre le MAD
-    // consulté (actif ou historique) plutôt que rester figés sur le BS.
   ];
   configs.forEach(cfg => {
     const arr = ratios[cfg.key];

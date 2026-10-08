@@ -427,6 +427,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .ratio-val{font-size:20px;font-weight:900;margin-bottom:2px}
 .ratio-label{font-size:9px;color:#000;font-weight:700}
 .ratio-seuil{font-size:8px;color:#000;font-weight:700;margin-top:2px}
+.ratio-sub-lines{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.12);font-size:10px;color:#4B5563;font-weight:600;display:flex;flex-direction:column;gap:3px}
+.ratio-sub-lines b{color:inherit;font-weight:800}
 .r-ok{color:var(--green);background:var(--green-bg)}
 .r-warn{color:#92720A;background:var(--gold-bg)}
 .r-alert{color:var(--red);background:var(--red-bg)}
@@ -3401,16 +3403,34 @@ const RATIO_BOX_THRESHOLDS = {
   fixe:    { threshold: 80, dir: 'above' }
 };
 
-/* Grille "Tableau de Bord des Risques" — une case par ligne du Tableau 3
-   du BS (hors lignes de section), valeur = dernière colonne du BS en
-   cours (voir bsRatioRowValues/BS_RATIO_TABLE_ROWS, partagés avec le
+/* Groupes de la grille "Tableau de Bord des Risques" — une case par
+   indicateur "parent" du Tableau 3 ; les sous-lignes Extérieure/Intérieure
+   (quand elles existent) s'affichent à l'intérieur de la MÊME case, sous
+   la valeur principale, plutôt qu'en cases séparées. */
+const RATIO_BOX_GROUPS = [
+  { key: 'pibac',    label: "Dette de l'Administration Centrale en % du PIB", unit: '%' },
+  { key: 'intrec',   label: 'Intérêts de la dette en % des Recettes budgétaires', unit: '%' },
+  { key: 'intpib',   label: 'Intérêts de la dette en % du PIB', unit: '%' },
+  { key: 'tauxmoy',  label: "Taux d'intérêt moyen pondéré de la dette", unit: '%',
+    sub: [{ key: 'tauxmoyext', label: 'Dette Extérieure' }, { key: 'tauxmoyint', label: 'Dette Intérieure' }] },
+  { key: 'duree',    label: "Durée moyenne de vie jusqu'à échéance (année)", unit: '',
+    sub: [{ key: 'dureeext', label: 'Dette Extérieure' }, { key: 'dureeint', label: 'Dette Intérieure' }] },
+  { key: 'ct',       label: 'Dette à court terme (% total)', unit: '%' },
+  { key: 'revision', label: 'Durée moyenne révision des taux (année)', unit: '',
+    sub: [{ key: 'revisionext', label: 'Dette Extérieure' }, { key: 'revisionint', label: 'Dette Intérieure' }] },
+  { key: 'devises',  label: 'Dette en devises (en % total)', unit: '%' },
+  { key: 'fixe',     label: 'Dette à taux fixe (% total)', unit: '%' }
+];
+
+/* Grille "Tableau de Bord des Risques" — valeur = dernière colonne du BS
+   en cours (voir bsRatioRowValues/BS_RATIO_TABLE_ROWS, partagés avec le
    tableau d'Evolution BS) ; se reconstruit à chaque chargement de
    bs_data.json, donc dynamique à chaque nouveau BS. */
 function refreshRatiosBoxes() {
   const host = document.getElementById('ratiosBoxGrid');
   if (!host) return;
   const bs = BS_DATA || BS_DATA_FALLBACK;
-  host.innerHTML = BS_RATIO_TABLE_ROWS.filter(r => !r.section).map(r => {
+  host.innerHTML = RATIO_BOX_GROUPS.map(r => {
     const cur = bsRatioRowValues(bs, r.key)[4];
     const th = RATIO_BOX_THRESHOLDS[r.key];
     let cls = '';
@@ -3419,8 +3439,14 @@ function refreshRatiosBoxes() {
       cls = ok ? 'r-ok' : 'r-warn';
     }
     const valTxt = cur == null ? '—' : fmt(cur) + r.unit;
+    const subHtml = r.sub ? '<div class="ratio-sub-lines">' + r.sub.map(s => {
+      const sv = bsRatioRowValues(bs, s.key)[4];
+      const svTxt = sv == null ? '—' : fmt(sv) + r.unit;
+      return `<div>${s.label} <b>${svTxt}</b></div>`;
+    }).join('') + '</div>' : '';
     return `<div class="ratio-item ${cls}" id="ratio-item-${r.key}">` +
-      `<div class="ratio-val" id="ratio-val-${r.key}">${valTxt}</div><div class="ratio-label">${r.label}</div></div>`;
+      `<div class="ratio-val" id="ratio-val-${r.key}">${valTxt}</div>` +
+      `<div class="ratio-label">${r.label}</div>${subHtml}</div>`;
   }).join('');
 }
 

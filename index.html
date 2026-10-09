@@ -1205,7 +1205,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
     <div id="evolSectionIndicateursBS" class="card" style="margin-bottom:12px">
       <div class="card-header">
-        <div><div class="card-title">Indicateurs Coûts et Risques</div><div class="card-sub">Ratios de la dette — Tableau 3 du BS</div></div>
+        <div><div class="card-title">Indicateurs Coûts et Risques</div><div class="card-sub" id="indicateursBsSub">Tableau 3 du BS</div></div>
         <div style="display:flex;gap:6px">
           <button type="button" class="chart-dl-btn" onclick="printOneCard('evolSectionIndicateursBS')">PDF</button>
           <button type="button" class="chart-dl-btn" onclick="exportChartCSV('tableCompareIndicateursBS','indicateurs_couts_risques_bs')">Excel</button>
@@ -2954,6 +2954,9 @@ function buildComparisonIndicateursBS() {
   if (!table) return;
   const bs = BS_DATA || BS_DATA_FALLBACK;
   const curLabel = (bs.meta && bs.meta.periode) || 'BS Actif';
+
+  const subEl = document.getElementById('indicateursBsSub');
+  if (subEl) subEl.textContent = 'Tableau 3' + ((bs.meta && bs.meta.bsName) ? ' — ' + bs.meta.bsName : '');
 
   const thead = '<thead><tr><th style="text-align:left">Indicateur</th>' +
     BS_RATIO_YEARS.map(y => `<th>${y}</th>`).join('') +

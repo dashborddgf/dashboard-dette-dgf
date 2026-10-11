@@ -2777,10 +2777,9 @@ function renderCompareTable(tableId, labels, datasets) {
     if (hasVar) {
       const prev = datasets[datasets.length - 2].data[i], last = datasets[datasets.length - 1].data[i];
       const delta = (prev == null || last == null) ? null : last - prev;
-      const pct = (delta != null && prev) ? (100 * delta / prev) : 0;
       const sign = delta != null && delta >= 0 ? '+' : '';
       const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
-      varCell = delta == null ? '<td>—</td>' : `<td class="td-b" style="color:${color}">${sign}${fmt(delta)} (${sign}${pct.toFixed(1).replace('.', ',')}%)</td>`;
+      varCell = delta == null ? '<td>—</td>' : `<td class="td-b" style="color:${color}">${sign}${fmt(delta)}</td>`;
     }
     return '<tr><td class="td-b">' + lab + '</td>' + datasets.map(d => '<td>' + fmt(d.data[i]) + '</td>').join('') + varCell + '</tr>';
   }).join('') + '</tbody>';

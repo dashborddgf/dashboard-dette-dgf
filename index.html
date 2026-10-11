@@ -180,6 +180,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
 /* ── SIDEBAR ── */
 .sidebar{width:var(--sidebar-w);background:var(--green);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow:hidden}
+.fullscreen-toggle-btn{position:fixed;top:16px;left:calc(var(--sidebar-w) - 14px);z-index:300;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--orange);color:var(--orange);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.25);padding:0}
+.fullscreen-toggle-btn:hover{background:var(--orange-bg)}
 .sidebar-header{background:var(--green);padding:14px 12px 10px;border-bottom:2px solid var(--orange)}
 .logo-row{display:flex;align-items:center;gap:9px;margin-bottom:4px}
 .logo-plate{background:#fff;border-radius:8px;padding:8px 10px 6px;display:flex;flex-direction:column;align-items:center}
@@ -519,6 +521,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
   /* Sidebar masquée, remplacée par bottom nav */
   .sidebar { display: none; }
+  .fullscreen-toggle-btn { display: none; }
 
   .main { margin-left: 0; }
 
@@ -637,7 +640,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 @media print {
   .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .ticker-wrap,
   #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn,
-  #metricFilterStock, #metricFilterService, #metricFilterTirages, .card-header { display: none !important; }
+  #metricFilterStock, #metricFilterService, #metricFilterTirages, .card-header,
+  .fullscreen-toggle-btn { display: none !important; }
   /* Légende par fiche : titre + période + filtres actifs, insérée sous
      l'en-tête de chaque carte (voir populatePrintMetaBlocks ci-dessous)
      pour que chaque tableau imprimé indique son propre état d'extraction.
@@ -776,6 +780,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 <!-- ═══════════ FIN ÉCRAN DE CONNEXION ═══════════ -->
 
 <!-- SIDEBAR -->
+<button type="button" class="fullscreen-toggle-btn" id="fullscreenToggleBtn" onclick="toggleFullscreen()" title="Plein écran">⤢</button>
 <aside class="sidebar">
   <div class="sidebar-header">
     <div class="logo-plate">
@@ -3449,6 +3454,24 @@ function injectObservationButtons() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   PLEIN ÉCRAN — bouton à côté des onglets
+════════════════════════════════════════════════════════════════ */
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('fullscreenToggleBtn');
+  if (!btn) return;
+  const isFs = !!document.fullscreenElement;
+  btn.textContent = isFs ? '⤡' : '⤢';
+  btn.title = isFs ? 'Réduire' : 'Plein écran';
+});
+
+/* ═══════════════════════════════════════════════════════════════
    INITIALISATION
 ════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -3461,6 +3484,17 @@ document.addEventListener('DOMContentLoaded', () => {
   loadObservations();
   loadBSData();
   loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META, l'historique et les libellés)
+
+  // Les navigateurs bloquent le plein écran automatique sans geste
+  // utilisateur : on le déclenche donc dès le tout premier clic sur la
+  // page. Le bouton à côté des onglets permet ensuite de basculer
+  // librement (réduire / revenir en plein écran).
+  document.addEventListener('click', function autoFullscreenOnce() {
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+    document.removeEventListener('click', autoFullscreenOnce);
+  }, { once: true });
 
   // Restaure l'écran actif précédent après un rechargement (Ctrl+R), plutôt
   // que de toujours retomber sur Vue d'Ensemble par défaut.

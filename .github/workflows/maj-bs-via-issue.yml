@@ -53,6 +53,16 @@ jobs:
 
       - name: Mettre à jour bs_data.json et commiter
         run: |
+          # detteGarantie vient du BS.pdf (Tableau 11), pas encore extrait par
+          # l'Office Script : on le reporte de l'ancien bs_data.json s'il existe,
+          # pour ne pas perdre cette donnée à chaque depot.
+          if [ -f bs_data.json ]; then
+            OLD_DG=$(jq -c '.detteGarantie // empty' bs_data.json)
+            if [ -n "$OLD_DG" ]; then
+              jq --argjson dg "$OLD_DG" '.detteGarantie = $dg' /tmp/bs_data.json > /tmp/bs_data_merged.json
+              mv /tmp/bs_data_merged.json /tmp/bs_data.json
+            fi
+          fi
           cp /tmp/bs_data.json bs_data.json
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

@@ -1922,21 +1922,21 @@ function refreshEncoursPublique() {
   }
 
   const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-  const pctTxt = v => v == null ? 'NULL' : fmt(v) + '%';
+  const pctTxt = v => v == null ? '—' : fmt(v) + '%';
 
   setTxt('enc-total-value', fmt(encTotal) + ' Md FCFA');
-  setTxt('enc-total-usd', (encTotalUSD != null ? '(' + fmt(encTotalUSD) + ' M USD)' : 'NULL') + (pibPct != null ? ' ; ' + fmt(pibPct) + '% du PIB' : ''));
+  setTxt('enc-total-usd', (encTotalUSD != null ? '(' + fmt(encTotalUSD) + ' M USD)' : '—') + (pibPct != null ? ' ; ' + fmt(pibPct) + '% du PIB' : ''));
   setTxt('enc-pib-value', pctTxt(pibPct));
 
   setTxt('enc-ext-value', fmt(encExt) + ' Md FCFA');
-  setTxt('enc-ext-tag', (encTotal ? fmt(encExt/encTotal*100) : 'NULL') + '% de l\'encours' + (pibValue ? ' ; ' + fmt(encExt/pibValue*100) + '% du PIB' : ''));
+  setTxt('enc-ext-tag', (encTotal ? fmt(encExt/encTotal*100) : '—') + '% de l\'encours' + (pibValue ? ' ; ' + fmt(encExt/pibValue*100) + '% du PIB' : ''));
 
   setTxt('enc-int-value', fmt(encInt) + ' Md FCFA');
-  setTxt('enc-int-tag', (encTotal ? fmt(encInt/encTotal*100) : 'NULL') + '% de l\'encours' + (pibValue ? ' ; ' + fmt(encInt/pibValue*100) + '% du PIB' : ''));
+  setTxt('enc-int-tag', (encTotal ? fmt(encInt/encTotal*100) : '—') + '% de l\'encours' + (pibValue ? ' ; ' + fmt(encInt/pibValue*100) + '% du PIB' : ''));
 
   const dg = bs.detteGarantie;
-  setTxt('enc-garantie-value', dg ? fmt(dg.valeur) + ' Md FCFA' : 'NULL');
-  setTxt('enc-garantie-tag', dg ? fmt(dg.ratioPib) + '% du PIB' : 'NULL');
+  setTxt('enc-garantie-value', dg ? fmt(dg.valeur) + ' Md FCFA' : '—');
+  setTxt('enc-garantie-tag', dg ? fmt(dg.ratioPib) + '% du PIB' : '—');
 }
 
 function buildChartMADEncours(enc) {

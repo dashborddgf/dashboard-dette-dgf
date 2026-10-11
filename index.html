@@ -1335,7 +1335,7 @@ function showScreen(id, el) {
   try { localStorage.setItem('dgf_last_screen', id); } catch (e) {}
   refreshAll();
   if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
-  if (id === 'comparaison-bs') { buildComparisonIndicateursBS(); }
+  if (id === 'comparaison-bs') { loadBSData().then(() => buildComparisonIndicateursBS()); }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3511,7 +3511,7 @@ window.showScreen = function(id, el) {
   try { localStorage.setItem('dgf_last_screen', id); } catch (e) {}
   refreshAll();
   if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
-  if (id === 'comparaison-bs') { buildComparisonIndicateursBS(); }
+  if (id === 'comparaison-bs') { loadBSData().then(() => buildComparisonIndicateursBS()); }
 };
 </script>
 

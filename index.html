@@ -1332,6 +1332,7 @@ function showScreen(id, el) {
     const grp = el.closest('.nav-group');
     if (grp) grp.classList.add('open');
   }
+  try { localStorage.setItem('dgf_last_screen', id); } catch (e) {}
   refreshAll();
   if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
   if (id === 'comparaison-bs') { buildComparisonIndicateursBS(); }
@@ -3454,6 +3455,18 @@ document.addEventListener('DOMContentLoaded', () => {
   loadObservations();
   loadBSData();
   loadRemoteData(); // charge les données fraîches depuis GitHub (met à jour MAD_META, l'historique et les libellés)
+
+  // Restaure l'écran actif précédent après un rechargement (Ctrl+R), plutôt
+  // que de toujours retomber sur Vue d'Ensemble par défaut.
+  try {
+    const savedScreen = localStorage.getItem('dgf_last_screen');
+    if (savedScreen && document.getElementById('screen-' + savedScreen)) {
+      const navEl = document.querySelector('.nav-item[onclick*="showScreen(\'' + savedScreen + '\'"]');
+      showScreen(savedScreen, navEl);
+      const mobEl = document.querySelector('.mobile-nav-item[onclick*="showScreen(\'' + savedScreen + '\'"]');
+      if (mobEl) setMobileActive(mobEl);
+    }
+  } catch (e) {}
 });
 </script>
 
@@ -3495,6 +3508,7 @@ window.showScreen = function(id, el) {
     const grp = el.closest('.nav-group');
     if (grp) grp.classList.add('open');
   }
+  try { localStorage.setItem('dgf_last_screen', id); } catch (e) {}
   refreshAll();
   if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
   if (id === 'comparaison-bs') { buildComparisonIndicateursBS(); }

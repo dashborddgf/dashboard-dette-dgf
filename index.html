@@ -1116,7 +1116,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="filter-sep"></div>
       <div id="filterGroups-mad" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
-        <span class="card-badge mad-badge-el" id="mad-badge">MAD Janv. 2026</span>
         <span class="card-badge bs-badge-el" id="bs-badge">BS —</span>
         <span class="filter-count" id="filterCount-mad">0 filtre(s)</span>
       </div>
@@ -1201,7 +1200,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="filter-sep"></div>
       <div id="filterGroups-bs" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
-        <span class="card-badge mad-badge-el" id="mad-badge-bs">MAD Janv. 2026</span>
         <span class="card-badge bs-badge-el" id="bs-badge-bs">BS —</span>
         <span class="filter-count" id="filterCount-bs">0 filtre(s)</span>
       </div>
@@ -1712,8 +1710,6 @@ function refreshAll() {
   // MAJ période
   const pLbl = MAD_META.periode;
   ['mad-period','mad-title-period'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=pLbl;});
-  const madBadgeTxt=(MAD_META.madName?stripMadPrefix(MAD_META.madName):pLbl);
-  document.querySelectorAll('.mad-badge-el').forEach(mb=>{mb.textContent=madBadgeTxt;});
   const mbf=document.getElementById('mad-filter-badge');if(mbf)mbf.textContent=lbl;
 
   // MAD filtre info

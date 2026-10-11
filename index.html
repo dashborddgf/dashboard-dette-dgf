@@ -2967,10 +2967,9 @@ function buildComparisonIndicateursBS() {
     if (r.section) return `<tr><td colspan="7" class="td-b" style="background:var(--green);color:#fff">${r.section}</td></tr>`;
     const [y22, y23, y24, y25, cur] = bsRatioRowValues(bs, r.key);
     const delta = (cur != null && y25 != null) ? cur - y25 : null;
-    const pct = (delta != null && y25) ? (100 * delta / y25) : 0;
     const sign = delta != null && delta >= 0 ? '+' : '';
     const color = delta != null && delta >= 0 ? 'var(--green)' : 'var(--red)';
-    const evoCell = delta == null ? '—' : `<span style="color:${color};font-weight:700">${sign}${fmt(delta)}${r.unit} (${sign}${pct.toFixed(1).replace('.', ',')}%)</span>`;
+    const evoCell = delta == null ? '—' : `<span style="color:${color};font-weight:700">${sign}${fmt(delta)}${r.unit}</span>`;
     const labelCell = r.sub
       ? `<td style="padding-left:28px;font-style:italic;color:#374151">${r.label}</td>`
       : `<td class="td-b">${r.label}</td>`;

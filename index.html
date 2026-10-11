@@ -1116,8 +1116,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="filter-sep"></div>
       <div id="filterGroups-mad" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
-        <span class="card-badge" id="mad-badge">MAD Janv. 2026</span>
-        <span class="card-badge" id="bs-badge">BS —</span>
+        <span class="card-badge mad-badge-el" id="mad-badge">MAD Janv. 2026</span>
+        <span class="card-badge bs-badge-el" id="bs-badge">BS —</span>
         <span class="filter-count" id="filterCount-mad">0 filtre(s)</span>
       </div>
     </div>
@@ -1200,7 +1200,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <span class="filter-label">🔍 Filtres</span>
       <div class="filter-sep"></div>
       <div id="filterGroups-bs" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"></div>
-      <div style="margin-left:auto">
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+        <span class="card-badge mad-badge-el" id="mad-badge-bs">MAD Janv. 2026</span>
+        <span class="card-badge bs-badge-el" id="bs-badge-bs">BS —</span>
         <span class="filter-count" id="filterCount-bs">0 filtre(s)</span>
       </div>
     </div>
@@ -1356,10 +1358,10 @@ function renderFilterBar() {
   FILTER_SCOPES.forEach(scope => {
     const host = document.getElementById('filterGroups-' + scope);
     if (!host) return;
-    // Devise retiré de l'Evolution MAD (n'apparaît que côté BS) — F.devise
-    // reste utilisable via la barre BS, qui continue d'affecter aussi les
-    // écrans MAD puisque F est un état partagé.
-    const defs = FILTER_DEFS.filter(def => !(scope === 'mad' && def.key === 'devise'));
+    // Filtre Devise retiré des deux barres (MAD et BS) — F.devise reste à
+    // vide en permanence, ce qui neutralise sans casser le code qui s'y
+    // référait (comportement équivalent à "Toutes devises").
+    const defs = FILTER_DEFS.filter(def => def.key !== 'devise');
     host.innerHTML = defs.map(def => renderFilterGroup(def, scope)).join('<div class="filter-sep"></div>');
   });
 }
@@ -1710,7 +1712,8 @@ function refreshAll() {
   // MAJ période
   const pLbl = MAD_META.periode;
   ['mad-period','mad-title-period'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=pLbl;});
-  const mb=document.getElementById('mad-badge');if(mb)mb.textContent='MAD '+(MAD_META.madName?stripMadPrefix(MAD_META.madName):pLbl);
+  const madBadgeTxt='MAD '+(MAD_META.madName?stripMadPrefix(MAD_META.madName):pLbl);
+  document.querySelectorAll('.mad-badge-el').forEach(mb=>{mb.textContent=madBadgeTxt;});
   const mbf=document.getElementById('mad-filter-badge');if(mbf)mbf.textContent=lbl;
 
   // MAD filtre info
@@ -3084,11 +3087,9 @@ async function loadBSData() {
   refreshRatiosBoxes();
   buildDeviseBars();
   loadBSHistoryIndex();
-  const bb = document.getElementById('bs-badge');
-  if (bb) {
-    const bsName = BS_DATA.meta && BS_DATA.meta.bsName;
-    bb.textContent = 'BS ' + (bsName ? bsName.replace(/^BS/i, '') : '—');
-  }
+  const bsName = BS_DATA.meta && BS_DATA.meta.bsName;
+  const bsBadgeTxt = 'BS ' + (bsName ? bsName.replace(/^BS/i, '') : '—');
+  document.querySelectorAll('.bs-badge-el').forEach(bb => { bb.textContent = bsBadgeTxt; });
 }
 
 /* Seuils de vigilance appliqués à certaines lignes du Tableau 3 (les

@@ -1,9 +1,9 @@
 {
   "meta": {
-    "bsName": "BS1T26",
-    "periode": "Mars 2026",
-    "situationAu": "2026-03-31",
-    "generated": "2026-10-11T22:04:29.044Z"
+    "bsName": "BS2T26",
+    "periode": "Juin 2026",
+    "situationAu": "2026-06-30",
+    "generated": "2026-10-11T22:06:48.482Z"
   },
   "periods": [
     "2022",
@@ -424,28 +424,28 @@
     "2024": 59.5,
     "2025": 57.1
   },
-  "pibACCurrent": 56,
+  "pibACCurrent": 57.9,
   "ratios": {
     "intrec": [
       15,
       16.6,
       16.7,
       16.5,
-      4.1
+      7.2
     ],
     "intpib": [
       2.2,
       2.6,
       2.7,
       2.8,
-      0.7
+      1.2
     ],
     "tauxmoy": [
       4.2,
       4.6,
       5,
       5.1,
-      5.1
+      5
     ],
     "tauxmoyext": [
       3.6,
@@ -459,84 +459,84 @@
       5.3,
       5.5,
       5.4,
-      5.4
+      5.3
     ],
     "duree": [
       6.9,
       7.1,
       7,
       7.2,
-      7.2
+      7.3
     ],
     "dureeext": [
       8.1,
       8.8,
       8.5,
       8.7,
-      8.7
+      8.8
     ],
     "dureeint": [
       5,
       4.3,
       4,
       4.1,
-      4.1
+      4.2
     ],
     "ct": [
-      9.3,
-      10.9,
-      14.6,
-      14.8,
-      14.8
-    ],
-    "revision": [
-      6.4,
-      6.6,
-      6.1,
-      5.8,
-      5.8
-    ],
-    "revisionext": [
-      8.6,
-      8,
-      7.5,
-      7.3,
-      7.3
-    ],
-    "revisionint": [
-      4.9,
-      4.6,
-      3.8,
-      3.4,
-      3.4
-    ],
-    "devises": [
       59.9,
       61.7,
       55.7,
       53.3,
-      52.7
+      51.3
+    ],
+    "revision": [
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9
+    ],
+    "revisionext": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "revisionint": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "devises": [
+      null,
+      null,
+      null,
+      null,
+      null
     ],
     "fixe": [
-      89.2,
-      89.8,
-      89.3,
-      89.4,
-      89.8
+      null,
+      null,
+      75953.2,
+      null,
+      4617400
     ]
   },
   "devisePortefeuille": {
     "total": {
       "EUR": {
-        "value": 14840.1,
-        "pct": 42.5
+        "value": 14969.2,
+        "pct": 41.5
       },
       "XOF": {
-        "value": 16511.4,
-        "pct": 47.3
+        "value": 17587.5,
+        "pct": 48.7
       },
       "USD": {
-        "value": 2408.2,
+        "value": 2481.2,
         "pct": 6.9
       },
       "CNY": {
@@ -544,21 +544,21 @@
         "pct": 1.2
       },
       "Autres": {
-        "value": 707.3,
-        "pct": 2
+        "value": 634.3,
+        "pct": 1.8
       }
     },
     "exterieur": {
       "EUR": {
-        "value": 14840.1,
-        "pct": 68.3
+        "value": 14969.2,
+        "pct": 67.2
       },
       "XOF": {
-        "value": 3365.7,
-        "pct": 15.5
+        "value": 3788.5,
+        "pct": 17
       },
       "USD": {
-        "value": 2408.2,
+        "value": 2481.2,
         "pct": 11.1
       },
       "CNY": {
@@ -566,8 +566,8 @@
         "pct": 1.9
       },
       "Autres": {
-        "value": 707.3,
-        "pct": 3.3
+        "value": 634.3,
+        "pct": 2.8
       }
     }
   },

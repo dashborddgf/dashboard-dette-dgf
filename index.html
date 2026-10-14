@@ -1153,14 +1153,9 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
 
     <div class="card" style="margin-bottom:12px;overflow:visible">
-      <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Année / Mois : ajoute une période (coche 2 mois ou plus) ; ✕ pour en retirer un</div></div></div>
+      <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Date début / Date fin : choisis les 2 périodes à comparer ; ✕ sur un mois ci-dessous pour le retirer</div></div></div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:10px;overflow:visible">
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-          <select id="evolYearSelect" onchange="onEvolYearChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
-          <select id="evolMonthSelect" onchange="onEvolMonthChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
-          <div style="flex:1"></div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:4px;border-top:1px dashed var(--border)">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
           <span style="font-size:10px;font-weight:700;color:var(--gray)">Date début</span>
           <select id="evolStartYearSelect" onchange="onEvolRangeYearChange('Start')" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
           <select id="evolStartMonthSelect" onchange="onEvolRangeChange()" style="border:1px solid var(--border);border-radius:14px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit"></select>
@@ -1378,7 +1373,7 @@ function showScreen(id, el) {
   }
   try { localStorage.setItem('dgf_last_screen', id); } catch (e) {}
   refreshAll();
-  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); populateEvolRangeSelects(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
+  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); populateEvolRangeSelects(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
   if (id === 'comparaison-bs') { loadBSData().then(() => buildComparisonIndicateursBS()); }
 }
 
@@ -2629,7 +2624,7 @@ function renderComparisonPicker() {
   const host = document.getElementById('compareSelectedChipsMAD');
   if (!host) return;
   if (!COMPARE.selected.length) {
-    host.innerHTML = '<span style="color:var(--gray);font-size:11px">Aucun mois sélectionné — utilise Année / Mois ci-dessus pour en ajouter.</span>';
+    host.innerHTML = '<span style="color:var(--gray);font-size:11px">Aucun mois sélectionné — utilise Date début / Date fin ci-dessus.</span>';
     return;
   }
   host.innerHTML = COMPARE.selected.map(key =>
@@ -2925,44 +2920,7 @@ function toggleEvolVarMAD(key) {
   applyEvolVarFilter({ stock: 'evolSectionStock', service: 'evolSectionService', tirages: 'evolSectionTirages' }, EVOL_VAR);
 }
 
-/* ─── Sélecteur Année / Mois relocalisé depuis la barre du haut : ajoute
-   directement une période à la sélection de comparaison MAD ci-dessous,
-   au lieu de changer le MAD affiché globalement (voir note plus bas). ─── */
-function renderEvolYearMonthPicker() {
-  const yearSel = document.getElementById('evolYearSelect');
-  const monthSel = document.getElementById('evolMonthSelect');
-  if (!yearSel || !monthSel) return;
-  const periods = compareAvailablePeriods().map(p => ({ ...p, ...(periodeToYearMonth(p.label) || { year: '?', month: '00' }) }));
-  if (!periods.length) { yearSel.innerHTML = ''; monthSel.innerHTML = ''; return; }
-  const years = [...new Set(periods.map(p => p.year))].sort();
-  const curYear = (yearSel.value && years.includes(yearSel.value)) ? yearSel.value : years[years.length - 1];
-  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y === curYear ? 'selected' : ''}>${y}</option>`).join('');
-  renderEvolMonthOptions(curYear);
-}
-
-function renderEvolMonthOptions(year) {
-  const monthSel = document.getElementById('evolMonthSelect');
-  if (!monthSel) return;
-  const periods = compareAvailablePeriods()
-    .map(p => ({ ...p, ...(periodeToYearMonth(p.label) || { year: '?', month: '00' }) }))
-    .filter(p => p.year === year).sort((a, b) => a.month.localeCompare(b.month));
-  monthSel.innerHTML = periods.map(p => `<option value="${p.key}">${p.label}</option>`).join('');
-}
-
-function onEvolYearChange() {
-  const yearSel = document.getElementById('evolYearSelect');
-  if (!yearSel) return;
-  renderEvolMonthOptions(yearSel.value);
-}
-
-async function onEvolMonthChange() {
-  const monthSel = document.getElementById('evolMonthSelect');
-  if (!monthSel || !monthSel.value) return;
-  const key = monthSel.value;
-  if (!COMPARE.selected.includes(key)) await toggleComparisonMonth(key);
-}
-
-/* ─── Date début / Date fin — alternative rapide au picker ci-dessus :
+/* ─── Date début / Date fin :
    choisir directement les 2 bornes à comparer plutôt que les ajouter une
    par une. Remplace la sélection de comparaison par exactement ces 2
    périodes (pas celles entre les deux). ─── */
@@ -3842,7 +3800,7 @@ window.showScreen = function(id, el) {
   }
   try { localStorage.setItem('dgf_last_screen', id); } catch (e) {}
   refreshAll();
-  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); renderEvolYearMonthPicker(); populateEvolRangeSelects(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
+  if (id === 'comparaison') { loadHistoryIndex().then(() => { renderComparisonPicker(); refreshComparison(); populateEvolRangeSelects(); renderEvolVarFilter('evolVarFilterMAD', EVOL_VAR, 'toggleEvolVarMAD'); renderEvolValeurFilter('evolValeurFilterMAD'); renderEvolDisplayFilter('evolDisplayFilterMAD'); }); }
   if (id === 'comparaison-bs') { loadBSData().then(() => buildComparisonIndicateursBS()); }
 };
 </script>

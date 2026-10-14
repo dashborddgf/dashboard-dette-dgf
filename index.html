@@ -934,6 +934,16 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="page-sub">Dette Publique · Administration Centrale · Côte d'Ivoire</div>
     </div>
     <div class="topbar-spacer"></div>
+    <div class="bs-hist-nav" title="Naviguer entre les MAD archivés" style="margin-right:12px">
+      <button type="button" class="bs-hist-btn mad-hist-prev-btn" onclick="madHistPrev()" title="MAD précédent" disabled>‹</button>
+      <span class="card-badge" id="topbar-mad-badge">MAD —</span>
+      <button type="button" class="bs-hist-btn mad-hist-next-btn" onclick="madHistNext()" title="MAD suivant / retour à l'actif" disabled>›</button>
+    </div>
+    <div class="bs-hist-nav" title="Naviguer entre les BS archivés">
+      <button type="button" class="bs-hist-btn bs-hist-prev-btn" onclick="bsHistPrev()" title="BS précédent" disabled>‹</button>
+      <span class="card-badge" id="topbar-bs-badge">BS —</span>
+      <button type="button" class="bs-hist-btn bs-hist-next-btn" onclick="bsHistNext()" title="BS suivant / retour à l'actif" disabled>›</button>
+    </div>
   </div>
 
   <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
@@ -1231,8 +1241,8 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="card-header">
         <div><div class="card-title">Situation de la Dette — Template BS</div><div class="card-sub">Millions USD &amp; Milliards F CFA · Dernière colonne : <span id="bs-active-name">—</span></div></div>
         <div class="bs-hist-nav" title="Naviguer entre les BS archivés">
-          <button type="button" class="bs-hist-btn" id="bsHistPrevBtn" onclick="bsHistPrev()" title="BS précédent" disabled>‹</button>
-          <button type="button" class="bs-hist-btn" id="bsHistNextBtn" onclick="bsHistNext()" title="BS suivant / retour à l'actif" disabled>›</button>
+          <button type="button" class="bs-hist-btn bs-hist-prev-btn" id="bsHistPrevBtn" onclick="bsHistPrev()" title="BS précédent" disabled>‹</button>
+          <button type="button" class="bs-hist-btn bs-hist-next-btn" id="bsHistNextBtn" onclick="bsHistNext()" title="BS suivant / retour à l'actif" disabled>›</button>
         </div>
       </div>
       <div class="card-body" style="padding:0;overflow-x:auto">
@@ -1912,11 +1922,12 @@ function refreshEncoursPublique() {
   const intKeys=['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
   const extKeys=['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
   const sumBy = (obj, keys) => keys.reduce((a,k) => a + (obj[k] || 0), 0);
-  const encInt = sumBy(DATA.encours, intKeys);
-  const encExt = sumBy(DATA.encours, extKeys);
+  const encSource = (MAD_VIEW && MAD_VIEW.encours) || DATA.encours;
+  const encInt = sumBy(encSource, intKeys);
+  const encExt = sumBy(encSource, extKeys);
   const encTotal = encInt + encExt;
 
-  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const bs = BS_VIEW || BS_DATA || BS_DATA_FALLBACK;
 
   const pibPct = (bs.pibACCurrent != null) ? bs.pibACCurrent
     : (bs.pibAC ? bs.pibAC[Object.keys(bs.pibAC).sort().pop()] : null);
@@ -2468,6 +2479,7 @@ async function loadRemoteData() {
     // MAJ des libellés d'en-tête (badge période, titre onglet, pied de page)
     updateMadLabels();
     refreshAll();
+    updateTopbarBadges();
     console.info('✅ data.json chargé — MAD :', madCoreLabel(), meta.dateMAJ ? '(généré le ' + meta.dateMAJ + ')' : '');
   } catch (e) {
     console.warn('⚠ data.json introuvable ou invalide — utilisation des données intégrées.', e);
@@ -2506,6 +2518,7 @@ async function loadHistoryIndex() {
   } catch (e) {
     console.info('ℹ Aucun MAD historique disponible (history/index.json absent ou invalide).');
   }
+  updateMadHistNav();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3089,6 +3102,8 @@ async function loadBSData() {
   const bsName = BS_DATA.meta && BS_DATA.meta.bsName;
   const bsBadgeTxt = bsName || '—';
   document.querySelectorAll('.bs-badge-el').forEach(bb => { bb.textContent = bsBadgeTxt; });
+  updateTopbarBadges();
+  updateBSHistNav();
 }
 
 /* Seuils de vigilance appliqués à certaines lignes du Tableau 3 (les
@@ -3167,11 +3182,8 @@ async function loadBSHistoryIndex() {
 }
 
 function updateBSHistNav() {
-  const prevBtn = document.getElementById('bsHistPrevBtn');
-  const nextBtn = document.getElementById('bsHistNextBtn');
-  if (!prevBtn || !nextBtn) return;
-  prevBtn.disabled = !BS_HIST.list.length || BS_HIST.idx === 0;
-  nextBtn.disabled = BS_HIST.idx === -1;
+  document.querySelectorAll('.bs-hist-prev-btn').forEach(b => { b.disabled = !BS_HIST.list.length || BS_HIST.idx === 0; });
+  document.querySelectorAll('.bs-hist-next-btn').forEach(b => { b.disabled = BS_HIST.idx === -1; });
 }
 
 async function bsHistPrev() {
@@ -3197,6 +3209,8 @@ async function loadHistoricalBS(idx) {
     BS_VIEW = await resp.json();
     BS_HIST.idx = idx;
     renderBSTable();
+    refreshEncoursPublique();
+    updateTopbarBadges();
     updateBSHistNav();
   } catch (e) {
     console.warn('⚠ Impossible de charger le BS archivé.', e);
@@ -3207,7 +3221,80 @@ function returnToActiveBS() {
   BS_VIEW = BS_DATA;
   BS_HIST.idx = -1;
   renderBSTable();
+  refreshEncoursPublique();
+  updateTopbarBadges();
   updateBSHistNav();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION HISTORIQUE — MAD (bandeau orange, Vue d'ensemble)
+   Même principe que BS_HIST ci-dessus : purement local à l'affichage
+   de la carte "Encours de la dette publique", ne modifie jamais
+   data.json ni le MAD Actif, n'affecte aucun autre écran.
+════════════════════════════════════════════════════════════════ */
+const MAD_HIST = { idx: -1 };
+let MAD_VIEW = null; // null = MAD Actif ; sinon { encours, meta } d'une archive
+
+function updateMadHistNav() {
+  document.querySelectorAll('.mad-hist-prev-btn').forEach(b => { b.disabled = !HIST.list.length || MAD_HIST.idx === 0; });
+  document.querySelectorAll('.mad-hist-next-btn').forEach(b => { b.disabled = MAD_HIST.idx === -1; });
+}
+
+async function madHistPrev() {
+  if (!HIST.list.length) return;
+  const target = MAD_HIST.idx === -1 ? HIST.list.length - 1 : MAD_HIST.idx - 1;
+  if (target < 0) return;
+  await loadHistoricalMAD(target);
+}
+
+async function madHistNext() {
+  if (MAD_HIST.idx === -1) return;
+  const target = MAD_HIST.idx + 1;
+  if (target >= HIST.list.length) { returnToActiveMAD(); return; }
+  await loadHistoricalMAD(target);
+}
+
+async function loadHistoricalMAD(idx) {
+  const entry = HIST.list[idx];
+  if (!entry) return;
+  try {
+    const resp = await fetch(entry.file + '?v=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('fetch échoué');
+    const payload = await resp.json();
+    MAD_VIEW = { encours: payload.encours || {}, meta: payload.meta || payload._meta || payload };
+    MAD_HIST.idx = idx;
+    refreshEncoursPublique();
+    updateTopbarBadges();
+    updateMadHistNav();
+  } catch (e) {
+    console.warn('⚠ Impossible de charger le MAD archivé.', e);
+  }
+}
+
+function returnToActiveMAD() {
+  MAD_VIEW = null;
+  MAD_HIST.idx = -1;
+  refreshEncoursPublique();
+  updateTopbarBadges();
+  updateMadHistNav();
+}
+
+/* Reflète MAD_VIEW/BS_VIEW (actif ou archivé) sur les badges du bandeau
+   orange, visibles depuis tous les écrans. */
+function updateTopbarBadges() {
+  const madEl = document.getElementById('topbar-mad-badge');
+  if (madEl) {
+    const meta = (MAD_VIEW && MAD_VIEW.meta) || MAD_META;
+    const name = meta.madName;
+    const txt = 'MAD' + (name ? stripMadPrefix(name) : (' ' + (meta.periode || '')));
+    madEl.textContent = txt + (MAD_HIST.idx !== -1 ? ' (archivé)' : '');
+  }
+  const bsEl = document.getElementById('topbar-bs-badge');
+  if (bsEl) {
+    const bs = BS_VIEW || BS_DATA || BS_DATA_FALLBACK;
+    const bsName = bs.meta && bs.meta.bsName;
+    bsEl.textContent = (bsName || '—') + (BS_HIST.idx !== -1 ? ' (archivé)' : '');
+  }
 }
 
 /* Répercute le ratio Dette AC/PIB (Tableau 3 du BS) sur le bandeau défilant

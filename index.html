@@ -3389,14 +3389,16 @@ async function onMadHistMonthChange() {
   await loadHistoricalMAD(idx);
 }
 
+const BS_QUARTER_MONTHS = ['Mars', 'Juin', 'Septembre', 'Décembre'];
 function bsHistEntries() {
   const list = BS_HIST.list.map((e, i) => {
     const m = (e.bsName || '').match(/BS(\d)T(\d{2})/i);
-    return { idx: i, year: m ? ('20' + m[2]) : null, label: e.periode || e.bsName };
+    return { idx: i, year: m ? ('20' + m[2]) : null, label: m ? BS_QUARTER_MONTHS[Number(m[1]) - 1] : (e.periode || e.bsName) };
   });
   const activeMeta = BS_DATA && BS_DATA.meta;
   const am = ((activeMeta && activeMeta.bsName) || '').match(/BS(\d)T(\d{2})/i);
-  list.push({ idx: -1, year: am ? ('20' + am[2]) : null, label: ((activeMeta && activeMeta.periode) || 'Actif') + ' (Actif)' });
+  const activeLabel = am ? ('Actif ' + BS_QUARTER_MONTHS[Number(am[1]) - 1]) : ('Actif' + ((activeMeta && activeMeta.periode) ? (' ' + activeMeta.periode) : ''));
+  list.push({ idx: -1, year: am ? ('20' + am[2]) : null, label: activeLabel });
   return list;
 }
 

@@ -2392,9 +2392,16 @@ function defaultActivePeriod() {
 
 /* Retire un éventuel préfixe "MAD" (ex: "MAD_Actif_Juillet_26") ainsi qu'un suffixe technique
    de type "_20260710_160218" pouvant avoir été ajouté par SharePoint en cas de conflit de nom. */
+/* Nettoie un nom de fichier brut (ex: "MAD1225.xlsx") pour l'affichage :
+   retire l'extension Excel, le suffixe horodatage éventuel, et pour
+   stripMadPrefix le préfixe "MAD" lui-même. Utilisé partout où un nom
+   MAD ou BS est affiché, pour ne jamais laisser filtrer ".xlsx/.xls". */
+function stripFileExt(s) {
+  return String(s || '').replace(/\.xlsx?$/i, '');
+}
 function stripMadPrefix(s) {
   if (!s) return '';
-  return String(s)
+  return stripFileExt(s)
     .replace(/^MAD[\s_-]*/i, '')
     .replace(/[_-]\d{8}[_-]\d{6}$/, '')
     .trim();
@@ -3001,7 +3008,7 @@ function buildComparisonIndicateursBS() {
   const curLabel = (bs.meta && bs.meta.periode) || 'BS Actif';
 
   const subEl = document.getElementById('indicateursBsSub');
-  if (subEl) subEl.textContent = 'Tableau 3' + ((bs.meta && bs.meta.bsName) ? ' — ' + bs.meta.bsName : '');
+  if (subEl) subEl.textContent = 'Tableau 3' + ((bs.meta && bs.meta.bsName) ? ' — ' + stripFileExt(bs.meta.bsName) : '');
 
   const thead = '<thead><tr><th style="text-align:left">Indicateur</th>' +
     BS_RATIO_YEARS.map(y => `<th>${y}</th>`).join('') +
@@ -3124,7 +3131,7 @@ async function loadBSData() {
   buildDeviseBars();
   loadBSHistoryIndex();
   const bsName = BS_DATA.meta && BS_DATA.meta.bsName;
-  const bsBadgeTxt = bsName || '—';
+  const bsBadgeTxt = bsName ? stripFileExt(bsName) : '—';
   document.querySelectorAll('.bs-badge-el').forEach(bb => { bb.textContent = bsBadgeTxt; });
   updateTopbarBadges();
   updateBSHistNav();
@@ -3321,7 +3328,7 @@ function updateTopbarBadges() {
   if (bsEl) {
     const bs = bsView();
     const bsName = bs.meta && bs.meta.bsName;
-    bsEl.textContent = (bsName || '—') + (BS_HIST.idx !== -1 ? ' (archivé)' : '');
+    bsEl.textContent = (bsName ? stripFileExt(bsName) : '—') + (BS_HIST.idx !== -1 ? ' (archivé)' : '');
   }
   updateHistBanner();
 }
@@ -3333,11 +3340,11 @@ function updateHistBanner() {
   const parts = [];
   if (MAD_HIST.idx !== -1 && HIST.list[MAD_HIST.idx]) {
     const e = HIST.list[MAD_HIST.idx];
-    parts.push('MAD ' + (e.periode || e.madName));
+    parts.push('MAD ' + (e.periode || stripFileExt(e.madName)));
   }
   if (BS_HIST.idx !== -1 && BS_HIST.list[BS_HIST.idx]) {
     const e = BS_HIST.list[BS_HIST.idx];
-    parts.push('BS ' + (e.bsName || e.periode));
+    parts.push('BS ' + (stripFileExt(e.bsName) || e.periode));
   }
   if (parts.length) {
     if (detail) detail.textContent = ' (' + parts.join(' · ') + ')';
@@ -3351,7 +3358,7 @@ function updateHistBanner() {
    orange — listent les archives + l'Actif (idx -1), choisir une entrée
    charge directement cette période (ou revient à l'Actif). ─── */
 function madHistEntries() {
-  const list = HIST.list.map((e, i) => ({ idx: i, year: (periodeToYearMonth(e.periode) || {}).year, label: e.periode || e.madName }));
+  const list = HIST.list.map((e, i) => ({ idx: i, year: (periodeToYearMonth(e.periode) || {}).year, label: e.periode || stripFileExt(e.madName) }));
   list.push({ idx: -1, year: (periodeToYearMonth(MAD_META.periode) || {}).year, label: (MAD_META.periode || 'Actif') + ' (Actif)' });
   return list;
 }
@@ -3393,7 +3400,7 @@ const BS_QUARTER_MONTHS = ['Mars', 'Juin', 'Septembre', 'Décembre'];
 function bsHistEntries() {
   const list = BS_HIST.list.map((e, i) => {
     const m = (e.bsName || '').match(/BS(\d)T(\d{2})/i);
-    return { idx: i, year: m ? ('20' + m[2]) : null, label: m ? BS_QUARTER_MONTHS[Number(m[1]) - 1] : (e.periode || e.bsName) };
+    return { idx: i, year: m ? ('20' + m[2]) : null, label: m ? BS_QUARTER_MONTHS[Number(m[1]) - 1] : (e.periode || stripFileExt(e.bsName)) };
   });
   const activeMeta = BS_DATA && BS_DATA.meta;
   const am = ((activeMeta && activeMeta.bsName) || '').match(/BS(\d)T(\d{2})/i);
@@ -3455,7 +3462,7 @@ function applyPibACData() {
 
 function renderBSTable() {
   const bs = BS_VIEW || BS_DATA || BS_DATA_FALLBACK;
-  const activePeriode = bs.meta?.periode || bs.meta?.bsName || 'BS —';
+  const activePeriode = bs.meta?.periode || stripFileExt(bs.meta?.bsName) || 'BS —';
   const periods = bs.periods.concat([activePeriode]);
   const nameEl = document.getElementById('bs-active-name');
   if (nameEl) nameEl.textContent = activePeriode + (BS_HIST.idx !== -1 ? ' (archivé)' : '');

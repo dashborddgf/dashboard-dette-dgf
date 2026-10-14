@@ -828,6 +828,25 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="1.5"/></svg>
     Indicateurs coûts et Risques
   </div>
+  <div class="nav-group" id="navgroup-mad" data-nav-key="mad">
+    <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('mad',this)">
+      <span class="nav-item-main">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" stroke-width="1.5"/></svg>
+        MAD
+      </span>
+      <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
+    </div>
+    <div class="nav-submenu" id="navsub-mad">
+      <div class="nav-item nav-subitem" onclick="showScreen('affichage-mad',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1" stroke-width="1.5"/><path d="M3 9h18M9 9v11" stroke-width="1.5"/></svg>
+        Affichage MAD
+      </div>
+      <div class="nav-item nav-subitem" onclick="showScreen('comparaison',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke-width="1.5"/></svg>
+        Evolution MAD
+      </div>
+    </div>
+  </div>
   <div class="nav-group" id="navgroup-evolution" data-nav-key="evolution">
     <div class="nav-item nav-group-toggle" onclick="toggleNavGroup('evolution',this)">
       <span class="nav-item-main">
@@ -837,10 +856,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <svg class="nav-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" stroke-width="2"/></svg>
     </div>
     <div class="nav-submenu" id="navsub-evolution">
-      <div class="nav-item nav-subitem" onclick="showScreen('comparaison',this)">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" stroke-width="1.5"/></svg>
-        MAD
-      </div>
       <div class="nav-item nav-subitem" onclick="showScreen('comparaison-bs',this)">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="10" width="4" height="11"/><rect x="10" y="4" width="4" height="17"/><rect x="17" y="7" width="4" height="14"/></svg>
         BS
@@ -1085,6 +1100,43 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
   </div><!-- /eurobonds -->
 
+  <!-- ══════════════ AFFICHAGE MAD (contenu du fichier MAD Actif) ══════════════ -->
+  <div class="screen" id="screen-affichage-mad">
+    <div class="alert-banner alert-blue">📋&nbsp; Tableau de Bord MAD — Données <span id="mad-period">Janvier 2026</span> — Source : SYGADE / DGF</div>
+
+    <div id="mad-filter-info" style="background:var(--gold-bg);border:1px solid var(--gold);border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:#5C4806;display:none">
+      <strong>⚠ Filtres actifs :</strong> <span id="mad-filter-desc"></span> — Les montants affichés correspondent à la sélection.
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div><div class="card-title">TABLEAU DE BORD — SUIVI MENSUEL DE LA DETTE PUBLIQUE</div><div class="card-sub">Situation au 31 <span id="mad-title-period">janvier 2026</span> — en milliards de FCFA — <strong id="mad-filter-badge" style="color:var(--orange)">Toutes dettes</strong></div></div>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto">
+        <table class="mad-tbl">
+          <thead>
+            <tr>
+              <th rowspan="2" style="text-align:left;width:200px">POSTES</th>
+              <th colspan="3" class="th-gr">MOBILISATIONS</th>
+              <th colspan="3" class="th-or">SERVICE DÛ</th>
+              <th colspan="3" class="th-go">SERVICE PAYÉ</th>
+              <th class="th-gy">ENCOURS</th>
+            </tr>
+            <tr>
+              <th class="th-gr">Cash</th><th class="th-gr">Traités</th><th class="th-gr">TOTAL</th>
+              <th class="th-or">Capital</th><th class="th-or">Intérêts</th><th class="th-or">TOTAL</th>
+              <th class="th-go">Capital</th><th class="th-go">Intérêts</th><th class="th-go">TOTAL</th>
+              <th class="th-gy">Stock</th>
+            </tr>
+          </thead>
+          <tbody id="mad-tbody">
+            <!-- dynamically rendered -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /affichage-mad -->
+
   <!-- ══════════════ EVOLUTION (ex-Comparaison Mensuelle) ══════════════ -->
   <div class="screen" id="screen-comparaison">
 
@@ -1121,46 +1173,6 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
         </div>
         <div id="compareSelectedChipsMAD" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"></div>
       </div>
-    </div>
-
-    <!-- Contenu du fichier MAD Actif (indépendant de la sélection de périodes
-         ci-dessus) — reproduit à l'identique le détail par créancier, au
-         même titre que le Tableau 3 reproduit sur Evolution BS. -->
-    <div id="evolSectionMADTable">
-      <div class="alert-banner alert-blue">📋&nbsp; Tableau de Bord MAD — Données <span id="mad-period">Janvier 2026</span> — Source : SYGADE / DGF</div>
-
-      <div id="mad-filter-info" style="background:var(--gold-bg);border:1px solid var(--gold);border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:#5C4806;display:none">
-        <strong>⚠ Filtres actifs :</strong> <span id="mad-filter-desc"></span> — Les montants affichés correspondent à la sélection.
-      </div>
-
-      <div class="card" style="margin-bottom:12px">
-        <div class="card-header">
-          <div><div class="card-title">TABLEAU DE BORD — SUIVI MENSUEL DE LA DETTE PUBLIQUE</div><div class="card-sub">Situation au 31 <span id="mad-title-period">janvier 2026</span> — en milliards de FCFA — <strong id="mad-filter-badge" style="color:var(--orange)">Toutes dettes</strong></div></div>
-        </div>
-        <div class="card-body" style="padding:0;overflow-x:auto">
-          <table class="mad-tbl">
-            <thead>
-              <tr>
-                <th rowspan="2" style="text-align:left;width:200px">POSTES</th>
-                <th colspan="3" class="th-gr">MOBILISATIONS</th>
-                <th colspan="3" class="th-or">SERVICE DÛ</th>
-                <th colspan="3" class="th-go">SERVICE PAYÉ</th>
-                <th class="th-gy">ENCOURS</th>
-              </tr>
-              <tr>
-                <th class="th-gr">Cash</th><th class="th-gr">Traités</th><th class="th-gr">TOTAL</th>
-                <th class="th-or">Capital</th><th class="th-or">Intérêts</th><th class="th-or">TOTAL</th>
-                <th class="th-go">Capital</th><th class="th-go">Intérêts</th><th class="th-go">TOTAL</th>
-                <th class="th-gy">Stock</th>
-              </tr>
-            </thead>
-            <tbody id="mad-tbody">
-              <!-- dynamically rendered -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
 
     <div id="compareEmpty" class="card" style="text-align:center;padding:30px;color:var(--gray);font-size:12px">
@@ -1343,6 +1355,7 @@ const PAGE_TITLES = {
   'vue-exec':'Encours de la dette — MAD + BS',
   'portefeuille-dette':'Portefeuille de la Dette — MAD + BS',
   'ratios':'Indicateurs coûts et Risques — MAD + BS',
+  'affichage-mad':'Affichage MAD',
   'comparaison':'Evolution — MAD',
   'comparaison-bs':'Evolution — BS'
 };

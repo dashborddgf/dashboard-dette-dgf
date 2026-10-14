@@ -241,6 +241,17 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .bs-hist-btn:hover:not(:disabled){background:var(--orange-bg);color:var(--orange)}
 .bs-hist-btn:disabled{opacity:.3;cursor:not-allowed}
 
+/* ── NAVIGATION HISTORIQUE (bandeau orange, MAD + BS) ── */
+.hist-picker{display:flex;align-items:center;gap:5px}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4AFF42;margin-right:5px;flex-shrink:0;animation:liveBlink 1.6s ease-in-out infinite}
+.live-dot.archived{background:#D1D5DB;animation:none}
+@keyframes liveBlink{0%,100%{opacity:1}50%{opacity:.3}}
+.hist-select{border:none;border-radius:20px;background:var(--orange-bg);color:var(--orange);font-size:9px;font-weight:700;padding:3px 6px;font-family:inherit;cursor:pointer;max-width:92px}
+.hist-banner{display:none;align-items:center;justify-content:center;gap:14px;background:#92400E;color:#fff;font-size:12px;font-weight:700;padding:7px 16px;position:sticky;top:66px;z-index:149;text-align:center}
+.hist-banner.visible{display:flex}
+.hist-banner button{background:#fff;color:#92400E;border:none;border-radius:6px;padding:4px 10px;font-weight:700;cursor:pointer;font-size:11px;font-family:inherit}
+@media (max-width:768px){.hist-banner{top:0}}
+
 /* ── LOADING OVERLAY ── */
 .loading-overlay{position:fixed;inset:0;background:rgba(10,14,26,.55);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s}
 .loading-overlay.visible{opacity:1;pointer-events:all}
@@ -934,16 +945,22 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div class="page-sub">Dette Publique · Administration Centrale · Côte d'Ivoire</div>
     </div>
     <div class="topbar-spacer"></div>
-    <div class="bs-hist-nav" title="Naviguer entre les MAD archivés" style="margin-right:12px">
-      <button type="button" class="bs-hist-btn mad-hist-prev-btn" onclick="madHistPrev()" title="MAD précédent" disabled>‹</button>
+    <div class="hist-picker" title="Naviguer entre les MAD archivés" style="margin-right:14px">
+      <span class="live-dot" id="mad-live-dot"></span>
       <span class="card-badge" id="topbar-mad-badge">MAD —</span>
-      <button type="button" class="bs-hist-btn mad-hist-next-btn" onclick="madHistNext()" title="MAD suivant / retour à l'actif" disabled>›</button>
+      <select class="hist-select" id="madHistYearSelect" onchange="onMadHistYearChange()"><option>Année</option></select>
+      <select class="hist-select" id="madHistMonthSelect" onchange="onMadHistMonthChange()"><option>Mois</option></select>
     </div>
-    <div class="bs-hist-nav" title="Naviguer entre les BS archivés">
-      <button type="button" class="bs-hist-btn bs-hist-prev-btn" onclick="bsHistPrev()" title="BS précédent" disabled>‹</button>
+    <div class="hist-picker" title="Naviguer entre les BS archivés">
+      <span class="live-dot" id="bs-live-dot"></span>
       <span class="card-badge" id="topbar-bs-badge">BS —</span>
-      <button type="button" class="bs-hist-btn bs-hist-next-btn" onclick="bsHistNext()" title="BS suivant / retour à l'actif" disabled>›</button>
+      <select class="hist-select" id="bsHistYearSelect" onchange="onBsHistYearChange()"><option>Année</option></select>
+      <select class="hist-select" id="bsHistPeriodSelect" onchange="onBsHistPeriodChange()"><option>Trim.</option></select>
     </div>
+  </div>
+  <div class="hist-banner" id="histBanner">
+    <span>⏳ Vous consultez des données archivées<span id="histBannerDetail"></span> — ce n'est pas l'Actif.</span>
+    <button type="button" onclick="returnAllToActive()">Revenir à l'Actif</button>
   </div>
 
   <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
@@ -1560,6 +1577,13 @@ const DATA = {
   }
 };
 
+/* MAD/BS actuellement affichés : l'Actif, sauf navigation dans l'historique
+   (bandeau orange) en cours — auquel cas l'archive browsée. Alimente tous les
+   écrans sauf Evolution (qui gère sa propre sélection de périodes via COMPARE
+   / BS_DATA directement, indépendante de cette navigation). */
+function madView() { return MAD_VIEW || DATA; }
+function bsView() { return BS_VIEW || BS_DATA || BS_DATA_FALLBACK; }
+
 /* ─── Filtrage des créanciers selon filtre Source / Créancier / Bailleur / Devise / Type ─── */
 /* Filtrage générique par clé d'instrument (Source/Créancier/Devise) —
    opère sur n'importe quel objet indexé par les mêmes clés MAD
@@ -1601,7 +1625,7 @@ function getFilteredEncoursFrom(baseEnc) {
   return enc;
 }
 
-function getFilteredEncours() { return getFilteredEncoursFrom(DATA.encours); }
+function getFilteredEncours() { return getFilteredEncoursFrom(madView().encours); }
 
 /* ─── Totaux filtrés ─── */
 function calcTotals() {
@@ -1613,7 +1637,7 @@ function calcTotals() {
   const intTotal = intKeys.filter(k=>enc[k]).reduce((a,k)=>a+(enc[k]||0),0);
   const extTotal = extKeys.filter(k=>enc[k]).reduce((a,k)=>a+(enc[k]||0),0);
 
-  const svc = DATA.service;
+  const svc = madView().service;
   let cap=0,int_=0;
   Object.keys(enc).forEach(k=>{
     if(svc[k]){cap+=svc[k][0];int_+=svc[k][1];}
@@ -1638,7 +1662,7 @@ function currentServiceYear(){
 /* ─── Recalcul dynamique de quelques encours ponctuels (Eurobonds, bandeau
    millésimes), à partir de DATA.encours complet (MAD courant). ─── */
 function updateDynamicBadges() {
-  const e = DATA.encours || {};
+  const e = madView().encours || {};
   const g = k => e[k] || 0;
   const euro = g('Eurobonds');
 
@@ -1744,8 +1768,8 @@ function refreshAll() {
 
 /* ─── Tableau MAD dynamique ─── */
 function renderMADTable(enc) {
-  const s = DATA.service;
-  const m = DATA.mobilisations;
+  const s = madView().service;
+  const m = madView().mobilisations;
   const tbody = document.getElementById('mad-tbody');
   if(!tbody) return;
 
@@ -1883,8 +1907,8 @@ function refreshVueEnsembleColonnes(enc) {
   ['col-enc-period','col-mob-period','col-svc-period'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = periode; });
 
   // Encours (+ %PIB dérivé du ratio officiel de l'année du MAD, au prorata Int/Ext)
-  const encInt = sumBy(DATA.encours, intKeys);
-  const encExt = sumBy(DATA.encours, extKeys);
+  const encInt = sumBy(madView().encours, intKeys);
+  const encExt = sumBy(madView().encours, extKeys);
   const encTotal = encInt + encExt;
   const ym = periodeToYearMonth(periode) || {};
   const ratioTotal = ratioPibPourAnnee(ym.year || '');
@@ -1894,7 +1918,7 @@ function refreshVueEnsembleColonnes(enc) {
   setStatValue('col-enc-ext', encExt); setStatPib('col-enc-ext-pib', pib ? encExt/pib*100 : 0);
 
   // Mobilisation
-  const mob = DATA.mobilisations || {};
+  const mob = madView().mobilisations || {};
   const mobInt = sumBy(mob, intKeys);
   const mobExt = sumBy(mob, extKeys);
   setStatValue('col-mob-total', mobInt + mobExt);
@@ -1902,7 +1926,7 @@ function refreshVueEnsembleColonnes(enc) {
   setStatValue('col-mob-ext', mobExt);
 
   // Service (capital + intérêts)
-  const svcSum = keys => keys.reduce((a,k) => { const v = DATA.service[k] || [0,0]; return a + v[0] + v[1]; }, 0);
+  const svcSum = keys => keys.reduce((a,k) => { const v = madView().service[k] || [0,0]; return a + v[0] + v[1]; }, 0);
   const svcInt = svcSum(intKeys);
   const svcExt = svcSum(extKeys);
   setStatValue('col-svc-total', svcInt + svcExt);
@@ -1922,12 +1946,11 @@ function refreshEncoursPublique() {
   const intKeys=['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
   const extKeys=['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
   const sumBy = (obj, keys) => keys.reduce((a,k) => a + (obj[k] || 0), 0);
-  const encSource = (MAD_VIEW && MAD_VIEW.encours) || DATA.encours;
-  const encInt = sumBy(encSource, intKeys);
-  const encExt = sumBy(encSource, extKeys);
+  const encInt = sumBy(madView().encours, intKeys);
+  const encExt = sumBy(madView().encours, extKeys);
   const encTotal = encInt + encExt;
 
-  const bs = BS_VIEW || BS_DATA || BS_DATA_FALLBACK;
+  const bs = bsView();
 
   const pibPct = (bs.pibACCurrent != null) ? bs.pibACCurrent
     : (bs.pibAC ? bs.pibAC[Object.keys(bs.pibAC).sort().pop()] : null);
@@ -1966,9 +1989,10 @@ function buildChartMADEncours(enc) {
 }
 
 function buildChartMADService(enc) {
-  const keys=Object.keys(enc).filter(k=>DATA.service[k]);
+  const svc = madView().service;
+  const keys=Object.keys(enc).filter(k=>svc[k]);
   const lblMap={BanqComm:'Bq.Comm.',BT:'BT',TPCI:'TPCI',OAT:'OAT',FMI:'FMI',BM:'BM',BAD:'BAD',BID:'BID',AutresMulti:'Aut.Multi',AFD:'AFD',KFW:'KFW',EximbankChine:'Eximbank',JICA:'JICA',AutresBil:'Aut.Bil.',Eurobonds:'Eurobonds',Samourai:'Samourai',Commerciaux:'Comm.'};
-  mkChart('chartMADService',{type:'bar',data:{labels:keys.map(k=>lblMap[k]||k),datasets:[{label:'Capital',data:keys.map(k=>DATA.service[k][0]),backgroundColor:C.orA,borderRadius:3},{label:'Intérêts',data:keys.map(k=>DATA.service[k][1]),backgroundColor:C.blA,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
+  mkChart('chartMADService',{type:'bar',data:{labels:keys.map(k=>lblMap[k]||k),datasets:[{label:'Capital',data:keys.map(k=>svc[k][0]),backgroundColor:C.orA,borderRadius:3},{label:'Intérêts',data:keys.map(k=>svc[k][1]),backgroundColor:C.blA,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{stacked:true,...gO},y:{stacked:true,...gO,ticks:{callback:v=>v.toLocaleString('fr-FR'),...gO.ticks}}}}});
 }
 
 /* Écran "Portefeuille de la Dette" — répartition par type de créanciers.
@@ -2003,7 +2027,7 @@ function buildCreancierBars(enc) {
 /* Répartition du portefeuille par devise — source BS, onglet "Graphique 2,3 & 4"
    (tableau "Total"), mise à jour à chaque nouveau BS. */
 function buildDeviseBars() {
-  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const bs = bsView();
   const total = bs.devisePortefeuille && bs.devisePortefeuille.total;
   if (!total) { renderCreancierBars('devise-bars', []); return; }
   const order = ['EUR', 'XOF', 'USD', 'CNY', 'Autres'];
@@ -2518,7 +2542,7 @@ async function loadHistoryIndex() {
   } catch (e) {
     console.info('ℹ Aucun MAD historique disponible (history/index.json absent ou invalide).');
   }
-  updateMadHistNav();
+  populateMadHistSelects();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3145,7 +3169,7 @@ const RATIO_BOX_GROUPS = [
 function refreshRatiosBoxes() {
   const host = document.getElementById('ratiosBoxGrid');
   if (!host) return;
-  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const bs = bsView();
   host.innerHTML = RATIO_BOX_GROUPS.map(r => {
     const cur = bsRatioRowValues(bs, r.key)[4];
     const th = RATIO_BOX_THRESHOLDS[r.key];
@@ -3167,10 +3191,11 @@ function refreshRatiosBoxes() {
 }
 
 /* ─── Navigation historique — BS archivés (bs_history/) ───
-   Purement local à l'affichage du tableau Template BS : ne modifie
-   jamais bs_data.json ni le BS Actif, et n'affecte jamais le ratio
-   Dette/PIB global (ticker, ratio-item, graphique) qui reste toujours
-   celui du BS Actif. */
+   Purement local à l'affichage (Template BS + bandeau orange) : ne
+   modifie jamais bs_data.json ni le BS Actif. Depuis que le bandeau
+   orange pilote aussi la carte Encours/Ratios (cf. bsView()), parcourir
+   l'historique affecte tous les écrans SAUF Evolution/Evolution BS, qui
+   gardent leur propre sélection de périodes indépendante. */
 async function loadBSHistoryIndex() {
   try {
     const resp = await fetch('bs_history/index.json?v=' + Date.now(), { cache: 'no-store' });
@@ -3179,6 +3204,7 @@ async function loadBSHistoryIndex() {
     BS_HIST.list = [];
   }
   updateBSHistNav();
+  populateBsHistSelects();
 }
 
 function updateBSHistNav() {
@@ -3208,10 +3234,8 @@ async function loadHistoricalBS(idx) {
     if (!resp.ok) throw new Error('fetch échoué');
     BS_VIEW = await resp.json();
     BS_HIST.idx = idx;
-    renderBSTable();
-    refreshEncoursPublique();
-    updateTopbarBadges();
     updateBSHistNav();
+    refreshHistNavDisplays();
   } catch (e) {
     console.warn('⚠ Impossible de charger le BS archivé.', e);
   }
@@ -3220,39 +3244,18 @@ async function loadHistoricalBS(idx) {
 function returnToActiveBS() {
   BS_VIEW = BS_DATA;
   BS_HIST.idx = -1;
-  renderBSTable();
-  refreshEncoursPublique();
-  updateTopbarBadges();
   updateBSHistNav();
+  refreshHistNavDisplays();
 }
 
 /* ═══════════════════════════════════════════════════════════════
    NAVIGATION HISTORIQUE — MAD (bandeau orange, Vue d'ensemble)
-   Même principe que BS_HIST ci-dessus : purement local à l'affichage
-   de la carte "Encours de la dette publique", ne modifie jamais
-   data.json ni le MAD Actif, n'affecte aucun autre écran.
+   Même principe que BS_HIST ci-dessus : purement local à l'affichage,
+   ne modifie jamais data.json ni le MAD Actif. Affecte tous les écrans
+   SAUF Evolution (cf. madView()).
 ════════════════════════════════════════════════════════════════ */
 const MAD_HIST = { idx: -1 };
-let MAD_VIEW = null; // null = MAD Actif ; sinon { encours, meta } d'une archive
-
-function updateMadHistNav() {
-  document.querySelectorAll('.mad-hist-prev-btn').forEach(b => { b.disabled = !HIST.list.length || MAD_HIST.idx === 0; });
-  document.querySelectorAll('.mad-hist-next-btn').forEach(b => { b.disabled = MAD_HIST.idx === -1; });
-}
-
-async function madHistPrev() {
-  if (!HIST.list.length) return;
-  const target = MAD_HIST.idx === -1 ? HIST.list.length - 1 : MAD_HIST.idx - 1;
-  if (target < 0) return;
-  await loadHistoricalMAD(target);
-}
-
-async function madHistNext() {
-  if (MAD_HIST.idx === -1) return;
-  const target = MAD_HIST.idx + 1;
-  if (target >= HIST.list.length) { returnToActiveMAD(); return; }
-  await loadHistoricalMAD(target);
-}
+let MAD_VIEW = null; // null = MAD Actif ; sinon { encours, service, mobilisations, devise, meta } d'une archive
 
 async function loadHistoricalMAD(idx) {
   const entry = HIST.list[idx];
@@ -3261,11 +3264,15 @@ async function loadHistoricalMAD(idx) {
     const resp = await fetch(entry.file + '?v=' + Date.now(), { cache: 'no-store' });
     if (!resp.ok) throw new Error('fetch échoué');
     const payload = await resp.json();
-    MAD_VIEW = { encours: payload.encours || {}, meta: payload.meta || payload._meta || payload };
+    MAD_VIEW = {
+      encours: payload.encours || {},
+      service: payload.service || {},
+      mobilisations: payload.mobilisations || {},
+      devise: payload.devise || {},
+      meta: payload.meta || payload._meta || payload
+    };
     MAD_HIST.idx = idx;
-    refreshEncoursPublique();
-    updateTopbarBadges();
-    updateMadHistNav();
+    refreshHistNavDisplays();
   } catch (e) {
     console.warn('⚠ Impossible de charger le MAD archivé.', e);
   }
@@ -3274,14 +3281,35 @@ async function loadHistoricalMAD(idx) {
 function returnToActiveMAD() {
   MAD_VIEW = null;
   MAD_HIST.idx = -1;
-  refreshEncoursPublique();
-  updateTopbarBadges();
-  updateMadHistNav();
+  refreshHistNavDisplays();
 }
 
-/* Reflète MAD_VIEW/BS_VIEW (actif ou archivé) sur les badges du bandeau
-   orange, visibles depuis tous les écrans. */
+/* Un seul point d'entrée pour tout rafraîchir après un changement de
+   MAD_VIEW/BS_VIEW (affiche l'archive partout sauf Evolution). */
+function refreshHistNavDisplays() {
+  applyPibACData(); // met à jour le bandeau défilant (%PIB) + appelle refreshAll()
+  refreshRatiosBoxes();
+  renderBSTable();
+  buildDeviseBars();
+  updateTopbarBadges();
+  populateMadHistSelects();
+  populateBsHistSelects();
+}
+
+function returnAllToActive() {
+  if (MAD_HIST.idx !== -1) returnToActiveMAD();
+  if (BS_HIST.idx !== -1) returnToActiveBS();
+}
+
+/* Reflète MAD_VIEW/BS_VIEW (actif ou archivé) sur les badges, le point
+   vert clignotant et la bande d'alerte du bandeau orange — visibles
+   depuis tous les écrans. */
 function updateTopbarBadges() {
+  const madDot = document.getElementById('mad-live-dot');
+  if (madDot) madDot.classList.toggle('archived', MAD_HIST.idx !== -1);
+  const bsDot = document.getElementById('bs-live-dot');
+  if (bsDot) bsDot.classList.toggle('archived', BS_HIST.idx !== -1);
+
   const madEl = document.getElementById('topbar-mad-badge');
   if (madEl) {
     const meta = (MAD_VIEW && MAD_VIEW.meta) || MAD_META;
@@ -3291,10 +3319,118 @@ function updateTopbarBadges() {
   }
   const bsEl = document.getElementById('topbar-bs-badge');
   if (bsEl) {
-    const bs = BS_VIEW || BS_DATA || BS_DATA_FALLBACK;
+    const bs = bsView();
     const bsName = bs.meta && bs.meta.bsName;
     bsEl.textContent = (bsName || '—') + (BS_HIST.idx !== -1 ? ' (archivé)' : '');
   }
+  updateHistBanner();
+}
+
+function updateHistBanner() {
+  const banner = document.getElementById('histBanner');
+  const detail = document.getElementById('histBannerDetail');
+  if (!banner) return;
+  const parts = [];
+  if (MAD_HIST.idx !== -1 && HIST.list[MAD_HIST.idx]) {
+    const e = HIST.list[MAD_HIST.idx];
+    parts.push('MAD ' + (e.periode || e.madName));
+  }
+  if (BS_HIST.idx !== -1 && BS_HIST.list[BS_HIST.idx]) {
+    const e = BS_HIST.list[BS_HIST.idx];
+    parts.push('BS ' + (e.bsName || e.periode));
+  }
+  if (parts.length) {
+    if (detail) detail.textContent = ' (' + parts.join(' · ') + ')';
+    banner.classList.add('visible');
+  } else {
+    banner.classList.remove('visible');
+  }
+}
+
+/* ─── Sélecteurs Année / Mois (MAD) et Année / Trimestre (BS) du bandeau
+   orange — listent les archives + l'Actif (idx -1), choisir une entrée
+   charge directement cette période (ou revient à l'Actif). ─── */
+function madHistEntries() {
+  const list = HIST.list.map((e, i) => ({ idx: i, year: (periodeToYearMonth(e.periode) || {}).year, label: e.periode || e.madName }));
+  list.push({ idx: -1, year: (periodeToYearMonth(MAD_META.periode) || {}).year, label: (MAD_META.periode || 'Actif') + ' (Actif)' });
+  return list;
+}
+
+function populateMadHistSelects() {
+  const yearSel = document.getElementById('madHistYearSelect');
+  const monthSel = document.getElementById('madHistMonthSelect');
+  if (!yearSel || !monthSel) return;
+  const entries = madHistEntries();
+  const years = [...new Set(entries.map(e => e.year).filter(Boolean))].sort();
+  if (!years.length) { yearSel.innerHTML = '<option>Année</option>'; monthSel.innerHTML = '<option>Mois</option>'; return; }
+  const curEntry = entries.find(e => e.idx === MAD_HIST.idx);
+  const curYear = (curEntry && curEntry.year) || years[years.length - 1];
+  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y === curYear ? 'selected' : ''}>${y}</option>`).join('');
+  populateMadHistMonths(curYear);
+}
+
+function populateMadHistMonths(year) {
+  const monthSel = document.getElementById('madHistMonthSelect');
+  if (!monthSel) return;
+  const entries = madHistEntries().filter(e => e.year === year);
+  monthSel.innerHTML = entries.map(e => `<option value="${e.idx}" ${e.idx === MAD_HIST.idx ? 'selected' : ''}>${e.label}</option>`).join('');
+}
+
+function onMadHistYearChange() {
+  const yearSel = document.getElementById('madHistYearSelect');
+  if (yearSel) populateMadHistMonths(yearSel.value);
+}
+
+async function onMadHistMonthChange() {
+  const monthSel = document.getElementById('madHistMonthSelect');
+  if (!monthSel || monthSel.value === '') return;
+  const idx = Number(monthSel.value);
+  if (idx === -1) { returnToActiveMAD(); return; }
+  await loadHistoricalMAD(idx);
+}
+
+function bsHistEntries() {
+  const list = BS_HIST.list.map((e, i) => {
+    const m = (e.bsName || '').match(/BS(\d)T(\d{2})/i);
+    return { idx: i, year: m ? ('20' + m[2]) : null, label: e.periode || e.bsName };
+  });
+  const activeMeta = BS_DATA && BS_DATA.meta;
+  const am = ((activeMeta && activeMeta.bsName) || '').match(/BS(\d)T(\d{2})/i);
+  list.push({ idx: -1, year: am ? ('20' + am[2]) : null, label: ((activeMeta && activeMeta.periode) || 'Actif') + ' (Actif)' });
+  return list;
+}
+
+function populateBsHistSelects() {
+  const yearSel = document.getElementById('bsHistYearSelect');
+  const periodSel = document.getElementById('bsHistPeriodSelect');
+  if (!yearSel || !periodSel) return;
+  const entries = bsHistEntries();
+  const years = [...new Set(entries.map(e => e.year).filter(Boolean))].sort();
+  if (!years.length) { yearSel.innerHTML = '<option>Année</option>'; periodSel.innerHTML = '<option>Trim.</option>'; return; }
+  const curEntry = entries.find(e => e.idx === BS_HIST.idx);
+  const curYear = (curEntry && curEntry.year) || years[years.length - 1];
+  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y === curYear ? 'selected' : ''}>${y}</option>`).join('');
+  populateBsHistPeriods(curYear);
+}
+
+function populateBsHistPeriods(year) {
+  const periodSel = document.getElementById('bsHistPeriodSelect');
+  if (!periodSel) return;
+  const entries = bsHistEntries().filter(e => e.year === year);
+  periodSel.innerHTML = entries.map(e => `<option value="${e.idx}" ${e.idx === BS_HIST.idx ? 'selected' : ''}>${e.label}</option>`).join('');
+}
+
+function onBsHistYearChange() {
+  const yearSel = document.getElementById('bsHistYearSelect');
+  if (yearSel) populateBsHistPeriods(yearSel.value);
+}
+
+async function onBsHistPeriodChange() {
+  const periodSel = document.getElementById('bsHistPeriodSelect');
+  if (!periodSel || periodSel.value === '') return;
+  const idx = Number(periodSel.value);
+  if (idx === -1) { returnToActiveBS(); return; }
+  await loadHistoricalBS(idx);
 }
 
 /* Répercute le ratio Dette AC/PIB (Tableau 3 du BS) sur le bandeau défilant
@@ -3302,7 +3438,7 @@ function updateTopbarBadges() {
    RATIO_PIB_PAR_ANNEE) ; la case "Dette/PIB" du Tableau de Bord des
    Risques est gérée par refreshRatiosBoxes (clé 'pibac'). */
 function applyPibACData() {
-  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const bs = bsView();
   const pibAC = bs.pibAC;
   if (!pibAC) return;
   Object.assign(RATIO_PIB_PAR_ANNEE, pibAC);

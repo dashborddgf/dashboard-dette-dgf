@@ -3004,7 +3004,7 @@ function bsRatioRowValues(payload, key) {
 function buildComparisonIndicateursBS() {
   const table = document.getElementById('tableCompareIndicateursBS');
   if (!table) return;
-  const bs = BS_DATA || BS_DATA_FALLBACK;
+  const bs = bsView();
   const curLabel = (bs.meta && bs.meta.periode) || 'BS Actif';
 
   const subEl = document.getElementById('indicateursBsSub');
@@ -3124,7 +3124,7 @@ async function loadBSData() {
     BS_DATA = BS_DATA_FALLBACK;
     console.info('ℹ bs_data.json introuvable — utilisation des données Template BS intégrées.');
   }
-  BS_VIEW = BS_DATA;
+  if (BS_HIST.idx === -1) BS_VIEW = BS_DATA; // ne pas écraser une archive en cours de consultation
   renderBSTable();
   applyPibACData();
   refreshRatiosBoxes();

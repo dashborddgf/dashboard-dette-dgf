@@ -10,11 +10,5 @@
     "bsName": "BS2T26",
     "periode": "Juin 2026",
     "file": "bs_history/bs_BS2T26_.json"
-  },
-  {
-    "id": "bs_BS4T26_",
-    "bsName": "BS4T26",
-    "periode": "Décembre 2026",
-    "file": "bs_history/bs_BS4T26_.json"
   }
 ]

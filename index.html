@@ -1268,11 +1268,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="screen" id="screen-template-bs">
     <div class="card">
       <div class="card-header">
-        <div><div class="card-title">Situation de la Dette — Template BS</div><div class="card-sub">Millions USD &amp; Milliards F CFA · Dernière colonne : <span id="bs-active-name">—</span></div></div>
-        <div class="bs-hist-nav" title="Naviguer entre les BS archivés">
-          <button type="button" class="bs-hist-btn bs-hist-prev-btn" id="bsHistPrevBtn" onclick="bsHistPrev()" title="BS précédent" disabled>‹</button>
-          <button type="button" class="bs-hist-btn bs-hist-next-btn" id="bsHistNextBtn" onclick="bsHistNext()" title="BS suivant / retour à l'actif" disabled>›</button>
-        </div>
+        <div><div class="card-title">Situation de la Dette — Template BS</div><div class="card-sub">Millions USD &amp; Milliards F CFA · Dernières colonnes : <span id="bs-active-name">—</span></div></div>
       </div>
       <div class="card-body" style="padding:0;overflow-x:auto">
         <table class="tbl tbl-bs" id="bsTable" style="min-width:900px">
@@ -3238,6 +3234,7 @@ async function loadBSHistoryIndex() {
   }
   updateBSHistNav();
   populateBsHistSelects();
+  renderBSTable(); // ré-affiche "Affichage BS" une fois les archives connues
 }
 
 function updateBSHistNav() {
@@ -3487,27 +3484,59 @@ function applyPibACData() {
   refreshAll();
 }
 
-function renderBSTable() {
-  const bs = BS_VIEW || BS_DATA || BS_DATA_FALLBACK;
-  const activePeriode = bs.meta?.periode || stripFileExt(bs.meta?.bsName) || 'BS —';
-  const periods = bs.periods.concat([activePeriode]);
+/* "Affichage BS" (screen-template-bs) montre désormais CHAQUE BS connu
+   (Actif + tous les archivés de bs_history) côte à côte en colonnes,
+   plutôt qu'un seul "courant" qu'il fallait faire défiler avec des
+   flèches — ex: 2022…2025, puis Mars 2026, puis Juin 2026, etc. */
+const BS_ALL_CACHE = {};
+
+async function loadAllBSPeriods() {
+  const out = [];
+  if (BS_DATA && BS_DATA.meta) {
+    out.push({ key: BS_DATA.meta.bsName, label: BS_DATA.meta.periode || stripFileExt(BS_DATA.meta.bsName), payload: BS_DATA });
+  }
+  for (const entry of BS_HIST.list) {
+    if (out.some(o => o.key === entry.bsName)) continue; // déjà couvert par l'Actif
+    let payload = BS_ALL_CACHE[entry.id];
+    if (!payload) {
+      try {
+        const resp = await fetch(entry.file + '?v=' + Date.now(), { cache: 'no-store' });
+        payload = await resp.json();
+        BS_ALL_CACHE[entry.id] = payload;
+      } catch (e) { continue; }
+    }
+    out.push({ key: entry.bsName, label: entry.periode || stripFileExt(entry.bsName), payload });
+  }
+  out.sort((a, b) => (a.payload.meta?.situationAu || '').localeCompare(b.payload.meta?.situationAu || ''));
+  return out;
+}
+
+async function renderBSTable() {
+  const periodsData = await loadAllBSPeriods();
   const nameEl = document.getElementById('bs-active-name');
-  if (nameEl) nameEl.textContent = activePeriode + (BS_HIST.idx !== -1 ? ' (archivé)' : '');
+  if (nameEl) nameEl.textContent = periodsData.map(p => p.label).join(' · ') || '—';
+  if (!periodsData.length) return;
+
+  const years = (periodsData[0].payload.periods) || ['2022', '2023', '2024', '2025'];
+  const colLabels = years.concat(periodsData.map(p => p.label));
 
   const head = document.getElementById('bsTableHead');
   if (head) head.innerHTML =
-    '<tr><th></th>' + periods.map(p => `<th colspan="2">${escHtmlBS(p)}</th>`).join('') + '</tr>' +
-    '<tr><th></th>' + periods.map(() => '<th>Millions USD</th><th>Milliards F CFA</th>').join('') + '</tr>';
+    '<tr><th></th>' + colLabels.map(p => `<th colspan="2">${escHtmlBS(p)}</th>`).join('') + '</tr>' +
+    '<tr><th></th>' + colLabels.map(() => '<th>Millions USD</th><th>Milliards F CFA</th>').join('') + '</tr>';
 
+  const baseRows = periodsData[0].payload.rows || [];
   const body = document.getElementById('bsTableBody');
-  if (body) body.innerHTML = bs.rows.map(r => {
+  if (body) body.innerHTML = baseRows.map((r, i) => {
     const rowClass = r.section ? 'bs-section' : (r.level >= 2 ? '' : 'bs-sub');
     const pad = 10 + (r.level || 0) * 16;
-    const cells = r.values.map(pair => {
-      const [usd, xof] = pair;
-      return `<td>${fmt(usd)}</td><td>${fmt(xof)}</td>`;
+    const yearCells = r.values.slice(0, years.length).map(pair => `<td>${fmt(pair[0])}</td><td>${fmt(pair[1])}</td>`).join('');
+    const curCells = periodsData.map(p => {
+      const row = (p.payload.rows || [])[i];
+      const pair = (row && row.values) ? row.values[row.values.length - 1] : [null, null];
+      return `<td>${fmt(pair[0])}</td><td>${fmt(pair[1])}</td>`;
     }).join('');
-    return `<tr class="${rowClass}"><td style="padding-left:${pad}px">${escHtmlBS(r.label)}</td>${cells}</tr>`;
+    return `<tr class="${rowClass}"><td style="padding-left:${pad}px">${escHtmlBS(r.label)}</td>${yearCells}${curCells}</tr>`;
   }).join('');
 }
 function escHtmlBS(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }

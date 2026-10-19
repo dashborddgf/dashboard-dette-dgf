@@ -1115,7 +1115,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 
     <div class="card" style="margin-bottom:12px">
       <div class="card-header">
-        <div><div class="card-title">TABLEAU DE BORD — SUIVI MENSUEL DE LA DETTE PUBLIQUE</div><div class="card-sub">Situation au 31 <span id="mad-title-period">janvier 2026</span> — en milliards de FCFA — <strong id="mad-filter-badge" style="color:var(--orange)">Toutes dettes</strong></div></div>
+        <div><div class="card-title">TABLEAU DE BORD — SUIVI MENSUEL DE LA DETTE PUBLIQUE</div><div class="card-sub">Situation au <span id="mad-title-period">31 janvier 2026</span> — en milliards de FCFA — <strong id="mad-filter-badge" style="color:var(--orange)">Toutes dettes</strong></div></div>
       </div>
       <div class="card-body" style="padding:0;overflow-x:auto">
         <table class="mad-tbl">
@@ -1758,7 +1758,10 @@ function refreshAll() {
   // le badge Evolution MAD (mad-badge-el) reste toujours lié à l'Actif.
   const pLbl = MAD_META.periode;
   const viewPeriode = (MAD_VIEW && MAD_VIEW.meta && MAD_VIEW.meta.periode) || pLbl;
-  ['mad-period','mad-title-period'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=viewPeriode;});
+  const madPeriodEl = document.getElementById('mad-period');
+  if (madPeriodEl) madPeriodEl.textContent = viewPeriode;
+  const madTitleEl = document.getElementById('mad-title-period');
+  if (madTitleEl) madTitleEl.textContent = lastDayLabel(viewPeriode);
   const madBadgeTxt='MAD'+(MAD_META.madName?stripMadPrefix(MAD_META.madName):(' '+pLbl));
   document.querySelectorAll('.mad-badge-el').forEach(mb=>{mb.textContent=madBadgeTxt;});
   const mbf=document.getElementById('mad-filter-badge');if(mbf)mbf.textContent=lbl;
@@ -3067,6 +3070,16 @@ function periodeToYearMonth(periode) {
   if (!m) return null;
   const idx = MOIS_FR.findIndex(x => x.toLowerCase() === m[1].toLowerCase());
   return { year: m[2], month: idx >= 0 ? String(idx + 1).padStart(2, '0') : '00' };
+}
+
+/* "31 Janvier 2026", "30 Juin 2026", "28/29 Février 2026"... — le dernier
+   jour du mois n'est pas toujours le 31 ; calculé depuis le libellé
+   "Mois Année" plutôt que codé en dur. */
+function lastDayLabel(periode) {
+  const ym = periodeToYearMonth(periode);
+  if (!ym || ym.month === '00') return periode || '';
+  const lastDay = new Date(Number(ym.year), Number(ym.month), 0).getDate();
+  return lastDay + ' ' + periode;
 }
 
 /* ═══════════════════════════════════════════════════════════════

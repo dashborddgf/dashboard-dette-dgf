@@ -1753,9 +1753,12 @@ function refreshAll() {
   // MAJ MAD
   renderMADTable(enc);
 
-  // MAJ période
+  // MAJ période — mad-period/mad-title-period suivent la période affichée
+  // (Actif ou archive en cours de consultation via le bandeau orange) ;
+  // le badge Evolution MAD (mad-badge-el) reste toujours lié à l'Actif.
   const pLbl = MAD_META.periode;
-  ['mad-period','mad-title-period'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=pLbl;});
+  const viewPeriode = (MAD_VIEW && MAD_VIEW.meta && MAD_VIEW.meta.periode) || pLbl;
+  ['mad-period','mad-title-period'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=viewPeriode;});
   const madBadgeTxt='MAD'+(MAD_META.madName?stripMadPrefix(MAD_META.madName):(' '+pLbl));
   document.querySelectorAll('.mad-badge-el').forEach(mb=>{mb.textContent=madBadgeTxt;});
   const mbf=document.getElementById('mad-filter-badge');if(mbf)mbf.textContent=lbl;
@@ -1914,7 +1917,7 @@ function refreshVueEnsembleColonnes(enc) {
   const intKeys=['BCEAO','BanqComm','TitriseesDomestique','BT','TPCI','OAT','Sukuk','RCI'];
   const extKeys=['FMI','BM','BAD','BID','AutresMulti','AFD','KFW','EximbankChine','JICA','AutresBil','Eurobonds','Samourai','Commerciaux'];
   const sumBy = (obj, keys) => keys.reduce((a,k) => a + (obj[k] || 0), 0);
-  const periode = MAD_META.periode || '';
+  const periode = (MAD_VIEW && MAD_VIEW.meta && MAD_VIEW.meta.periode) || MAD_META.periode || '';
   ['col-enc-period','col-mob-period','col-svc-period'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = periode; });
 
   // Encours (+ %PIB dérivé du ratio officiel de l'année du MAD, au prorata Int/Ext)

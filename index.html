@@ -259,6 +259,13 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .hist-banner button{background:#fff;color:#92400E;border:none;border-radius:6px;padding:4px 10px;font-weight:700;cursor:pointer;font-size:11px;font-family:inherit}
 @media (max-width:768px){.hist-banner{top:0}}
 
+/* ── Invite d'installation iOS (Safari ne propose aucune bannière
+   automatique comme Android/Chrome — il faut expliquer le geste) ── */
+.ios-install-banner{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:300;background:var(--dark);color:#fff;border-radius:10px;padding:10px 14px;font-size:12.5px;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.ios-install-banner.visible{display:flex}
+.ios-install-banner span{flex:1}
+.ios-install-banner button{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:13px;cursor:pointer;flex-shrink:0;width:24px;height:24px;border-radius:50%;line-height:1}
+
 /* ── LOADING OVERLAY ── */
 .loading-overlay{position:fixed;inset:0;background:rgba(10,14,26,.55);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s}
 .loading-overlay.visible{opacity:1;pointer-events:all}
@@ -656,10 +663,10 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
    N'imprime que l'onglet actuellement affiché : la sidebar, la barre du haut,
    les filtres et la nav mobile sont masqués ; le contenu prend toute la largeur. */
 @media print {
-  .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .ticker-wrap,
+  .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .hist-banner, .ticker-wrap,
   #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn,
   #metricFilterStock, #metricFilterService, #metricFilterTirages, .card-header,
-  .fullscreen-toggle-btn { display: none !important; }
+  .fullscreen-toggle-btn, .ios-install-banner { display: none !important; }
   /* Légende par fiche : titre + période + filtres actifs, insérée sous
      l'en-tête de chaque carte (voir populatePrintMetaBlocks ci-dessous)
      pour que chaque tableau imprimé indique son propre état d'extraction.
@@ -987,6 +994,11 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   <div class="hist-banner" id="histBanner">
     <span>⏳ Vous consultez des données archivées<span id="histBannerDetail"></span> — ce n'est pas l'Actif.</span>
     <button type="button" onclick="returnAllToActive()">Revenir à l'Actif</button>
+  </div>
+
+  <div class="ios-install-banner" id="iosInstallBanner">
+    <span>📲 Pour installer l'application : appuyez sur <strong>Partager</strong> (le carré avec une flèche), puis <strong>« Sur l'écran d'accueil »</strong>.</span>
+    <button type="button" onclick="dismissIosInstallBanner()" title="Fermer">✕</button>
   </div>
 
   <div class="alert-banner alert-green ticker-wrap" id="alert-exec">
@@ -3817,6 +3829,26 @@ if ('serviceWorker' in navigator) {
 // Renvoie les observations saisies hors connexion dès que le réseau revient.
 window.addEventListener('online', () => { syncPendingObservations().then(renderAllObservationBadges); });
 
+/* iOS/Safari ne propose jamais de bannière d'installation automatique
+   (contrairement à Android/Chrome) et n'offre aucune API pour la
+   déclencher depuis le JS — on affiche donc nous-mêmes une invite
+   expliquant le geste manuel (Partager > Sur l'écran d'accueil). */
+function dismissIosInstallBanner() {
+  const b = document.getElementById('iosInstallBanner');
+  if (b) b.classList.remove('visible');
+  try { localStorage.setItem('dgf_ios_install_dismissed', '1'); } catch (e) {}
+}
+function maybeShowIosInstallBanner() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = ('standalone' in navigator) && navigator.standalone;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem('dgf_ios_install_dismissed') === '1'; } catch (e) {}
+  if (isIOS && !isStandalone && !dismissed) {
+    const b = document.getElementById('iosInstallBanner');
+    if (b) b.classList.add('visible');
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    INITIALISATION
 ════════════════════════════════════════════════════════════════ */
@@ -3826,6 +3858,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFilters();
   initNavSortable();
   injectObservationButtons();
+  maybeShowIosInstallBanner();
   injectPrintMetaBlocks();
   loadObservations();
   loadBSData();

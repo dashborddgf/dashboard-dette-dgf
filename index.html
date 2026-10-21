@@ -405,6 +405,20 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
 .modal-actions button{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none}
 .modal-actions .btn-cancel{background:#F1F5F9;color:var(--gray)}
 .modal-actions .btn-save{background:var(--green);color:#fff}
+
+/* ── Boîte de confirmation générique (Import MAD/BS, etc.) ── */
+.confirm-card{background:#fff;border-radius:16px;width:min(360px,88vw);padding:28px 26px 22px;box-shadow:0 16px 40px rgba(0,0,0,.3);text-align:center;display:flex;flex-direction:column;align-items:center}
+.confirm-card-icon{width:60px;height:60px;border-radius:50%;border:3px solid var(--orange);display:flex;align-items:center;justify-content:center;margin-bottom:16px;flex-shrink:0}
+.confirm-card-icon svg{width:28px;height:28px;color:var(--orange)}
+.confirm-card-title{font-size:17px;font-weight:800;color:var(--green);margin-bottom:10px}
+.confirm-card-text{font-size:12.5px;color:var(--dark);line-height:1.6;margin-bottom:20px}
+.confirm-card-text div{margin-bottom:6px}
+.confirm-card-text div:last-child{margin-bottom:0}
+.confirm-card-actions{display:flex;gap:10px;width:100%}
+.confirm-card-actions button{flex:1;padding:9px 0;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.confirm-card-actions .btn-cancel{background:#F1F5F9;color:var(--gray)}
+.confirm-card-actions .btn-accept{background:var(--green);color:#fff}
+
 .card-body{padding:12px 14px}
 .cw{position:relative;height:190px}
 .cw-sm{height:155px}
@@ -1314,6 +1328,21 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   </div>
 </main>
 
+<!-- BOÎTE DE CONFIRMATION GÉNÉRIQUE (Import MAD/BS, etc.) -->
+<div class="modal-overlay" id="confirmModalOverlay">
+  <div class="confirm-card">
+    <div class="confirm-card-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v4m0 4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="confirm-card-title" id="confirmModalTitle">Confirmation</div>
+    <div class="confirm-card-text" id="confirmModalText"></div>
+    <div class="confirm-card-actions">
+      <button type="button" class="btn-cancel" id="confirmModalCancelBtn">Annuler</button>
+      <button type="button" class="btn-accept" id="confirmModalAcceptBtn">Accepter</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL OBSERVATION (partagée par tous les graphiques/tableaux) -->
 <div class="modal-overlay" id="obsModalOverlay" onclick="if(event.target===this) closeObservationModal()">
   <div class="modal-box">
@@ -2125,26 +2154,43 @@ function openSharePointFolder(url) {
 function openNSHFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshFolderUrl); }
 function openSDMTFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.sdmtFolderUrl); }
 
-function openMADFolder() {
-  const msg = "IMPORT MAD\n\n" +
-    "1. Le dossier SharePoint MAD va s'ouvrir dans un nouvel onglet.\n" +
-    "2. Avant de déposer le nouveau MAD, déplacez l'ancien fichier dans le dossier Historique.\n" +
-    "3. Déposez ensuite le nouveau fichier MAD en gardant la même structure de colonnes.\n\n" +
-    "Voulez-vous ouvrir le dossier MAD maintenant ?";
+/* Boîte de confirmation générique (remplace confirm() natif du navigateur) —
+   réutilisable pour tout "Voulez-vous continuer ?" du dashboard. */
+function showConfirmModal({ title, lines, acceptLabel, cancelLabel, onAccept }) {
+  const overlay = document.getElementById('confirmModalOverlay');
+  if (!overlay) { if (onAccept) onAccept(); return; }
+  document.getElementById('confirmModalTitle').textContent = title || 'Confirmation';
+  document.getElementById('confirmModalText').innerHTML = (lines || []).map(l => `<div>${l}</div>`).join('');
+  const acceptBtn = document.getElementById('confirmModalAcceptBtn');
+  const cancelBtn = document.getElementById('confirmModalCancelBtn');
+  acceptBtn.textContent = acceptLabel || 'Accepter';
+  cancelBtn.textContent = cancelLabel || 'Annuler';
+  overlay.classList.add('open');
+  function cleanup() { overlay.classList.remove('open'); acceptBtn.onclick = null; cancelBtn.onclick = null; }
+  acceptBtn.onclick = () => { cleanup(); if (onAccept) onAccept(); };
+  cancelBtn.onclick = cleanup;
+}
 
-  if (confirm(msg)) {
-    openSharePointFolder(SHAREPOINT_MAD_CONFIG.madFolderUrl);
-  }
+function openMADFolder() {
+  showConfirmModal({
+    title: 'Import MAD',
+    lines: [
+      "Le dossier SharePoint MAD va s'ouvrir dans un nouvel onglet.",
+      "Avant de déposer le nouveau MAD, déplacez l'ancien fichier dans le dossier Historique.",
+      "Déposez ensuite le nouveau fichier MAD en gardant la même structure de colonnes."
+    ],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.madFolderUrl)
+  });
 }
 
 function openBSFolder() {
-  const msg = "IMPORT BS\n\n" +
-    "Le dossier SharePoint BS va s'ouvrir dans un nouvel onglet.\n\n" +
-    "Voulez-vous ouvrir le dossier BS maintenant ?";
-
-  if (confirm(msg)) {
-    openSharePointFolder(SHAREPOINT_MAD_CONFIG.bsFolderUrl);
-  }
+  showConfirmModal({
+    title: 'Import BS',
+    lines: ["Le dossier SharePoint BS va s'ouvrir dans un nouvel onglet."],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.bsFolderUrl)
+  });
 }
 
 function openESGFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.esgFolderUrl); }

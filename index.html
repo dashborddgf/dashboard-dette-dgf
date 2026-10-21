@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DGF – Tableau de Bord Digital de Suivi Mensuel des Statistiques de la Dette et d'Historisation</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#037B3D">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dette DGF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -3747,6 +3753,16 @@ document.addEventListener('fullscreenchange', () => {
   btn.textContent = isFs ? '⤡' : '⤢';
   btn.title = isFs ? 'Réduire' : 'Plein écran';
 });
+
+/* ═══════════════════════════════════════════════════════════════
+   MODE HORS CONNEXION (PWA) — installable sur mobile, consultable
+   sans réseau une fois visité au moins une fois en ligne.
+════════════════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 
 /* ═══════════════════════════════════════════════════════════════
    INITIALISATION

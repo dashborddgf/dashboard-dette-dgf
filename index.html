@@ -3550,6 +3550,43 @@ let OBSERVATIONS = {};
 let _obsCurrentSlug = null;
 let _obsCurrentPage = '';
 
+/* File d'attente locale des observations pas encore envoyées au serveur
+   (typiquement saisies hors connexion) : conservée dans localStorage pour
+   survivre à un rechargement de page, et renvoyée automatiquement dès que
+   la connexion revient — jamais perdue silencieusement comme avant. */
+const OBSERVATIONS_PENDING_KEY = 'dgf_pending_observations';
+
+function getPendingObservations() {
+  try { return JSON.parse(localStorage.getItem(OBSERVATIONS_PENDING_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+function setPendingObservations(pending) {
+  try { localStorage.setItem(OBSERVATIONS_PENDING_KEY, JSON.stringify(pending)); } catch (e) {}
+}
+function applyPendingObservations() {
+  const pending = getPendingObservations();
+  Object.keys(pending).forEach(slug => { OBSERVATIONS[slug] = pending[slug]; });
+}
+async function syncPendingObservations() {
+  if (!OBSERVATIONS_ENDPOINT_URL) return;
+  const pending = getPendingObservations();
+  const slugs = Object.keys(pending);
+  if (!slugs.length) return;
+  for (const slug of slugs) {
+    try {
+      await fetch(OBSERVATIONS_ENDPOINT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, ...pending[slug] })
+      });
+      delete pending[slug];
+    } catch (e) {
+      // Toujours hors connexion (ou flux indisponible) — on réessaiera au prochain retour réseau.
+    }
+  }
+  setPendingObservations(pending);
+}
+
 function slugify(s) {
   return (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -3562,6 +3599,9 @@ async function loadObservations() {
   } catch (e) {
     console.info('ℹ Aucune observation disponible (observations.json absent ou invalide).');
   }
+  // Réapplique par-dessus les observations saisies hors connexion et pas
+  // encore synchronisées, pour qu'elles restent visibles entre-temps.
+  applyPendingObservations();
   renderAllObservationBadges();
 }
 
@@ -3606,10 +3646,18 @@ async function saveObservation() {
   const text = document.getElementById('obsModalText').value.trim();
   const author = document.getElementById('obsModalAuthor').value.trim();
   const date = new Date().toISOString();
+  const obs = { text, author, date, page };
 
-  OBSERVATIONS[slug] = { text, author, date, page };
+  OBSERVATIONS[slug] = obs;
   renderAllObservationBadges();
   closeObservationModal();
+
+  // Gardé en file d'attente locale tant que l'envoi distant n'a pas
+  // réussi (hors connexion notamment) : jamais perdu au rechargement de
+  // la page, renvoyé automatiquement dès que la connexion revient.
+  const pending = getPendingObservations();
+  pending[slug] = obs;
+  setPendingObservations(pending);
 
   if (!OBSERVATIONS_ENDPOINT_URL) {
     console.warn('⚠ OBSERVATIONS_ENDPOINT_URL non configuré — observation gardée localement seulement pour cette session.');
@@ -3619,10 +3667,13 @@ async function saveObservation() {
     await fetch(OBSERVATIONS_ENDPOINT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, text, author, date, page })
+      body: JSON.stringify({ slug, ...obs })
     });
+    const p = getPendingObservations();
+    delete p[slug];
+    setPendingObservations(p);
   } catch (e) {
-    console.warn("⚠ Échec de l'enregistrement distant de l'observation.", e);
+    console.warn("⚠ Échec de l'enregistrement distant de l'observation — sera retenté automatiquement dès que la connexion revient.", e);
   }
 }
 
@@ -3763,6 +3814,8 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
+// Renvoie les observations saisies hors connexion dès que le réseau revient.
+window.addEventListener('online', () => { syncPendingObservations().then(renderAllObservationBadges); });
 
 /* ═══════════════════════════════════════════════════════════════
    INITIALISATION

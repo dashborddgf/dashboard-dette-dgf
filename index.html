@@ -2151,8 +2151,6 @@ function openSharePointFolder(url) {
   if (!url) { alert('Lien SharePoint non configuré pour le moment.'); return; }
   window.open(url, '_blank', 'noopener,noreferrer');
 }
-function openNSHFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshFolderUrl); }
-function openSDMTFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.sdmtFolderUrl); }
 
 /* Boîte de confirmation générique (remplace confirm() natif du navigateur) —
    réutilisable pour tout "Voulez-vous continuer ?" du dashboard. */
@@ -2193,10 +2191,54 @@ function openBSFolder() {
   });
 }
 
-function openESGFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.esgFolderUrl); }
-function openFichesDetteFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.fichesDetteFolderUrl); }
-function openAVDFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.avdFolderUrl); }
-function openNotesFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.notesFolderUrl); }
+function openESGFolder() {
+  showConfirmModal({
+    title: 'Import ESG',
+    lines: ["Le dossier SharePoint ESG va s'ouvrir dans un nouvel onglet."],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.esgFolderUrl)
+  });
+}
+function openFichesDetteFolder() {
+  showConfirmModal({
+    title: 'Import Fiches de la Dette',
+    lines: ["Le dossier SharePoint Fiches de la Dette va s'ouvrir dans un nouvel onglet."],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.fichesDetteFolderUrl)
+  });
+}
+function openAVDFolder() {
+  showConfirmModal({
+    title: 'Import AVD',
+    lines: ["Le dossier SharePoint AVD va s'ouvrir dans un nouvel onglet."],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.avdFolderUrl)
+  });
+}
+function openNotesFolder() {
+  showConfirmModal({
+    title: 'Import Notes',
+    lines: ["Le dossier SharePoint Notes va s'ouvrir dans un nouvel onglet."],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.notesFolderUrl)
+  });
+}
+function openNSHFolder() {
+  showConfirmModal({
+    title: 'Import NSH',
+    lines: ["Le dossier SharePoint NSH va s'ouvrir dans un nouvel onglet."],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.nshFolderUrl)
+  });
+}
+function openSDMTFolder() {
+  showConfirmModal({
+    title: 'Import SDMT',
+    lines: ["Le dossier SharePoint SDMT va s'ouvrir dans un nouvel onglet."],
+    acceptLabel: 'Ouvrir le dossier',
+    onAccept: () => openSharePointFolder(SHAREPOINT_MAD_CONFIG.sdmtFolderUrl)
+  });
+}
 function openHistoriqueFolder() { openSharePointFolder(SHAREPOINT_MAD_CONFIG.historyFolderUrl); }
 
 /* Télécharge l'onglet actuellement affiché en PDF via l'impression native du navigateur

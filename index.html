@@ -1193,7 +1193,12 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
     </div>
 
     <div class="card" style="margin-bottom:12px;overflow:visible">
-      <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Date début / Date fin : choisis les 2 périodes à comparer ; ✕ sur un mois ci-dessous pour le retirer</div></div></div>
+      <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Date début / Date fin : choisis les 2 périodes à comparer ; ✕ sur un mois ci-dessous pour le retirer</div></div>
+        <div style="display:flex;gap:6px">
+          <button type="button" class="chart-dl-btn" onclick="printAllEvolCards()">PDF</button>
+          <button type="button" class="chart-dl-btn" onclick="exportAllEvolCSV()">Excel</button>
+        </div>
+      </div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:10px;overflow:visible">
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
           <span style="font-size:10px;font-weight:700;color:var(--gray)">Date début</span>
@@ -2357,6 +2362,58 @@ function printOneCard(cardId) {
     Object.values(charts).forEach(c => { if (c && typeof c.draw === 'function') c.draw(); });
     downloadPDF();
   }));
+}
+
+/* ─── Téléchargement groupé des 3 cartes Evolution MAD (Stock, Service,
+   Tirages) depuis la carte Filtres — contrairement à printOneCard, aucune
+   carte n'est masquée : l'impression/l'export porte sur les 3 à la fois. */
+function printAllEvolCards() {
+  const content = document.getElementById('compareContent');
+  if (!content || content.style.display === 'none') {
+    alert("Aucune donnée à imprimer pour l'instant — sélectionnez au moins 2 périodes.");
+    return;
+  }
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    Object.values(charts).forEach(c => { if (c && typeof c.draw === 'function') c.draw(); });
+    downloadPDF();
+  }));
+}
+
+function exportAllEvolCSV() {
+  const content = document.getElementById('compareContent');
+  if (!content || content.style.display === 'none') {
+    alert("Aucune donnée à exporter pour l'instant — sélectionnez au moins 2 périodes.");
+    return;
+  }
+  const sections = [
+    { id: 'tableChartCompareEncours', label: 'Stock de la Dette' },
+    { id: 'tableChartCompareService', label: 'Service de la Dette' },
+    { id: 'tableChartCompareTirages', label: 'Tirages et Mobilisations d\'Emprunts' }
+  ];
+  const blocks = [];
+  sections.forEach(s => {
+    const table = document.getElementById(s.id);
+    if (!table || !table.rows.length) return;
+    const rows = Array.from(table.rows).map(tr =>
+      Array.from(tr.cells).map(td => csvEscape(td.textContent.trim())).join(';')
+    );
+    blocks.push(csvEscape(s.label));
+    blocks.push(rows.join('\r\n'));
+  });
+  if (!blocks.length) {
+    alert("Aucune donnée à exporter pour l'instant — sélectionnez au moins 2 périodes.");
+    return;
+  }
+  const csv = '﻿' + blocks.join('\r\n\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'evolution_mad_complet.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 /* Exporte en CSV (ouvrable dans Excel) le contenu d'un <table> déjà

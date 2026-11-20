@@ -680,6 +680,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
   .sidebar, .topbar, .footer, .mobile-nav, .loading-overlay, #histBanner, .hist-banner, .ticker-wrap,
   #filterBar-mad, #filterBar-bs, .filter-summary, .obs-btn, .modal-overlay, .chart-dl-btn,
   #metricFilterStock, #metricFilterService, #metricFilterTirages, .card-header,
+  #evolFiltersCardMAD,
   .fullscreen-toggle-btn, .ios-install-banner { display: none !important; }
   /* Légende par fiche : titre + période + filtres actifs, insérée sous
      l'en-tête de chaque carte (voir populatePrintMetaBlocks ci-dessous)
@@ -1192,7 +1193,7 @@ body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#EEF0F4
       <div id="filterTags-mad" style="display:flex;gap:5px;flex-wrap:wrap"></div>
     </div>
 
-    <div class="card" style="margin-bottom:12px;overflow:visible">
+    <div class="card" id="evolFiltersCardMAD" style="margin-bottom:12px;overflow:visible">
       <div class="card-header"><div><div class="card-title">Filtres — Evolution MAD</div><div class="card-sub">Date début / Date fin : choisis les 2 périodes à comparer ; ✕ sur un mois ci-dessous pour le retirer</div></div>
         <div style="display:flex;gap:6px">
           <button type="button" class="chart-dl-btn" onclick="printAllEvolCards()">PDF</button>
